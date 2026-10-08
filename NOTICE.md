@@ -7,7 +7,7 @@
 本 MOD 同样与上述各方**没有任何关联**，未获其授权或认可。
 
 - 上游项目：<https://github.com/sganggs/Stronghold-Protocol>
-- 本 MOD：<https://github.com/muchiyun/-mod>
+- 本 MOD：<https://github.com/Stronghold-Protocol-Mod/Rhodes-Mod>
 
 ---
 

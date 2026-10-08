@@ -1,0 +1,185 @@
+--- a/server/sim/content/tokens.js
++++ b/server/sim/content/tokens.js
+@@ -338,7 +338,9 @@
+     if (how !== 'skill') continue;
+     u.mem.docked = true;
+     u.mem.readyAt = -Infinity;
+-    if (!SKILL_SUMMON_START_DEPLOY) u.deferDeploy = true;
++    // a piece opts out of the battle-start free deploy by setting `mem.noStartDeploy` in its own kit install
++    // (罗德岛 MOD 战术锚点: a start deploy would move 凯尔希·思衡托 at t≈0, before her S3 cast).
++    if (!SKILL_SUMMON_START_DEPLOY || u.mem.noStartDeploy) u.deferDeploy = true;
+     battle.on('death', (ctx) => {
+       if (ctx.unit !== u || battle.finished) return;
+       u.removed = false;
+@@ -1558,6 +1560,151 @@
+ }
+ 
+ // ---------------------------------------------------------------------------------------------------------------
++// 罗德岛 MOD summons (tools/local-extract/build-rhodes-mod.mjs; docs/MOD-RHODES.md)
++//
++// The 卫戍协议 season never shipped 凯尔希·思衡托 / Mon3tr / 可露希尔, so their summons had no records and the mod
++// cleared every token link. applyMod now projects the three official token records into data/tokens.json; the kits
++// below are what the generic token never had. They are ALWAYS registered but inert while the mod is off: no unit ever
++// carries these defIds until the mod's data is applied (`npm run mod:rhodes`).
++//
++//   重构体       Mon3tr talent 自我修复 — a body only its owner may heal; bleeds the trait's damage_per_second (80)
++//                a second, hands every ally standing around it +atk (the owner talent's bb.atk, 15 %) and, when its
++//                owner heals it, adds one FULL-STRENGTH chain jump (that jump is the owner kit's job — it reads
++//                `mem.rebuildHit` here). Placed by hand on a ground tile of Mon3tr's range (tokens.json `ownerRange`).
++//   指挥中心     可露希尔 talent 精准投放 — blocks 2 (data), comes back 15 s after being defeated ("被击败后会在15秒后
++//                自动刷新"; its own data respawnTime is 10, the talent text is the 15 that counts) and marks every
++//                operator standing in its effect range as her 援军 (owner kit `trait.ourbaseAllies`) — that is what
++//                her trait's ×1.5 attacks need. A tactician's talent token: TACTICIAN_TOKENS turns it into the 援军
++//                the engine would otherwise fill with the generic token_tactician_reinforce.
++//   战术锚点     凯尔希·思衡托 S3 — an untargetable marker on a RANGED tile OUTSIDE her range. The moment it lands its
++//                owner teleports onto it and the marker is consumed ("部署战术锚点后，自身移动至该位置"). [ASSUMED] the
++//                marker is used up by the move: `Battle.relocate` refuses a tile occupied by another living unit, so
++//                keeping it standing would leave her nowhere to land. The marker opts OUT of the battle-start free
++//                deploy (its `install` sets `mem.noStartDeploy`, honoured by dockSkillSummons): a start deploy would
++//                move her at t≈0, before the cast.
++const MOD_TOKEN_IDS = Object.freeze({
++  rebuildBody: 'token_10050_monstr_prosts',
++  commandCenter: 'token_10066_closur_ourbase',
++  tacticalAnchor: 'token_10068_kalts2_mtship',
++});
++
++/** The owner's talent that hands out `tokenId` — its blackboard carries that summon's own numbers. */
++function ownerTalentOf(unit, tokenId) {
++  const o = ownerOf(unit);
++  for (const t of o?.def?.talents ?? []) if (t && t.tokenKey === tokenId) return t;
++  return null;
++}
++
++/** 重构体 (Mon3tr 自我修复). */
++function rebuildBody(bb, raw, def) {
++  const drain = num(def?.traitBb?.damage_per_second, 80);
++  return {
++    skill: null,
++    trait: { noAttack: true },
++    install(battle, unit) {
++      // "仅可被自身治疗": every heal that is not its owner's lands as 0 (damage.js heal() honours ctx.amount). Run at
++      // the highest priority so a later handler (罗德岛's overheal scaling) sees the cancelled amount.
++      battle.on('heal', (ctx) => {
++        if (ctx.target !== unit || ctx.source === unit.ownerUnit) return;
++        ctx.amount = 0;
++      }, { owner: unit, priority: 100 });
++
++      // "自身生命会不断流失" (trait damage_per_second) — non-lethal, exactly like 教官's hp drain (professions.js).
++      if (drain > 0) {
++        battle.every(1, () => {
++          if (!unit.alive || !unit.deployed) return;
++          if (unit.hp - drain < 1) unit.hp = Math.min(unit.hp, 1);
++          else battle.loseHp(unit, drain, { source: unit, silent: true });
++        }, { owner: unit });
++      }
++
++      // "重构体周围友方单位的攻击力+15%" — the number is the OWNER talent's (`自我修复` bb.atk: 15 % at every level,
++      // checked against data/chess.json), re-applied while the body stands, so a body that dies (or its owner leaving)
++      // drops the aura with it.
++      battle.every(0.25, () => {
++        if (!unit.alive || !unit.deployed || !unit.canAct) return;
++        const pct = num(ownerTalentOf(unit, MOD_TOKEN_IDS.rebuildBody)?.bb?.atk, 0);
++        if (!(pct > 0)) return;
++        for (const a of battle.alliesInGrid(unit)) {
++          if (a === unit) continue;
++          battle.addBuff(a, { key: `rebuild:${unit.id}`, duration: 0.5, refresh: 'replace', mods: { atkPct: pct }, source: unit });
++        }
++      }, { owner: unit });
++    },
++  };
++}
++
++/** 指挥中心 (可露希尔 精准投放). */
++function commandCenter(bb, raw, def) {
++  // the TALENT text is the authority: "被击败后会在15秒后自动刷新" (the token's own data respawnTime is 10 — the
++  // character-table value pre-dates the talent, exactly like 凯尔希's Mon3tr redeploy times).
++  const respawn = 15;
++  // 广域覆盖 (the elite's module talent): "效果范围随可露希尔携带技能变化" — the record's own `rangeGrid` is just the
++  // tile it stands on, while the 支援范围 its character-table skill slot names (data/tokens.json
++  // `variants[owner].skill.rangeGrid` — plus / 3×3 / 长十字, one per 可露希尔 skill) IS the effect range. The def already
++  // merges the owner's selected skill (simdata getToken), so `def.skill.rangeGrid` is that grid.
++  const effectGrid = def?.skill?.rangeGrid;
++  return {
++    skill: null,
++    trait: { noAttack: true },
++    install(battle, unit) {
++      // the effect range the 援军 marking (below) and 可露希尔 S3's range lock read — without it the aura would only
++      // ever see the token's own tile, and no ally could be marked a 援军.
++      if (Array.isArray(effectGrid) && effectGrid.length) {
++        unit.rangeGrid = effectGrid.map((p) => [p[0], p[1]]);
++        if (unit.alive && unit.deployed) battle.refreshRange(unit);
++      }
++      enableRespawn(battle, unit, { delay: respawn, requireOwner: true });
++
++      // "效果范围内的友方单位视为自身的援军": her trait (×1.5 vs enemies her 援军 blocks) reads `trait.ourbaseAllies`
++      // in the closur kit. Recomputed on a timer so an ally walking in / dying takes effect within a quarter second.
++      const clear = () => { const o = ownerOf(unit); if (o) o.trait.ourbaseAllies = null; };
++      const mark = () => {
++        const o = ownerOf(unit);
++        if (!o) return;
++        if (!unit.alive || !unit.deployed) { o.trait.ourbaseAllies = null; return; }
++        const set = new Set();
++        // the tactician herself is not her own 援军 ("自身攻击援军阻挡的敌人"): the marking is for OTHER allies in range
++        for (const a of battle.alliesInGrid(unit)) if (a !== unit && a !== o) set.add(a.uid);
++        o.trait.ourbaseAllies = set;
++      };
++      // a deploy refreshes the range first (the tile keys move with the token), then the marking
++      battle.on('deploy', (ctx) => { if (ctx.unit === unit) { battle.refreshRange(unit); mark(); } }, { owner: unit });
++      mark();
++      battle.every(0.25, mark, { owner: unit });
++      battle.on('death', (ctx) => { if (ctx.unit === unit || ctx.unit === unit.ownerUnit) clear(); }, { owner: unit });
++    },
++  };
++}
++
++/** 战术锚点 (凯尔希·思衡托 S3). */
++function tacticalAnchor(bb, raw, def) {
++  /** Consume the marker for good: it never waits on its tile and never comes back (see dockSkillSummons). */
++  const consume = (battle, unit) => { unit.mem.consumed = true; battle.retreat(unit, { reason: 'expired', permanent: true }); };
++  return {
++    skill: null,
++    trait: { noAttack: true },
++    install(battle, unit) {
++      // the marker must NOT take the battle-start free deploy (a start deploy would move 凯尔希·思衡托 at t≈0, before
++      // her S3 cast): opt out of SKILL_SUMMON_START_DEPLOY for this piece only (dockSkillSummons honours the flag).
++      unit.mem.noStartDeploy = true;
++      untargetable(battle, unit); // "不会受到攻击"
++      onDeploy(battle, unit, () => {
++        const o = ownerOf(unit);
++        if (!o || !o.alive || !o.deployed) return;
++        const r = unit.tileR, c = unit.tileC;
++        if (r == null || c == null || (o.tileR === r && o.tileC === c)) return;
++        // the marker is consumed by the move (see the header): free the tile first, then bring her over
++        consume(battle, unit);
++        if (battle.moveRedeploy(o, r, c, { clearSp: false })) battle.fx('anchor', { x: c, y: r, id: o.id, fromX: unit.x, fromY: unit.y });
++      });
++      // the owner off the field takes the marker with it (a summon never outlives its owner)
++      battle.on('death', (ctx) => { if (ctx.unit === unit.ownerUnit && unit.alive) consume(battle, unit); }, { owner: unit });
++    },
++  };
++}
++
++// ---------------------------------------------------------------------------------------------------------------
+ // registry
+ 
+ const RAW_KITS = {
+@@ -1583,6 +1730,10 @@
+   [TOKEN_IDS.yanyou]: yanyouKit,
+   [TOKEN_IDS.reserveMedic]: reserveMedicKit,
+   [TOKEN_IDS.touch]: touchKit,
++  // 罗德岛 MOD summons (inert while the mod's data is stripped — see the MOD_TOKEN_IDS block above)
++  [MOD_TOKEN_IDS.rebuildBody]: rebuildBody,
++  [MOD_TOKEN_IDS.commandCenter]: commandCenter,
++  [MOD_TOKEN_IDS.tacticalAnchor]: tacticalAnchor,
+ };
+ /** tokenId → kit fn; kits built here carry `fromTokens: true` (deploy limits only police those). */
+ export const kits = Object.freeze(Object.fromEntries(Object.entries(RAW_KITS).map(([id, f]) => [id, (bb, raw, def) => {
+@@ -1625,7 +1776,7 @@
+  */
+ const SKILL_SUMMON_UNCAPPED = new Set([TOKEN_IDS.goldenOath]);
+ /** Tactician talent tokens that replace the engine's generic 援军. */
+-const TACTICIAN_TOKENS = new Set([TOKEN_IDS.wolfPack, TOKEN_IDS.manifold]);
++const TACTICIAN_TOKENS = new Set([TOKEN_IDS.wolfPack, TOKEN_IDS.manifold, MOD_TOKEN_IDS.commandCenter]);
+ 
+ const tokenIdsOf = (u) => (u.def?.tokens || []).map((t) => (typeof t === 'string' ? t : t?.tokenId)).filter(Boolean);
+ /**

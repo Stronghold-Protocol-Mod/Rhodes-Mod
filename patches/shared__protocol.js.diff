@@ -1,0 +1,13 @@
+--- a/shared/protocol.js
++++ b/shared/protocol.js
+@@ -397,6 +397,10 @@
+ export const S2C = [
+   'welcome', 'ok', 'error', 'pong',
+   'room.state', 'room.closed',
++  // mod.state { matches, canToggle, reason, toggles: [{ id, name, englishName, description, on }] } — pushed to EVERY
++  // connected session when a data mod was switched with the in-page 内容开关 (server/mod/api.js → Lobby.modChanged);
++  // the same body as GET /mod/state, which is what the badge reads before it ever has a session
++  'mod.state',
+   'm.public', 'm.private', 'm.field', 'm.toast', 'm.ticker', 'm.emote', 'm.result',
+   // m.unitStats { seq, round, units: [unitStatsEntry] } — the answer to g.unitStats (the requester only)
+   'm.unitStats',

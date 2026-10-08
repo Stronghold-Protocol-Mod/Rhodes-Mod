@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "toggles": [
+    {
+      "id": "rhodes",
+      "name": "罗德岛 MOD",
+      "englishName": "Rhodes Island MOD",
+      "description": "7 名罗德岛干员与 rhodesShip 盟约（docs/MOD-RHODES.md）",
+      "files": ["chess", "bonds", "effects", "garrisons", "tokens", "items"],
+      "marker": { "file": "bonds", "key": "rhodesShip" }
+    }
+  ]
+}

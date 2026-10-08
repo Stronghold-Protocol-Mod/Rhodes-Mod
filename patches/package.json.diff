@@ -1,0 +1,12 @@
+--- a/package.json
++++ b/package.json
+@@ -30,6 +30,9 @@
+     "golden:update": "node tools/golden.mjs --update",
+     "vendor": "node tools/vendor.mjs",
+     "build-data": "node tools/build-data.mjs",
++    "mod:rhodes": "node tools/mod-toggle.mjs on",
++    "mod:rhodes:strip": "node tools/mod-toggle.mjs off",
++    "mod:rhodes:status": "node tools/mod-toggle.mjs status",
+     "assets": "node tools/vendor.mjs && node tools/fetch-assets.mjs",
+     "postinstall": "node tools/vendor.mjs",
+     "setup": "node tools/setup.mjs",

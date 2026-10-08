@@ -1,0 +1,21 @@
+--- a/public/i18n/en.json
++++ b/public/i18n/en.json
+@@ -1055,5 +1055,17 @@
+   "选择「{name}」的朝向": "Choose {name}'s facing",
+   "选择朝向": "Choose a facing",
+   "朝向：{dir}": "Facing: {dir}",
+-  "开发版 · 不稳定，请勿用于公开服务器": "Development build · unstable, not for public servers"
++  "开发版 · 不稳定，请勿用于公开服务器": "Development build · unstable, not for public servers",
++  "有对局正在进行，无法切换 MOD": "A match is running — the MOD cannot be switched",
++  "只有运行服务器的本机可以切换 MOD": "Only the machine running the server can switch the MOD",
++  "切换失败": "Switch failed",
++  "已切换：{name} {state}，正在重新载入数据…": "Switched: {name} {state} — reloading the data…",
++  "已关闭": "Off",
++  "已开启": "On",
++  "有对局正在进行（{n} 场），本局结束后可切换": "A match is running ({n}) — switchable once it ends",
++  "只有运行服务器的本机可以切换": "Only the machine running the server can switch this",
++  "点击切换": "Click to switch",
++  "MOD 开关": "MOD switches",
++  "重新载入游戏数据": "Reload the game data",
++  "数据已变更": "Data changed"
+ }

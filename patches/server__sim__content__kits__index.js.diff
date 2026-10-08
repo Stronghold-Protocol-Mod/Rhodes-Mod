@@ -1,0 +1,61 @@
+--- a/server/sim/content/kits/index.js
++++ b/server/sim/content/kits/index.js
+@@ -22,6 +22,15 @@
+ // stand-in kit, a 4★ reserve the generic kit (GENERIC_KIT_CHARS). OPERATOR_KITS is merged after the stand-ins.
+ // KITTED_CHARS = every character a 自选 pick may field with a faithful kit; an operator outside it is not offered
+ // (shared/diy.js diyPool / validateDiyPicks `kitted`).
++//
++// 罗德岛 MOD kits (the local add-on, docs/MOD-RHODES.md): MOD_KIT_FILES lists `ops/mod-rhodes-<codename>.js`, one per
++// 罗德岛 operator of the custom faction, each registering its `chess_rhodes_<codename>_a` id (the elite `_b` record
++// shares it — data/chess.json gives `_b` `baseId` = `_a`). These files are ALWAYS loaded, but they are inert unless the
++// mod's data is applied: `kitOf` only matches a `chess_rhodes_*` key that a fielded unit actually carries, and no unit
++// carries one until `tools/local-extract/build-rhodes-mod.mjs` writes the mod's chess records (the `npm run mod:rhodes`
++// toggle). With the data stripped (`npm run mod:rhodes:strip`) no unit resolves to these keys, so the mod's code is
++// dead weight of a few KB and the official game is byte-for-byte unaffected. MOD_KITS is merged last, after the 自选
++// operators; a `chess_rhodes_*` key never meets a `chess_char_*` / `char_*` one.
+ 
+ export const KIT_FILES = Object.freeze([
+   // tier 1
+@@ -153,6 +162,17 @@
+ ]);
+ 
+ /**
++ * The 罗德岛 MOD's own kits (local add-on): `ops/mod-rhodes-<codename>.js`, one per 罗德岛 operator the mod fields
++ * (`chess_rhodes_<codename>_a`). Unlike the 自选 group these are keyed by a CHESS id, not a charId: a mod operator is a
++ * whole chess record of its own (data/chess.json), not a DIY pick of an existing one. Loaded like every other kit file
++ * and merged into KITS last; inert while the mod's data is stripped (see the MOD note above).
++ */
++export const MOD_KIT_FILES = Object.freeze([
++  'mod-rhodes-amiya3.js', 'mod-rhodes-ascln.js', 'mod-rhodes-closur.js',
++  'mod-rhodes-kalts2.js', 'mod-rhodes-logos.js', 'mod-rhodes-monstr.js',
++]);
++
++/**
+  * The 预备干员 whose every skill the generic kit covers exactly (冲锋号令, 攻击力 / 防御力 / 治疗强化, 战术咏唱, 一击即退 —
+  * test/content/standin.test.js): fielded with no kit file, as 补位 stand-ins and as tier-5 自选 picks.
+  */
+@@ -171,6 +191,7 @@
+ const MODULES = await Promise.all(KIT_FILES.map((group) => Promise.all(group.map(loadKitFile))));
+ const STANDIN_MODULES = await Promise.all(STANDIN_KIT_FILES.map(loadKitFile));
+ const OPERATOR_MODULES = await Promise.all(OPERATOR_KIT_FILES.map(loadKitFile));
++const MOD_MODULES = await Promise.all(MOD_KIT_FILES.map(loadKitFile));
+ const registryOf = (m) => (m && m.default && typeof m.default === 'object' ? m.default : {});
+ 
+ /** The registry of each tier group (index 0 = tier 1): baseChessId → kit builder, in KIT_FILES order. */
+@@ -182,11 +203,14 @@
+ /** The 自选 operator kits: owned-6★ charId → kit builder, in OPERATOR_KIT_FILES order. */
+ export const OPERATOR_KITS = Object.freeze(Object.assign({}, ...OPERATOR_MODULES.map(registryOf)));
+ 
++/** The 罗德岛 MOD kits: `chess_rhodes_*` baseChessId → kit builder, in MOD_KIT_FILES order (inert while the mod is off). */
++export const MOD_KITS = Object.freeze(Object.assign({}, ...MOD_MODULES.map(registryOf)));
++
+ /**
+  * The merged kit registry: baseChessId → (bb, chess, def) => Kit, tier 1 … tier 6, then the stand-ins' charIds, then
+- * the 自选 operators' charIds.
++ * the 自选 operators' charIds, then the 罗德岛 MOD's chess ids.
+  */
+-export const KITS = Object.freeze(Object.assign({}, ...TIER_KITS, STANDIN_KITS, OPERATOR_KITS));
++export const KITS = Object.freeze(Object.assign({}, ...TIER_KITS, STANDIN_KITS, OPERATOR_KITS, MOD_KITS));
+ 
+ /**
+  * Every character a 自选 pick may field with a faithful kit: the 预备干员 (GENERIC_KIT_CHARS), the stand-ins with a kit

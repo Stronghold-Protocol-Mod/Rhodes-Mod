@@ -1,0 +1,22 @@
+--- a/server/match/player/diy.js
++++ b/server/match/player/diy.js
+@@ -139,11 +139,17 @@
+    *   widen it to slot an operator whose kit is still being written)
+    * @returns {boolean} false when the picks are malformed (nothing changes) or the player is a bot
+    */
+-  setDiy(picks, { kitted = KITTED_CHARS } = {}) {
++  setDiy(picks, { kitted = null } = {}) {
+     if (this.isBot) return false;
+     const gd = this.m.gd;
+     const data = gd.raw;
+-    const res = checkDiyPicks(picks, { data, kitted });
++    // The 罗德岛 MOD's hiding of the author's 自选 version of its five shared operators (kits/mod.js `effectiveKitted`) is
++    // applied where a pick is ACCEPTED FROM A CLIENT — the lobby's `room.diy` handler and `welcome.diyKitted` — because
++    // that is what "not offered" means. The match itself validates against the full registry: its seats were already
++    // filtered by the lobby, while a seat built directly (the author's own tests force a 自选 pick of a hidden operator
++    // to exercise its kit) must keep working with the mod on.
++    const eff = kitted ?? KITTED_CHARS;
++    const res = checkDiyPicks(picks, { data, kitted: eff });
+     if (!res || !('ok' in res)) {
+       this.m.log?.warn?.(`[match ${this.m.roomCode}] 自选 picks of ${this.playerId} ignored: ${res && res.detail}`);
+       return false;

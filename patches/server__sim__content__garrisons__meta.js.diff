@@ -1,0 +1,45 @@
+--- a/server/sim/content/garrisons/meta.js
++++ b/server/sim/content/garrisons/meta.js
+@@ -27,6 +27,10 @@
+ //     selling one this round is a new copy (fires on its own first refresh).
+ //     "本回合每刷新过1次" (SERVER_ADD_REFRESH_CNT_MULTIPLIER_BOND_LAYER, 阿罗玛 / 安洁莉娜 / 售出时)
+ //     fires on another event and reads the player's refreshes of the round (roundStats), like 本回合每获得过 / 每花费.
++//   * MOD (罗德岛) `modautochess_gar_prep_gain_chess_by_bond` — 可露希尔's custom 进入休整期时 trait: it hands over
++//     `bb.count` 【罗德岛】 operators of tier ≤ the current 调度中心等级, once per board copy per round (see its handler
++//     below). Its bond id doubles as the "已激活" gate. It was a SERVER_SPEND coin meter until the 2026-10-06 ruling
++//     (a spend-driven meter spun without bound — "电表倒转").
+ 
+ import { metaBonds, frontPiece, behindPiece, distinctTiers } from '../support/meta.js';
+ 
+@@ -186,6 +190,31 @@
+   },
+ };
+ 
++// ---------------------------------------------------------------------------------------------------------------------
++// MOD (罗德岛) — 可露希尔: "进入休整期时，若已激活【罗德岛】盟约，获得count名不高于当前调度中心等级的【罗德岛】干员"
++//
++// Fires once per board copy on the official SERVER_PREP_START hook (→ onRoundStart), so the ceiling is the number of
++// 可露希尔 standing on the board, not the player's purse. It used to be a SERVER_SPEND coin meter — every `bb.cost` (8)
++// funds spent granted `bb.count` (user design 2026-10-05) — which turned into an unbounded money pump: enough copies and
++// a single 休整期 spun the meter round and round (user playtest 2026-10-06, "电表倒转"). `bbStr.bond` doubles as the
++// "已激活" gate, `bbStr.tier === 'shoplv'` reads the CURRENT 调度中心等级 (upgraded by the player, never by the round),
++// and the operator is rolled off the SHARED pool (`ctx.rollChess({bond, maxTier})`) — so a tier the pool has nothing left
++// in simply yields fewer operators: the ceiling is a filter, never a guarantee. `conditionkey: character_target_inboard`
++// keeps it a board trait (the dispatcher skips hand copies).
++H.modautochess_gar_prep_gain_chess_by_bond = {
++  run(ctx) {
++    const { bb, bbStr } = ctx.source;
++    const bond = ids(bbStr.bond)[0];
++    if (!bond || !ctx.bondActive(bond)) return;
++    const n = Math.min(10, Math.max(0, num(bb.count, 1)));
++    const maxTier = bbStr.tier === 'shoplv' ? ctx.shopLevel() : Math.max(1, Math.min(6, num(bb.max_tier, 6)));
++    for (let i = 0; i < n; i++) {
++      const id = ctx.rollChess({ bond, maxTier });
++      if (id) ctx.grantChess(id);
++    }
++  },
++};
++
+ H.SERVER_ADD_REFRESH_CNT_MULTIPLIER_BOND_LAYER = {
+   run(ctx) {
+     const { bb, bbStr, garrison } = ctx.source;

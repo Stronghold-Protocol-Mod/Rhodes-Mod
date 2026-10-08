@@ -1,0 +1,63 @@
+--- a/server/sim/content/items/battle.js
++++ b/server/sim/content/items/battle.js
+@@ -834,6 +834,60 @@
+     });
+     S.on('death', (c) => { if (c.unit === u) { st.bonus = 0; st.armed = false; } });
+   },
++  // ════════════════════════════════════════════════════════════════════════════════════════════════════════════
++  // MOD (罗德岛) — the two 罗德岛 items. Inert when the mod's data is stripped: `applyMod` is what puts
++  // `chess_item_3_13_e_a` / `chess_item_6_12_e_a` into items.json, so with the mod OFF nothing ever resolves
++  // these keys (registry lookups go through itemKeyOf → these bare keys, which no stock item maps to).
++  // Kept verbatim from the mod's own items/battle.js; they only use APIs the author's file already imports.
++  // ════════════════════════════════════════════════════════════════════════════════════════════════════════════
++  // 罗德岛急救包 (罗德岛): the bond's LOW-TIER piece (`giveBondId: rhodesShip` — worn together with 变形同构体 it is
++  // what hands the bond to any operator, and it is the 罗德岛徽章's combo partner). max_hp comes from the generic stat
++  // buff; the code adds the bond's own 3-tier rule to its carrier: every heal / HP-regen the carrier RECEIVES is
++  // ×(1 + heal_taken). Bonds install before items (content/index.js DOMAIN_NAMES), so 罗德岛's own heal hook — which
++  // boosts a member's received heals by (0.30 + 0.008·L) — has already run when this one multiplies the same ctx.
++  chess_item_3_13_e(battle, u, rec, S) {
++    const p = bp(rec, 'act1autochess_equip_acarm130_global_buff');
++    if (!p) return;
++    const boost = num(p.heal_taken);
++    if (!(boost > 0)) return;
++    S.on('heal', (c) => {
++      if (c.target !== u || !(c.amount > 0)) return;
++      c.amount *= 1 + boost;
++    });
++  },
++  // 罗德岛徽章 (罗德岛): 生命值 comes from the generic stat buff; the code turns the carrier's HEALING into offense.
++  // The gate is `memberOf` — 「若携带者为【罗德岛】盟约干员」, i.e. MEMBERSHIP, never the bond's tier — so the item is
++  // worth taking at 3 distinct (or off 变形同构体 alone) exactly as much as at 6. Every heal the carrier produces
++  // deals heal_damage_scale of that heal's amount as ARTS damage to a RANDOM enemy of the carrier's attack range.
++  // The amount is the NOMINAL one: damage.js heal() emits `heal` BEFORE the max-HP clamp, so a heal that lands on a
++  // full-HP ally — the vector 罗德岛's 6-tier rule is what opens — converts at full value.
++  // With 罗德岛急救包 the carrier's attack range also keeps 脆弱 (fragile) on its enemies: an aura refreshed every
++  // 0.5 s with a 0.6 s duration (同名取最高, the standard 脆弱 status — 画地为牢's shape in kits/tier5.js).
++  chess_item_6_12_e(battle, u, rec, S) {
++    const p = bp(rec, 'act1autochess_equip_acarm131_global_buff');
++    if (!p) return;
++    const scale = num(p.heal_damage_scale);
++    if (!(scale > 0)) return;
++    const partner = partnerOf(p);
++    const frag = num(p.fragile);
++    const foesInRange = () => battle.enemiesInKeys(u.rangeKeys, u, { canHitFly: true }).filter((e) => e.alive);
++    S.on('heal', (c) => {
++      if (c.source !== u || !(c.amount > 0) || !memberOf(battle, u, 'rhodesShip')) return;
++      const foes = foesInRange();
++      if (!foes.length) return;
++      const t = battle.rng.pick(foes);
++      battle.dealDamage(u, t, { amount: c.amount * scale, type: 'arts', canDodge: false, tags: procTags('rhodesBadge') });
++      fxOn(battle, 'strike', t, 'item:chess_item_6_12_e', rec.id);
++    });
++    if (frag > 0 && partner) {
++      S.every(0.5, () => {
++        if (!onField(u) || !memberOf(battle, u, 'rhodesShip') || !carries(battle, u, partner)) return;
++        for (const e of battle.enemiesInKeys(u.rangeKeys, u, { canHitFly: true })) {
++          if (e.alive) battle.applyStatus(e, 'fragile', { duration: 0.6, value: frag, source: u });
++        }
++      }, { immediate: true });
++    }
++  },
+ };
+ 
+ /** 浓缩嗅盐 "免疫晕眩、冻结等特殊状态" — research 04 §4 list (stun/freeze/sleep/levitate/palsy). 寒冷 is a debuff, not a

@@ -1,0 +1,373 @@
+{
+  "name": "rhodes-mod",
+  "version": "1.0.0",
+  "base": {
+    "name": "stronghold-protocol-alliance",
+    "version": "0.2.1"
+  },
+  "files": {
+    "docs/MOD-RHODES.md": "a8f4d7dbbda7b3a24caffe4aa11d34e91b8ab0b16616062fcb0f9f83e79ca40f",
+    "mod/toggles.json": "7802ece631b1af07559ec6f8a7b2f2d504b23cfd0c7b68230a45482032cdec0e",
+    "mod/variants/rhodes/on/bonds.json": "2609c842ef45a906eabc29553bc780ce1a6e1fbceeb09fe74bba6890e95ec53b",
+    "mod/variants/rhodes/off/bonds.json": "53a22f4724771b6ff40041635e907c0af39790731f661b0439fc593f5a91c94c",
+    "mod/variants/rhodes/on/chess.json": "13e7c3c045a8523f8dbc5f6bb9c531494d1d02a2e385bb2e6cda1ee07b644c80",
+    "mod/variants/rhodes/off/chess.json": "34338e7cd766981ce43d3e4049d9a60b3d2aea017e00f5cfea8682bcfe54461b",
+    "mod/variants/rhodes/on/effects.json": "98cad4458ef10023fe8a721f5a355b800efeef56e7a0ce5a424a93c77473a713",
+    "mod/variants/rhodes/off/effects.json": "96e28be614f04da6d58c9e95706d742863c756b94dcad498e808c3410ba620e3",
+    "mod/variants/rhodes/on/garrisons.json": "df565cc59c9a712a0eea580d6c23a808276177ea16ccffcfc22972323e5ac313",
+    "mod/variants/rhodes/off/garrisons.json": "f5b1f5558a263c95abcf36411c31e781efd3ebb1bebdced99ad1f242c2a960e3",
+    "mod/variants/rhodes/on/items.json": "cc149800d96f41465f7f1d23863b8afe1a67e07541f8681aad1a14eb91e4d6fc",
+    "mod/variants/rhodes/off/items.json": "6122a3cd75531f551a03082f000426a2d6b8028788fbd1abbaea5286592fbba4",
+    "mod/variants/rhodes/on/tokens.json": "72814efa1462200aabc03459fb19043eb0a0099deaa99b255694653d912c94d2",
+    "mod/variants/rhodes/off/tokens.json": "ca98a1189d62c3221e3bc9d149f8ba67d44cab5a6c5e780251fb162177d6519c",
+    "public/js/ui/modBadge.js": "c29a6537a8b1ff704d7d76bc2260920de19529abbd08719ba79f910ba13e2f77",
+    "server/mod/api.js": "424300ac42f61c164729e7234fc79a4bdc3389ea7d155b7baca79697e357cbcc",
+    "server/mod/toggle.js": "df1f3c6adc36c2e500224c1443734d6660f0e8704c84776b33c1dabde264d179",
+    "server/sim/content/bonds/rhodes.js": "6e1b20cb849fe6e216f76a5fb146950c2c924108e5ba1e0fd11a309dedd9fd5c",
+    "server/sim/content/kits/mod.js": "4ab56a929b7a8e8a895587f48337cad377f593e6aea1f913d106aea4c7191b83",
+    "server/sim/content/kits/ops/mod-rhodes-amiya3.js": "a613da560a7a83e4c2d708ef0bbdde16a59ab29d384d13973058cede91601ad3",
+    "server/sim/content/kits/ops/mod-rhodes-ascln.js": "21d58aebe1c1ec7949756da1ee4ea2e53e6ffe58a0f4180542db2c757eb9c643",
+    "server/sim/content/kits/ops/mod-rhodes-closur.js": "605f027ee4e50cbec19e4848b19e12955b5159852d8d36720c8d2d0ec519e27c",
+    "server/sim/content/kits/ops/mod-rhodes-kalts2.js": "8f74a1d6184481d9a84d6523da54caa0308f4251b742a6439ebe851ce87c8317",
+    "server/sim/content/kits/ops/mod-rhodes-logos.js": "d5caa7f277398e99ff452059120d59acb2c568b600f7665b1f262b580b0aa570",
+    "server/sim/content/kits/ops/mod-rhodes-monstr.js": "f2954b1f5c47345a2a685f65d416e961bb8b697b1dfc712879ced94c34ab4bbf",
+    "public/assets/bond/rhodesShip.png": "c1aafd771ed19a83ef254f5baa446f76ca2d39391e98b3447ff0432f532ca5e6",
+    "public/assets/char/avatar/char_1037_amiya3_2.png": "52118a69c8f67a0ed92ed9da3ba2222770f5ee2b90609a8a20a40d7b3b7db30d",
+    "public/assets/char/avatar/char_230_savage.png": "3ecdc911a812cf01315caab7decf29863594a825d74191bcbc0cbb16ffd0fda6",
+    "public/assets/char/avatar/char_230_savage_2.png": "9e889c1bd60a450d96cee4303d0d575b5defdff72d9bbc5ae351d121828d5e09",
+    "public/assets/char/portrait/char_1037_amiya3_2.png": "376ad72ece4ac8fe63d4334687728dee70a29dce177321c4ded3f7d60bce0e9e",
+    "public/assets/char/portrait/char_230_savage_1.png": "5efaafa9f134de6d8c3a03b163fcd87045a9ef35fa18ed2e30647c57fd362dcf",
+    "public/assets/char/portrait/char_230_savage_2.png": "a7779c25b587d2174ad5e6725cca073485331d5bd24dc6780ef527511441c0ea",
+    "public/assets/item/trap_1130_acarm130.png": "c1aafd771ed19a83ef254f5baa446f76ca2d39391e98b3447ff0432f532ca5e6",
+    "public/assets/item/trap_1131_acarm131.png": "9374de10a4877747b326aedfe4f89f030100e93f9894f7a73a07b864572003ce",
+    "public/assets/skill/skchr_amiya3_1.png": "6655d1e70c29d00644a8ca3d592604ff513e134d28cef9bb5655dd3919c1b334",
+    "public/assets/skill/skchr_amiya3_2.png": "6d0466da14490404162f9ad03c8266d8812ae94ac8eac20c01fd8f632e13de1f",
+    "public/assets/skill/skchr_savage_2.png": "dae2ebdf83b885e48bc7c1fd6388b9e357d3581e96bdc2cdf90807e99eac5cc3",
+    "public/assets/spine/op/char_1037_amiya3/back/char_1037_amiya3.atlas": "9a091fc70fe566ac5f742a99f127691cad4d4b6ffcb0d4f58b2f6287329fb1ef",
+    "public/assets/spine/op/char_1037_amiya3/back/char_1037_amiya3.png": "e5578becc147b19ab86f9668f1c73f72968ec7ce64185ef8ba09bcf456bd28d0",
+    "public/assets/spine/op/char_1037_amiya3/back/char_1037_amiya3.skel": "e80d96f6b542b26cae91596613ddd290c54c41d803e93dd301c39e4638a81e69",
+    "public/assets/spine/op/char_1037_amiya3/front/char_1037_amiya3.atlas": "3c4fd8de0e3d84e772ce2e0507481ff81050ace9317181a1e7b166df131d1fcc",
+    "public/assets/spine/op/char_1037_amiya3/front/char_1037_amiya3.png": "9dbaae59caea27be1a5906974a13eb429d26e9002f1a1dabaee70c73b5fa347c",
+    "public/assets/spine/op/char_1037_amiya3/front/char_1037_amiya3.skel": "75ab06cad33c2ea236b914843c09ee7f4ee9181e46fb360fcde0cf6706e185e2",
+    "public/assets/spine/op/char_230_savage/back/char_230_savage.atlas": "797503eecc36d7fd4c522fcc8bf416d1484bd48da0a5911c285d75d72fa5d113",
+    "public/assets/spine/op/char_230_savage/back/char_230_savage.png": "6e37a3576c369ba898006b33870d507f6b35834efe338c47d281fce17cc2b0c8",
+    "public/assets/spine/op/char_230_savage/back/char_230_savage.skel": "0dc6456d0685dfce9a9373a89701c25932ee6b2b422391e757ef399044048f1d",
+    "public/assets/spine/op/char_230_savage/front/char_230_savage.atlas": "ed5286aae11640bb72a9509eeb9a2527681f2e3d51c934a4bf6e288c40099626",
+    "public/assets/spine/op/char_230_savage/front/char_230_savage.png": "19a33ddd0a8f6338f4a6bee1094e67fb2c58690bc6b1e75b5343df9759ebfd72",
+    "public/assets/spine/op/char_230_savage/front/char_230_savage.skel": "12ecd1e14cfe090bc64708cd39d29cbbf70a075724ee8c01a7d0add6de958529",
+    "public/assets/spine/token/token_10050_monstr_prosts/token_10050_monstr_prosts_boc_11.atlas": "fc152481ee1b6ca24598467463355af6a7554aff2c3efde0962347808e1de801",
+    "public/assets/spine/token/token_10050_monstr_prosts/token_10050_monstr_prosts_boc_11.png": "861e54fb4650a2aa1afd261a91ae45057071f3bf6026f6cc4138ab7287f0702d",
+    "public/assets/spine/token/token_10050_monstr_prosts/token_10050_monstr_prosts_boc_11.skel": "a75e7fd1497e600f93c4a7f4a4c76cf913505fc72c2a345bd96d0cee84353ecb"
+  },
+  "patches": {
+    "package.json": {
+      "patch": "patches/package.json.diff",
+      "baseSha256": "850f762c9dea2c74b1e8cf78e713afbbbce4332e3597776c99d92cfa6ccddcae",
+      "resultSha256": "baeaddb94c0c82bdf61aac45bfb61cb3a696b601e8f62180bfaf4789819f0dc2",
+      "hunks": 1,
+      "added": 3,
+      "removed": 0
+    },
+    "public/css/screens/title.css": {
+      "patch": "patches/public__css__screens__title.css.diff",
+      "baseSha256": "9f8a8e326b103304400b2ced438605ea6cecaae658ac01d87f09a8f8dae8d565",
+      "resultSha256": "f385db4720115ca6c589a64ecd061c3f7e8d6dd1ad33cf953bd4bba36a7264b1",
+      "hunks": 1,
+      "added": 56,
+      "removed": 0
+    },
+    "public/i18n/en.json": {
+      "patch": "patches/public__i18n__en.json.diff",
+      "baseSha256": "61c036e1077c0f0b0e2cba424692ec9f94dc3e4ccf34162f23d1be99d1dced43",
+      "resultSha256": "153c18b8c8df42bdfc8995fa296076f882c971d4e09dcd40b4ed0a1e0d2674c3",
+      "hunks": 1,
+      "added": 13,
+      "removed": 1
+    },
+    "public/js/main.js": {
+      "patch": "patches/public__js__main.js.diff",
+      "baseSha256": "29f9f299a6b162b104c5222bcf4f43e631a79e03b59c8ec2ce6d42b216874a5f",
+      "resultSha256": "df31cf71895a11335335cdb14d6d687f00319063e734571d97ba769a91e48db2",
+      "hunks": 2,
+      "added": 4,
+      "removed": 0
+    },
+    "public/js/screens/title.js": {
+      "patch": "patches/public__js__screens__title.js.diff",
+      "baseSha256": "53c72a2268e03bc043b63c30b44f840bbdd8bd9542ef754a3012a0ab66a4a9b7",
+      "resultSha256": "bf47c2b5d86ce90c6db27a7372fd2eef953f753c318cc1ecfd48d62f7bedb26f",
+      "hunks": 2,
+      "added": 3,
+      "removed": 0
+    },
+    "public/js/store.js": {
+      "patch": "patches/public__js__store.js.diff",
+      "baseSha256": "9f836d711b630e0fdaf14641aefb061d3c1ff1851953f16c5749fcbb4e021197",
+      "resultSha256": "6438e67d86f15cc24a7c9a87c4170463805860f671bf75281cfafcf70c4eeda4",
+      "hunks": 1,
+      "added": 4,
+      "removed": 0
+    },
+    "server/http/routes.js": {
+      "patch": "patches/server__http__routes.js.diff",
+      "baseSha256": "2eef41a84821de9be5819a748e2382ec98ac378de98094fec31ab7545f73e881",
+      "resultSha256": "7beb686a2e20fd0101f3951563981fbb7517b86af0382211443636b829d2f853",
+      "hunks": 2,
+      "added": 4,
+      "removed": 0
+    },
+    "server/http/websocket.js": {
+      "patch": "patches/server__http__websocket.js.diff",
+      "baseSha256": "1f7f875cc7a25ec6b2bec56b390476795c1a94e17025c03cc035b3648ab28556",
+      "resultSha256": "a040799d5da8d427850f5daa4717bb4d0130fd63decdfcd453f38671bd001341",
+      "hunks": 1,
+      "added": 5,
+      "removed": 3
+    },
+    "server/index.js": {
+      "patch": "patches/server__index.js.diff",
+      "baseSha256": "b4d44ac161db9cbf58fb67ee54a7c9bcaf7db244496be63bbe94c5d196acead6",
+      "resultSha256": "e57c3e79a7d2f3b48681cb667740f1e32d994b7f2dccb4131da019fd18352f75",
+      "hunks": 2,
+      "added": 6,
+      "removed": 1
+    },
+    "server/lobby.js": {
+      "patch": "patches/server__lobby.js.diff",
+      "baseSha256": "f4d482eb038a1aeaa21ef6a1d30585c7f99b0819d8e987a9d235e5bcb2511991",
+      "resultSha256": "6eba605afc794fb4e32ad320f1251b639fb21cfe3ff0b3d1c2a1e65553613fa5",
+      "hunks": 4,
+      "added": 22,
+      "removed": 2
+    },
+    "server/match/player/diy.js": {
+      "patch": "patches/server__match__player__diy.js.diff",
+      "baseSha256": "3cf51b18a679e384b81fd4da52faca089a0a2c56c13b454f678f23ac8b445799",
+      "resultSha256": "532af3f33d04d6df0c651d2e566927d70f9375679e6d12bc534ef13484998ce1",
+      "hunks": 1,
+      "added": 8,
+      "removed": 2
+    },
+    "server/sim/content/bonds.js": {
+      "patch": "patches/server__sim__content__bonds.js.diff",
+      "baseSha256": "efb8599a69feee06d2efa4ffeaf30783e3a650ed474359b4d37f42122acd8f89",
+      "resultSha256": "58d14166964ce0119f75d156742bd44d8b31daa62b6eeee5270a7eefaac8f97f",
+      "hunks": 2,
+      "added": 10,
+      "removed": 3
+    },
+    "server/sim/content/garrisons/battle.js": {
+      "patch": "patches/server__sim__content__garrisons__battle.js.diff",
+      "baseSha256": "bbd17d3aefbb3f1009414c54f21c11d5bd895a62e2adea2819a85400add022cd",
+      "resultSha256": "83ced0228be0ea895d5c850753a7dd42c98c4f82c05cb166a30821ea6eaab78b",
+      "hunks": 2,
+      "added": 81,
+      "removed": 0
+    },
+    "server/sim/content/garrisons/meta.js": {
+      "patch": "patches/server__sim__content__garrisons__meta.js.diff",
+      "baseSha256": "1d0fd0ff5690de832b3b99bb7a972ce38c877cd126db90e986e80851dc8cde1f",
+      "resultSha256": "7fc4b162d6c52425bce46940e960a1b64ceeea3ae1791614f6416e2e4445d5fc",
+      "hunks": 2,
+      "added": 29,
+      "removed": 0
+    },
+    "server/sim/content/items/battle.js": {
+      "patch": "patches/server__sim__content__items__battle.js.diff",
+      "baseSha256": "c2f88f182681824b5418c5fe7893f2eca6d0131503b4f53c04318f589db176e5",
+      "resultSha256": "839fc4284218b596279cf90946027351116c0cc3066c53b7cfac23cf5d00e9aa",
+      "hunks": 1,
+      "added": 54,
+      "removed": 0
+    },
+    "server/sim/content/kits/index.js": {
+      "patch": "patches/server__sim__content__kits__index.js.diff",
+      "baseSha256": "17dd63f999eb00bbdc935050e6510a976d244e8eb61513a38bb5107fa50f946c",
+      "resultSha256": "fc98ad96bc96e5044d587dade13ec29aa70b2155368149252f437fadd3a98572",
+      "hunks": 4,
+      "added": 26,
+      "removed": 2
+    },
+    "server/sim/content/tokens.js": {
+      "patch": "patches/server__sim__content__tokens.js.diff",
+      "baseSha256": "414db8c4487690f5898e5b7581f94dde2c8c3ed50998f85696de71143798b1d4",
+      "resultSha256": "724d4317f2122238a047e000c197581f62e9279ef2f0ea1f1cb104f6ffd4f91c",
+      "hunks": 4,
+      "added": 153,
+      "removed": 2
+    },
+    "shared/protocol.js": {
+      "patch": "patches/shared__protocol.js.diff",
+      "baseSha256": "c2970f19380fafa1cc6e60d564d11340a0dc2cd3619154a25418e334baa49cdc",
+      "resultSha256": "c6ed120f17d487b28fced7d60c43265795146bae88b2a85b7057e7f4a38e00e9",
+      "hunks": 1,
+      "added": 4,
+      "removed": 0
+    }
+  },
+  "merge": {
+    "data/assets.json": {
+      "file": "patches/data__assets.json.merge",
+      "note": "装机时按此结构差量合入；hash 由合并后的 body 重算（tools/assets/manifest.mjs contentHash）",
+      "setValues": {
+        "chars": [
+          "char_1037_amiya3",
+          "char_230_savage"
+        ],
+        "tokens": [
+          "token_10050_monstr_prosts",
+          "token_10066_closur_ourbase",
+          "token_10068_kalts2_mtship"
+        ],
+        "bonds": [
+          "rhodesShip"
+        ],
+        "items": [
+          "trap_1130_acarm130",
+          "trap_1131_acarm131"
+        ],
+        "skills": [
+          "skchr_amiya3_1",
+          "skchr_amiya3_2",
+          "skchr_savage_2"
+        ],
+        "skillsById": [
+          "skchr_amiya3_1",
+          "skchr_amiya3_2",
+          "skchr_savage_1",
+          "skchr_savage_2"
+        ]
+      },
+      "remove": {
+        "skills": [
+          "skchr_kalts_1",
+          "skchr_kalts_2",
+          "skchr_kalts_3"
+        ],
+        "skillsById": [
+          "skchr_kalts_1",
+          "skchr_kalts_2",
+          "skchr_kalts_3"
+        ]
+      },
+      "statsDelta": {
+        "files": 3,
+        "bytes": 29067,
+        "chars": 2,
+        "charsWithBack": 2,
+        "tokensWithSpine": 1,
+        "bonds": 1
+      }
+    }
+  },
+  "assets": [
+    {
+      "path": "/assets/bond/rhodesShip.png",
+      "size": 988
+    },
+    {
+      "path": "/assets/char/avatar/char_1037_amiya3_2.png",
+      "size": 67922
+    },
+    {
+      "path": "/assets/char/avatar/char_230_savage.png",
+      "size": 53574
+    },
+    {
+      "path": "/assets/char/avatar/char_230_savage_2.png",
+      "size": 54525
+    },
+    {
+      "path": "/assets/char/portrait/char_1037_amiya3_2.png",
+      "size": 138317
+    },
+    {
+      "path": "/assets/char/portrait/char_230_savage_1.png",
+      "size": 102962
+    },
+    {
+      "path": "/assets/char/portrait/char_230_savage_2.png",
+      "size": 92080
+    },
+    {
+      "path": "/assets/item/trap_1130_acarm130.png",
+      "size": 988
+    },
+    {
+      "path": "/assets/item/trap_1131_acarm131.png",
+      "size": 7406
+    },
+    {
+      "path": "/assets/skill/skchr_amiya3_1.png",
+      "size": 16221
+    },
+    {
+      "path": "/assets/skill/skchr_amiya3_2.png",
+      "size": 23414
+    },
+    {
+      "path": "/assets/skill/skchr_savage_2.png",
+      "size": 20383
+    },
+    {
+      "path": "/assets/spine/op/char_1037_amiya3/back/char_1037_amiya3.atlas",
+      "size": 7040
+    },
+    {
+      "path": "/assets/spine/op/char_1037_amiya3/back/char_1037_amiya3.png",
+      "size": 95999
+    },
+    {
+      "path": "/assets/spine/op/char_1037_amiya3/back/char_1037_amiya3.skel",
+      "size": 308420
+    },
+    {
+      "path": "/assets/spine/op/char_1037_amiya3/front/char_1037_amiya3.atlas",
+      "size": 10659
+    },
+    {
+      "path": "/assets/spine/op/char_1037_amiya3/front/char_1037_amiya3.png",
+      "size": 106135
+    },
+    {
+      "path": "/assets/spine/op/char_1037_amiya3/front/char_1037_amiya3.skel",
+      "size": 493240
+    },
+    {
+      "path": "/assets/spine/op/char_230_savage/back/char_230_savage.atlas",
+      "size": 2777
+    },
+    {
+      "path": "/assets/spine/op/char_230_savage/back/char_230_savage.png",
+      "size": 44122
+    },
+    {
+      "path": "/assets/spine/op/char_230_savage/back/char_230_savage.skel",
+      "size": 64614
+    },
+    {
+      "path": "/assets/spine/op/char_230_savage/front/char_230_savage.atlas",
+      "size": 6842
+    },
+    {
+      "path": "/assets/spine/op/char_230_savage/front/char_230_savage.png",
+      "size": 57401
+    },
+    {
+      "path": "/assets/spine/op/char_230_savage/front/char_230_savage.skel",
+      "size": 137840
+    },
+    {
+      "path": "/assets/spine/token/token_10050_monstr_prosts/token_10050_monstr_prosts_boc_11.atlas",
+      "size": 783
+    },
+    {
+      "path": "/assets/spine/token/token_10050_monstr_prosts/token_10050_monstr_prosts_boc_11.png",
+      "size": 29487
+    },
+    {
+      "path": "/assets/spine/token/token_10050_monstr_prosts/token_10050_monstr_prosts_boc_11.skel",
+      "size": 9614
+    }
+  ]
+}

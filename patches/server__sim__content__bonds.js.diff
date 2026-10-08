@@ -1,0 +1,35 @@
+--- a/server/sim/content/bonds.js
++++ b/server/sim/content/bonds.js
+@@ -1,13 +1,18 @@
+ // server/sim/content/bonds.js — the 23 bonds (盟约), battle side + prep side (DESIGN §7, research 02).
+ //
+-// Entry point imported by content/index.js. The work is split into two submodules that each export
++// Entry point imported by content/index.js. The work is split into submodules that each export
+ // install(battle) / registerMeta(registry):
+ //   bonds/core.js    8 core bonds  炎 萨尔贡 维多利亚 谢拉格 拉特兰 阿戈尔 叙拉古 卡西米尔
+ //   bonds/addon.js   15 add-on bonds 精准 迅捷 灵巧 奥术 坚守 助力 远见 奇迹 投资人 突袭 不屈 调和 协防干员 独行 绝技
++//   bonds/rhodes.js  the 罗德岛 MOD's custom bond `rhodesShip` (docs/MOD-RHODES.md)
+ // plus support/meta.js (shared prep→battle `contentInfo`). Parts are loaded with guarded dynamic imports and run in
+ // isolation: one failing part never disables the others (the first error is re-thrown afterwards so
+ // content/index.js records it in battle.errors / the server log).
+ // Membership (own bonds, 变形同构体 grants, 调和 enjoying active core bonds) lives in support/index.js.
++//
++// The 罗德岛 part is ALWAYS loaded but inert while the mod is off: its install() finds no player whose `rhodesShip`
++// tier ≥ 1 (bondTier returns 0) and returns before registering anything, and its registerMeta() is a no-op
++// (`npm run mod:rhodes` writes the bond's data; `npm run mod:rhodes:strip` removes it — the file itself stays).
+ 
+ async function load(path) {
+   try {
+@@ -18,8 +23,10 @@
+   }
+ }
+ 
+-const [core, addon, supportMeta] = await Promise.all([load('./bonds/core.js'), load('./bonds/addon.js'), load('./support/meta.js')]);
+-const PARTS = Object.freeze([['bonds/core', core], ['bonds/addon', addon]]);
++const [core, addon, rhodes, supportMeta] = await Promise.all([
++  load('./bonds/core.js'), load('./bonds/addon.js'), load('./bonds/rhodes.js'), load('./support/meta.js'),
++]);
++const PARTS = Object.freeze([['bonds/core', core], ['bonds/addon', addon], ['bonds/rhodes', rhodes]]);
+ 
+ function runAll(fnName, arg, pre = null) {
+   let first = null;

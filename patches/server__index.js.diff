@@ -1,0 +1,23 @@
+--- a/server/index.js
++++ b/server/index.js
+@@ -24,6 +24,7 @@
+ 
+ import http from 'node:http';
+ import { getData, loadData } from './data.js';
++import { setLiveBundle, liveBundle } from './mod/toggle.js';
+ import { ROOT, listenAddress, serveDirs, makeLogger, parseTrustProxy } from './http/config.js';
+ import { WS_MAX_PAYLOAD, createSessionStack, attachWebSocket } from './http/websocket.js';
+ import { DATA_SHIM_JS, createStaticHandler } from './http/static.js';
+@@ -63,7 +64,11 @@
+ 
+   // The process-wide singleton serves the default data dir; a custom dir (tests) gets its own copy.
+   const data = opts.dataDir ? loadData(dataDir, { log }) : getData({ dir: dataDir, log });
+-  const { registry, lobby, network } = createSessionStack(opts, { data, log });
++  // 内容开关 (server/mod/toggle.js, docs/MOD-RHODES.md §开关): the Lobby reads the data through the live holder rather
++  // than a closure over this boot value, so a mod switched ON/OFF in the page reaches its next call — room.diy checks,
++  // welcome.diyKitted and every match started afterwards. A custom dataDir (tests) keeps the fixed bundle it was given.
++  const live = opts.dataDir ? null : setLiveBundle(data);
++  const { registry, lobby, network } = createSessionStack(opts, { data, log, getData: live ? liveBundle : null });
+   // content packs (docs/PACKS.md): scanned now — the start log names them — and again whenever their folders change
+   const packs = createPackRegistry({ publicDir, dataDir, packsDir }, { log });
+   packs.refresh(true);

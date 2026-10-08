@@ -1,0 +1,19 @@
+--- a/public/js/screens/title.js
++++ b/public/js/screens/title.js
+@@ -24,6 +24,7 @@
+ import { scriptOf } from '../../../shared/i18nPacks.js';
+ import { GIcon } from '../ui/gameComponents.js';
+ import { SettingsModal } from '../ui/settings.js';
++import { ModBadge } from '../ui/modBadge.js';
+ 
+ // Same character classes as server/net.js sanitizeName (control, zero-width, bidi, BOM), so a name
+ // the client accepts is never rejected by the server's hello validation.
+@@ -282,6 +283,8 @@
+ 
+     <${SettingsModal} open=${settingsOpen} onClose=${() => setSettingsOpen(false)} />
+ 
++    <${ModBadge} />
++
+     <footer class="title-foot">
+       <span>${t('非官方同人复刻 · 游戏素材版权归 上海鹰角网络 / Yostar 所有')}</span>
+       <${MicroLabel}>v${APP_VERSION} · WEB SIMULATION<//>

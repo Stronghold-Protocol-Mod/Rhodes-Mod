@@ -1,0 +1,20 @@
+--- a/public/js/main.js
++++ b/public/js/main.js
+@@ -35,6 +35,7 @@
+ import { useErrorBoundary } from '../vendor/hooks.module.js';
+ import { html, UiHosts, Button, MicroLabel, closeAllDialogs } from './ui/components.js';
+ import { ConnectionBanner } from './ui/connBanner.js';
++import { ModBadge, installModState } from './ui/modBadge.js';
+ import { ToastHost, toast, toastError, describeError } from './ui/toasts.js';
+ import { net, identity, NetError } from './net.js';
+ import { store, useStore, emptyMatch, selectRoute, sessionResetNotice, isSpectating } from './store.js';
+@@ -211,6 +212,9 @@
+   net.on('replaced', () => toast(t('该身份已在其他页面登录，本页已断开'), 'warn', { ttl: 6000 }));
+   net.on('unhandledError', (err) => toastError(err));
+   net.on('room.state', onRoomState);
++  // 内容开关 (ui/modBadge.js): a data mod was switched with the in-page badge — adopt the new state; the badge then
++  // offers the reload that refetches /data/*.json.
++  installModState(net);
+   net.on('room.closed', (msg) => {
+     backToLobby();
+     const known = Object.hasOwn(CLOSE_REASON, String(msg.reason)) ? CLOSE_REASON[msg.reason] : null;

@@ -1,0 +1,100 @@
+--- a/server/sim/content/garrisons/battle.js
++++ b/server/sim/content/garrisons/battle.js
+@@ -22,6 +22,17 @@
+ //                       character_same_col (≥ check_count incl. self). Gains go through support.gainLayers with
+ //                       reason 'garrison', source = the trait's owner, cap = max_add_count_per_battle per (instance, bond)
+ //                       — per instance for bond_actived_maxstack (塑心: the highest bond may change, the cap does not).
++//   MOD (罗德岛)         modautochess_gar_event_heal — 阿米娅·医疗 "为攻击范围内的干员恢复生命时，自身已激活的盟约层数+N":
++//                       the engine's `heal` hook (the same one the 罗德岛 bond reads) fires for every heal a garrison
++//                       owner lands; a heal that lands (missing HP > 0) — or whose OVERFLOW becomes the target's 屏障
++//                       (`opts.overheal` + `amount > maxHp - hp`, a full-HP member included), or the HP-regen of her own
++//                       诚挚期许 aura (the engine regen loop heals with SELF as the source; the trigger credits the aura's
++//                       owner) — on ANOTHER operator of the same player inside the owner's ATTACK RANGE counts once.
++//                       "每回合至多N次" caps the TRIGGERS (bb `max_trigger_per_battle`, counted per garrison instance,
++//                       never handed to gainLayers); the LAYERS the ceiling can produce are declared by bb
++//                       `max_add_count_per_battle` (12 / 24), which gainLayers does read — and which the client-result
++//                       plausibility bound adds to its per-round budget.
++//                       Target bonds / amount use the generic bond_type (bond_self) / bond_add_type paths.
+ //   act1autochess_gar_event_addition_cnt (魔王)  layerGain: a 'garrison' gain whose source stands on the tile in front
+ //                       of 魔王 (range_id 1-1) — or was knocked out there this instant (幽灵鲨 "被击倒时"; engine ctx.tile)
+ //                       — gets +extra_cnt per bond (the extra does not count toward the source's per-battle cap).
+@@ -361,9 +372,79 @@
+   // grants are resolved in install(); 风丸's rule lives in the prep economy
+   ADD_BOND() {},
+   NONE() {},
++
++  // MOD (罗德岛) — see installHealGain
++  modautochess_gar_event_heal: installHealGain,
+ };
+ 
+ // ---------------------------------------------------------------------------------------------------------------------
++// MOD (罗德岛) — heal-driven layer gain (阿米娅·医疗)
++
++/**
++ * 阿米娅·医疗's 特质 (`modautochess_gar_event_heal`): every heal the owner LANDS on another operator of her own player
++ * that stands inside her ATTACK RANGE adds `bb.bond_add_count` layers to each of her ACTIVE bonds (bond_self) — +1
++ * normal, +2 精锐. "每回合至多N次" is a cap on the number of TRIGGERS: `bb.max_trigger_per_battle` is counted right
++ * here, and `bb.max_add_count_per_battle` (12 / 24 = the ceiling × the per-trigger count) is handed to `gainLayers`
++ * as the official per-battle LAYER cap — the declaration the client-result plausibility bound also reads
++ * (server/match/fields.js layerAllowanceOf), so 12 triggers of +2 are an honest, accepted result.
++ *
++ * The engine emits `heal` (server/sim/damage.js) for every heal instance — the same hook the 罗德岛 bond reads for its
++ * received-heal boost, which also means the listener keeps the hook alive on its own. Next to a heal that restores HP,
++ * two more shapes count (user request 2026-10-07: 「阿米娅如果给予屏障也可以用于叠加层数，然后阿米娅天赋的自动回血也可以
++ * 用于叠加层数」):
++ *
++ *   1. A heal whose OVERFLOW becomes the target's 屏障. `damage.js heal()` writes the shield AFTER the hook, so the
++ *      trigger reads the engine's own contract instead of the shield: `opts.overheal` (the flag the 罗德岛 bond sets on
++ *      its members at 6 distinct) plus `amount > maxHp - hp` — exactly the condition `heal()` itself uses to write the
++ *      `overheal` barrier. A heal on a FULL-HP member therefore counts: it restores nothing but banks a barrier.
++ *   2. 诚挚期许's HP-regen aura (kits/tier3.js: `hp_recovery_per_sec_by_max_hp_ratio` while her skill is active). The
++ *      engine's regeneration loop heals a unit with ITSELF as the source (`{ regen: true }`), so the trigger attributes
++ *      that heal to the owner whose regen aura the target is carrying (a buff with `mods.hpRegenRatio` whose `source`
++ *      is one of the owners — the kit stamps `source` on the aura). Without it the regen half of her own talent could
++ *      never fund her own 特质.
++ *
++ * Both stay same-player and range-limited (the text's 攻击范围内的干员), and one heal instance fires at most ONE trigger
++ * (a heal that both restores HP and overflows counts once). This is the ONLY thing that turns healing into 罗德岛 layers
++ * in battle: the bond's own `layer_heal_step` accumulator was deleted on 2026-10-06 (user ruling — see bonds/rhodes.js).
++ */
++function installHealGain(battle, list) {
++  const owners = new Set(list.map((it) => it.unit));
++  for (const it of list) it.triggers = 0;
++  battle.on('heal', (c) => {
++    const t = c.target;
++    if (!t || !S.isOp(t)) return;
++    let src = c.source;
++    // the engine's regen loop heals a unit with itself as the source — credit the owner whose aura it is carrying
++    if (c.opts && c.opts.regen && src === t) {
++      src = regenAuraOwner(t, owners);
++      if (!src) return;
++    }
++    if (!src || !owners.has(src) || !S.onField(src)) return;
++    if (t === src || t.ownerId !== src.ownerId) return;
++    if (!S.inRange(src, t)) return;
++    const missing = t.s ? t.s.maxHp - t.hp : 0;
++    const banks = !!(c.opts && c.opts.overheal) && c.amount > missing; // the overflow becomes the target's 屏障
++    if (!(missing > 0) && !banks) return;
++    for (const it of list) {
++      if (it.unit !== src) continue;
++      const bb = it.bb;
++      const max = S.num(bb.max_trigger_per_battle, 0) > 0 ? S.num(bb.max_trigger_per_battle) : Infinity;
++      if (it.triggers >= max) continue;
++      it.triggers++;
++      fireGain(battle, it);
++    }
++  });
++}
++
++/** The owner of the HP-regen aura `u` is carrying (诚挚期许's `hpRegenRatio`, stamped with its source), or null. */
++function regenAuraOwner(u, owners) {
++  for (const b of u.buffs || []) {
++    if (b.source && owners.has(b.source) && b.mods && b.mods.hpRegenRatio > 0) return b.source;
++  }
++  return null;
++}
++
++// ---------------------------------------------------------------------------------------------------------------------
+ // layer readers (每叠加N层)
+ 
+ const READERS = new Set([

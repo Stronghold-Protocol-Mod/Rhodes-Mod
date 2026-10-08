@@ -1,0 +1,62 @@
+--- a/public/css/screens/title.css
++++ b/public/css/screens/title.css
+@@ -273,3 +273,59 @@
+   font-weight: 700;
+   letter-spacing: .02em;
+ }
++
++/* ---- 内容开关 badge (ui/modBadge.js, docs/MOD-RHODES.md §开关) ---------------------------------- */
++/* Sits on its own line just above the footer, so it never collides with the version / dev tags. */
++.mod-badge-row {
++  position: absolute;
++  z-index: 2;
++  left: .44rem;
++  bottom: .62rem;
++  display: flex;
++  flex-wrap: wrap;
++  gap: .08rem;
++  align-items: center;
++}
++.mod-badge {
++  display: inline-flex;
++  align-items: center;
++  gap: .07rem;
++  height: .3rem;
++  padding: 0 .14rem;
++  font: inherit;
++  font-size: .14rem;
++  line-height: 1;
++  letter-spacing: .02em;
++  color: var(--text-lo);
++  background: var(--bg-glass);
++  border: 1px solid var(--line-2);
++  border-radius: .04rem;
++  cursor: pointer;
++  transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
++}
++.mod-badge:hover { color: var(--text-hi); border-color: var(--line-3); }
++.mod-badge:focus-visible { outline: 2px solid var(--mint-500); outline-offset: 1px; }
++.mod-badge__dot {
++  width: .07rem;
++  height: .07rem;
++  border-radius: 50%;
++  background: var(--text-dim);
++  box-shadow: none;
++  flex: none;
++}
++.mod-badge__name { color: var(--text-md); white-space: nowrap; }
++.mod-badge__state { color: var(--text-lo); white-space: nowrap; }
++
++/* ON: the mint of the rest of the chrome, with a lit dot */
++.mod-badge.is-on { border-color: var(--mint-a35); background: rgba(13, 44, 36, .82); }
++.mod-badge.is-on .mod-badge__dot { background: var(--mint-500); box-shadow: 0 0 .1rem var(--mint-glow); }
++.mod-badge.is-on .mod-badge__state { color: var(--mint-500); }
++.mod-badge.is-on:hover { border-color: var(--mint-500); }
++
++/* locked (a guest, or a match is running): still readable, and the click explains why */
++.mod-badge.is-locked { cursor: not-allowed; opacity: .62; }
++.mod-badge.is-busy { opacity: .5; pointer-events: none; }
++
++/* somebody else switched it: the page's data are stale */
++.mod-badge--reload { border-color: var(--gold-a20); }
++.mod-badge--reload .mod-badge__state { color: var(--gold); }

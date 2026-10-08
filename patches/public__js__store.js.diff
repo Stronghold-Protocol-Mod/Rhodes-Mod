@@ -1,0 +1,13 @@
+--- a/public/js/store.js
++++ b/public/js/store.js
+@@ -83,6 +83,10 @@
+   ticker: [],
+   emotes: [],
+   clock: { offset: 0, rtt: null, synced: false },
++  // 内容开关 (ui/modBadge.js, docs/MOD-RHODES.md §开关): the data mods of this server — read from GET /mod/state and
++  // refreshed by the `mod.state` push. `canToggle` is the server's answer for THIS page (loopback only); `stale`
++  // turns on when somebody else switched something, because the page's /data/*.json are fetched once per page.
++  mod: { ready: false, canToggle: false, reason: null, matches: 0, toggles: [], stale: false, busy: false },
+   ui: { pendingJoin: null, restoring: false, buildStale: false },
+ });
+ 

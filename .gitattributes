@@ -1,0 +1,9 @@
+# 本仓库的每个文件都被 tools/manifest.json 以 SHA-256 钉死：
+# 补丁要逐行匹配官方原文，载荷要逐字节校验。因此**禁止** git 做任何行尾转换。
+# eol=lf：文本按 LF 原样存取；binary：二进制完全不动。
+* text=auto eol=lf
+
+*.png binary
+*.skel binary
+# Spine 的 .atlas 是文本，但官方导出用 CRLF —— 必须原样保留，否则哈希对不上
+*.atlas binary

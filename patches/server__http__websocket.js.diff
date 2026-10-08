@@ -1,0 +1,22 @@
+--- a/server/http/websocket.js
++++ b/server/http/websocket.js
+@@ -18,14 +18,16 @@
+ /**
+  * The session stack of one server.
+  * @param {{ MatchClass?: Function, seedFn?: () => number, [option: string]: any }} opts startServer() options
+- * @param {{ data: object, log: object }} deps the game data the lobby's matches use, the logger
++ * @param {{ data: object, log: object, getData?: (() => object) | null }} deps the game data the lobby's matches use,
++ *   the logger, and — when the caller keeps the data live (the 内容开关, server/mod/toggle.js) — a getter the Lobby
++ *   calls instead of reading the fixed `data` it was booted with. `null`/absent ⇒ the fixed bundle.
+  * @returns {{ registry: SessionRegistry, lobby: Lobby, network: Network }}
+  */
+-export function createSessionStack(opts, { data, log }) {
++export function createSessionStack(opts, { data, log, getData: liveGetData = null }) {
+   const netOptions = netOptionsFrom(opts);
+   const registry = new SessionRegistry({ reconnectWindowMs: netOptions.reconnectWindowMs ?? NET_DEFAULTS.reconnectWindowMs });
+   const lobbyOptions = lobbyOptionsFrom(opts);
+-  const lobby = new Lobby({ registry, log, MatchClass: opts.MatchClass, getData: () => data, seedFn: opts.seedFn, options: lobbyOptions });
++  const lobby = new Lobby({ registry, log, MatchClass: opts.MatchClass, getData: liveGetData || (() => data), seedFn: opts.seedFn, options: lobbyOptions });
+   const network = new Network({ registry, handler: lobby, log, options: netOptions });
+   return { registry, lobby, network };
+ }

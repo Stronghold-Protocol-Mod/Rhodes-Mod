@@ -2,8 +2,8 @@
 //
 //   node tools/mod-toggle.mjs on|off|status [--toggle rhodes] [--game <游戏根目录>]
 //
-// 和网页里那个徽标开关是同一件事（同样只切 mod/toggles.json 登记的 6 个数据文件），区别只是从终端做。
-// 六个临时文件全部写完才逐个 rename，失败只会留下旧状态或新状态、不会半写；切完再从磁盘回读标记确认。
+// 和网页里那个徽标开关是同一件事（同样只切 mod/toggles.json 登记的数据文件，罗德岛是 7 个），区别只是从终端做。
+// 七个临时文件全部写完才逐个 rename，失败只会留下旧状态或新状态、不会半写；切完再从磁盘回读标记确认。
 
 import fs from 'node:fs';
 import path from 'node:path';

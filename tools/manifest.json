@@ -1,17 +1,18 @@
 {
   "name": "rhodes-mod",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "base": {
     "name": "stronghold-protocol-alliance",
     "version": "0.2.3"
   },
   "files": {
-    "docs/MOD-RHODES.md": "d794f3d8272a0d4aaf15aaa1a6ad2a4a5ca6e7f93aa4946913e812c42b6f1e20",
-    "mod/toggles.json": "7802ece631b1af07559ec6f8a7b2f2d504b23cfd0c7b68230a45482032cdec0e",
+    "docs/MOD-RHODES.md": "a59a22cd75410932a402b419c41180cb1b8e63f48906e421fa690183b1036549",
     "mod/variants/rhodes/on/bonds.json": "2609c842ef45a906eabc29553bc780ce1a6e1fbceeb09fe74bba6890e95ec53b",
     "mod/variants/rhodes/off/bonds.json": "53a22f4724771b6ff40041635e907c0af39790731f661b0439fc593f5a91c94c",
     "mod/variants/rhodes/on/chess.json": "0c771f9cf3fbaa5897e97bad35a26b77c2d637c6c09e346481a713a7c2faf6bb",
     "mod/variants/rhodes/off/chess.json": "fd463d31c21d3f40524058abb47fe64b6c32ebed22956586a50bee672e6dfa79",
+    "mod/variants/rhodes/on/config.json": "696adeecb6b76b21e619203f09031e90bd29a73daa4c4be45a8d2c39e990589a",
+    "mod/variants/rhodes/off/config.json": "c16504ca347c4a967d9cf3349d5e1ad081d2ae52d56b87b7841e33ea38853eef",
     "mod/variants/rhodes/on/effects.json": "98cad4458ef10023fe8a721f5a355b800efeef56e7a0ce5a424a93c77473a713",
     "mod/variants/rhodes/off/effects.json": "96e28be614f04da6d58c9e95706d742863c756b94dcad498e808c3410ba620e3",
     "mod/variants/rhodes/on/garrisons.json": "df565cc59c9a712a0eea580d6c23a808276177ea16ccffcfc22972323e5ac313",
@@ -22,7 +23,7 @@
     "mod/variants/rhodes/off/tokens.json": "9e3501357b07d754711fcfd8506286efa32b7774d98e419fdcff48c1f6729b39",
     "public/js/ui/modBadge.js": "c29a6537a8b1ff704d7d76bc2260920de19529abbd08719ba79f910ba13e2f77",
     "server/mod/api.js": "424300ac42f61c164729e7234fc79a4bdc3389ea7d155b7baca79697e357cbcc",
-    "server/mod/toggle.js": "df1f3c6adc36c2e500224c1443734d6660f0e8704c84776b33c1dabde264d179",
+    "server/mod/toggle.js": "e21002f59adb087a3b605cd41bc96de779f83e92fad0e6f4b1b5eb770ad82b6c",
     "server/sim/content/bonds/rhodes.js": "6e1b20cb849fe6e216f76a5fb146950c2c924108e5ba1e0fd11a309dedd9fd5c",
     "server/sim/content/kits/mod.js": "4ab56a929b7a8e8a895587f48337cad377f593e6aea1f913d106aea4c7191b83",
     "server/sim/content/kits/ops/mod-rhodes-amiya3.js": "a613da560a7a83e4c2d708ef0bbdde16a59ab29d384d13973058cede91601ad3",
@@ -31,6 +32,7 @@
     "server/sim/content/kits/ops/mod-rhodes-kalts2.js": "8f74a1d6184481d9a84d6523da54caa0308f4251b742a6439ebe851ce87c8317",
     "server/sim/content/kits/ops/mod-rhodes-logos.js": "d5caa7f277398e99ff452059120d59acb2c568b600f7665b1f262b580b0aa570",
     "server/sim/content/kits/ops/mod-rhodes-monstr.js": "f2954b1f5c47345a2a685f65d416e961bb8b697b1dfc712879ced94c34ab4bbf",
+    "mod/toggles.json": "f0de01c04bc0ec65315297db67d5132d03b0c94193bfad654006e6bcea8ed848",
     "public/assets/bond/rhodesShip.png": "c1aafd771ed19a83ef254f5baa446f76ca2d39391e98b3447ff0432f532ca5e6",
     "public/assets/char/avatar/char_1037_amiya3_2.png": "52118a69c8f67a0ed92ed9da3ba2222770f5ee2b90609a8a20a40d7b3b7db30d",
     "public/assets/char/avatar/char_230_savage.png": "3ecdc911a812cf01315caab7decf29863594a825d74191bcbc0cbb16ffd0fda6",
@@ -143,9 +145,9 @@
     "server/match/bot.js": {
       "patch": "patches/server__match__bot.js.diff",
       "baseSha256": "ca8de1a60f2a0a206c117a8b039f0185844523188d804d61efad63eba0cb1f46",
-      "resultSha256": "be57abea607366b8412c477b4d8de1946ab33cdc5f1cae433b5aa8100a9ca6d9",
+      "resultSha256": "20203231f3afaae2eaccf92a7c1657cad5e077515d14ae194be2d6e782af83a9",
       "hunks": 7,
-      "added": 109,
+      "added": 130,
       "removed": 4
     },
     "server/match/player/diy.js": {

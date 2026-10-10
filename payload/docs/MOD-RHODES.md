@@ -65,6 +65,13 @@ Bond behaviour (numbers live in `data/bonds.json` → `bonds.rhodesShip.bb`):
   bonds in `bbStr.bond_id` but not 罗德岛 — even though the mod marks it `isCore: true` with the same weight 10 — so the    
   bond the mod hands 迷迭香 / 隐德来希 fed their own 特质 nothing. The builder's `patchCoreBondReaders` now keeps that    
   list exactly in sync with the `isCore` set (appending, never reordering; idempotent on a re-run).
+- **罗德岛 is a 核心盟约 in the mode rosters too** (2026-10-10, user ruling 「把罗德岛作为一个核心盟约看待」).
+  `config.modes[*].activeBondIds` is the official "the bonds this mode offers" list the release ships for every curated
+  mode, and it held the season's eight faction bonds but not 罗德岛 — the one 核心盟约 an official reader could not name.
+  The builder's `addToModeRosters` appends it to the nine rosters (last, so the official order and the eight keep their
+  places; idempotent on a re-run, and `inactiveBondIds` is never touched). `data/config.json` therefore became the
+  **7th file of the 开关** (`mod/toggles.json` + `mod/variants/rhodes/`), and OFF is the release's own config.json byte
+  for byte.
 
 **Each mod operator also carries one or two OFFICIAL bonds** next to 罗德岛 (`extraBonds` in the builder). A visible  
 chess is banned only when *every* one of its bonds is drawn into the per-match disabled set D, and D holds 3 of the 9  
@@ -288,17 +295,19 @@ operator kits from `server/sim/content/kits/tier1..6.js` into `server/sim/conten
 split `Battle.js` into `server/sim/battle/`, and added 补位 / 自选编队 / i18n. The mod therefore lives in three shapes:
 
 **1. Data (the toggle).** Everything the mod *adds* is data written by `tools/local-extract/build-rhodes-mod.mjs`  
-(`data/{chess,bonds,effects,garrisons,tokens,items,assets}.json`). `npm run mod:rhodes` applies it, `npm run
+(`data/{chess,bonds,effects,garrisons,tokens,items,config,assets}.json`). `npm run mod:rhodes` applies it, `npm run
 mod:rhodes:strip` removes it — both idempotent and byte-deterministic (strip → rebuild is byte-identical). This is the  
 whole switch: **no source file is added or removed by the toggle.**
 
 > Since 2026-10-08 the same switch is also in the page — see **网页端开关 · the in-page 内容开关** below. It writes
-> these same six files from frozen variants; the npm scripts remain the way to *build* them.
+> these same seven files from frozen variants; the npm scripts remain the way to *build* them.
 
 The strip is the *exact* inverse: besides chess / bonds / effects / garrisons it also removes the 3 tokens  
 (`isMod` records `token_10050_monstr_prosts` 重构体 / `token_10066_closur_ourbase` 指挥中心 / `token_10068_kalts2_mtship`  
 战术锚点) and the 4 equipment records (`chess_item_3_13_e_a/_b` 罗德岛急救包, `chess_item_6_12_e_a/_b` 罗德岛徽章) it  
-wrote, plus the `effects.json` entries those items point at. After a strip both `data/tokens.json` and `data/items.json`  
+wrote, plus the `effects.json` entries those items point at — and it takes `rhodesShip` back off the nine mode rosters in
+`data/config.json` (`config.modes[*].activeBondIds`), the official "the bonds this mode offers" list. After a strip both
+`data/tokens.json` and `data/items.json`  
 are **byte-identical to the author's v0.2.3 release**, which is what keeps the author's `op_{monstr,closur,kalts2}.test.js`,  
 `playtest6_summons` and `feedback5-we2-placement` green with the mod off.
 
@@ -378,13 +387,13 @@ screen** shows whether the mod is on and switches it with one click. No terminal
 **It is the same switch, not a second one.** The mod is data-driven by contract — its code under
 `server/sim/content/` is *always* loaded and inert until `data/*.json` carries its records, and `bonds.rhodesShip`
 is the presence marker (`server/sim/content/kits/mod.js modActive`). So switching means writing one of two frozen
-variants of **six** files into `data/`, which is exactly what the two npm scripts do (minus their rebuild).
+variants of **seven** files into `data/`, which is exactly what the two npm scripts do (minus their rebuild).
 
 ### Layout
 
 | Path | What it is |
 | --- | --- |
-| `mod/toggles.json` | the registry the server reads: `id`, display names, `files` (the six), `marker` (`bonds.rhodesShip`). Adding a second mod is a registry entry + a `mod/variants/<id>/` |
+| `mod/toggles.json` | the registry the server reads: `id`, display names, `files` (the seven), `marker` (`bonds.rhodesShip`). Adding a second mod is a registry entry + a `mod/variants/<id>/` |
 | `mod/variants/<id>/on/*.json` | the state `npm run mod:rhodes` writes (taken from the live `data/`) |
 | `mod/variants/<id>/off/*.json` | the state `npm run mod:rhodes:strip` writes — **byte-identical to the author's v0.2.3 release** |
 | `server/mod/toggle.js` | the engine: registry, state, the atomic swap, the live-bundle holder, the loopback check |
@@ -392,9 +401,9 @@ variants of **six** files into `data/`, which is exactly what the two npm script
 | `tools/local-extract/build-mod-variants.mjs` | writes the variants; `--check` verifies them; `--ref <dir>` asserts OFF ≡ an official release |
 | `tools/local-extract/lib/strip-rhodes.mjs` | the strip rules as a pure function — shared by the CLI and the variant builder, so the two can never disagree |
 
-`data/assets.json` is deliberately **not** in the six: `strip-rhodes-mod.mjs` never reverts it (the mod's icon
+`data/assets.json` is deliberately **not** in the seven: `strip-rhodes-mod.mjs` never reverts it (the mod's icon
 *metadata* stays so the art keeps resolving), so including it would invent a third state the test suite has never
-been run in. The seven files that differ from the author's release are therefore six switched + `assets.json`
+been run in. The eight files that differ from the author's release are therefore seven switched + `assets.json`
 permanently additive.
 
 ### Why it is live (and why it is safe)
@@ -410,7 +419,7 @@ hot reload"), and **no module captures the bundle at import time**. Two call sit
   safe, and it is also why `POST /mod/toggle` is **refused while any match runs** (`409`, `matches > 0`): the browser
   refetches `/data/*.json` on reload and would otherwise be out of step with the field it is watching.
 
-The switch is verified by **reading the marker back off disk**, never by trusting the writes; all six temporary
+The switch is verified by **reading the marker back off disk**, never by trusting the writes; all seven temporary
 files are written before the first rename, so a failure leaves either the old state or the new one, never a
 half-written file.
 
@@ -572,18 +581,26 @@ box around every atlas region and the chibi broke apart.
 ## The bot plays the mod (2026-10-10)
 
 `server/match/bot.js` — the AI teammates and AI 托管 — knows the faction now. Both rules key on the data
-(`modOn(gd)` reads `bonds.rhodesShip`, the mod's presence marker), so a stripped checkout keeps the author's own
-decisions unchanged: the two-state parity of `test/match` still holds (same failure set on and off), and the author's
-own bot suites are untouched.
+(`modOn(gd)` reads `bonds.rhodesShip`, the mod's presence marker, and `isTopPayoffCore(bond)` reads `isCore` + the
+mod's own `isMod` marker off the bond record), so a stripped checkout keeps the author's own decisions unchanged: the
+two-state parity of `test/match` still holds (same failure set on and off), and the author's own bot suites are
+untouched.
 
-- **罗德岛 is a commit bond.** Its first threshold (3 distinct members) only widens the heals a member *receives*; the
-  barrier, the 6-member medic rule and the operators' layer 特质 are the 6-member tier. Before this, the bot's generic
-  scoring banked the first tier and filled the rest of the board with stronger operators — on a mixed bench it capped at
-  4 members even owning all seven. Now, once `bondPlan` builds the plan around it, the bot pushes to the **top**
-  threshold: `bondValue` keeps paying for a member below 6 (`COMMIT_BUY`), `lineupScore` weighs committed members at
-  `COMMIT_MEMBER` (18, against `FOCUS_MEMBER` 4) up to the top threshold and pays `COMMIT_DONE` once the 6 really
-  stand, and `bondPlan` credits how near owned + reachable sits to it. The same mixed bench now fields every 罗德岛
-  member it owns (6 when it has 6).
+罗德岛 reaches the bot through the **core-bond** path like any of the season's eight faction bonds — it is a
+`bondPlan` focus candidate, its members are bought at the core weight (`bondValue` × 1.4), its signature items are
+valued as core items (`itemTarget`: 14 against 9) and a teammate building it is seen through `mainCoreBond` — because
+it *is* a 核心盟约 (`isCore`, listed on every mode's roster, see above). What the mod adds is where its payoff sits:
+
+- **A core bond that pays at its TOP threshold.** 罗德岛's first threshold (3 distinct members) only widens the heals a
+  member *receives*; the barrier, the 6-member medic rule and the operators' layer 特质 are the 6-member tier. Before
+  this, the bot's generic scoring banked the first tier and filled the rest of the board with stronger operators — on a
+  mixed bench it capped at 4 members even owning all seven. Now, once `bondPlan` builds the plan around it, the bot
+  pushes to the **top** threshold: `bondValue` keeps paying for a member below 6 (`TOP_PAYOFF_BUY`), `lineupScore`
+  weighs its members at `TOP_PAYOFF_MEMBER` (18, against `FOCUS_MEMBER` 4) up to that threshold and pays
+  `TOP_PAYOFF_DONE` once the 6 really stand, and `bondPlan` credits how near owned + reachable sits to it. The same
+  mixed bench now fields every 罗德岛 member it owns (6 when it has 6). `isTopPayoffCore(bond) = isCore && isMod` is
+  read off the bond's own record — not a hard-coded id — so it stays inert while the data is stripped (no `isMod` bond
+  exists then) and would apply unchanged to any core bond the season ever ships with that shape.
 - **转职 — the 变形同构体 pairing.** 变形同构体 alone grants nothing: worn with a `giveBondId` item the carrier counts
   as a member of that bond (`bondsMeta.pieceBonds`). `equipMorphPair` — run before the generic equip loop, which then
   leaves the morph alone — gathers the pair on one operator: **阿米娅·医疗** first, because her 特质 pays a layer to
@@ -600,7 +617,7 @@ own bot suites are untouched.
   machine running the server (`isLoopback`) rather than to a room host: a guest who could switch it would have write
   access to `data/`. If a room host should also be able to, the gate is the single `isLoopback` call in
   `server/mod/api.js`. Outside its reach: `data/assets.json` (never reverted, see 网页端开关), and any file edited
-  by hand outside the builder is in neither variant — `--check` catches the drift on the six it does cover.
+  by hand outside the builder is in neither variant — `--check` catches the drift on the seven it does cover.
 - **Kits.** Six of the seven mod operators ship a **hand-authored kit** (the seventh, 暴行, runs the generic kit).    
   The three detailed here are the ones whose kits are pure additions on top of the profession profile:
   - 逻各斯 (`chess_rhodes_logos`, `kits/ops/mod-rhodes-logos.js`): S1 殁亡 is a toggle execution aura (0.1 s sweeps, one attempt per target      

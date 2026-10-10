@@ -1,5 +1,34 @@
 # 更新日志
 
+## 1.3.0
+
+让**罗德岛正式算作一个「核心盟约」**。此前它虽然已经带 `isCore: true`，但那是「引擎层面」的核心盟约（上名单、被调和 +1、算核心盟约层数、进核心/备用商店分池、UI 打「核心盟约」标签）；**唯一漏掉的是「模式名册」**——即 `config.json` 里每个模式 `activeBondIds` 的那份「本模式提供哪些盟约」清单，里面只有官方的 8 个势力盟约，没有罗德岛。本版把它补上；顺手把 AI 里早先「自己发明」的一套 `COMMIT_*` 特例收敛成通用了的核心盟约逻辑。
+
+### 变更
+
+- **模式名册补上罗德岛**（`data/config.json`）：所有 9 个模式的 `activeBondIds` 末尾追加 `rhodesShip`（`inactiveBondIds` 不动——MOD 只会**增加**一个盟约）。名册的数量随之从 23 → 24（两个 FUNNY 模式 13 → 14）。
+  - 数据侧：`tools/local-extract/build-rhodes-mod.mjs` 新增 `addToModeRosters()`，`strip-rhodes-mod.mjs` 对应地在关闭时把 `rhodesShip` 从各名册里**摘除**（关闭态与官方 0.2.3 的 `config.json` 逐字节相同）。
+  - 于是**开关文件由 6 个变成 7 个**：新增 `config`（`chess` / `bonds` / `effects` / `garrisons` / `tokens` / `items` / `config`）。`mod/toggles.json`、ON/OFF 冻结快照、开关引擎与相应测试同步更新。
+- **AI 收敛到通用核心盟约路径**（`server/match/bot.js`）：删掉 1.2.0 里那套 MOD 专属的 `isCommit` / `COMMIT_MEMBER` / `COMMIT_DONE` / `COMMIT_BUY` 特例，改为一个统一的 **`isTopPayoffCore(bond)`** ——「是核心盟约**且**收益落在**最高档**（阈值有 2 档、真正质变在 6 名）」。
+  - 逻辑上等价于 1.2.0 的 AI 行为（该凑 6 还是凑 6、该加权还是加权），但不再为罗德岛单开一段代码：评级/购买/上阵三处都走同一套「核心盟约 + 最高档收益」判断，只是增益值换成 `TOP_PAYOFF_MEMBER` / `TOP_PAYOFF_DONE` / `TOP_PAYOFF_BUY`。
+  - **对原版仍为零影响**：`isTopPayoffCore` 同时要求 `isCore && isMod`，MOD 关闭时它恒为 `false`，AI 行为与原版逐字节一致。
+- **审计**:把「核心盟约待遇」在 data / engine / UI / AI / tests / docs 六层逐项过了一遍 —— 除模式名册外，其余各层（`bondsMeta` 调和、`support` 的 `coreBondIds`、装备与商店分池、`matchInfo` / `bondStrip` / `loadout` / `detailPanel` 的 UI、`public/dev/game-mock.js`）**早已把罗德岛当核心盟约**，无需改动。审计结论记在开发树的 `CHANGELOG.md`。
+- 新增测试：`test/content/mod_rhodes.test.js` 增加「罗德岛是核心盟约、且各模式名册都列有它」等断言（开启时 2 项），以及关闭态「任何模式名册都不提及罗德岛」（1 项）。
+
+### 验证
+
+- **遍历名册**：ON 下 9 个模式的 `activeBondIds` 均为在官方基础上**末尾追加** `rhodesShip`（24 / 14 条），`inactiveBondIds` 不变；在副本上 `strip` 得到的 `config.json` 与官方 0.2.3 **逐字节相同**，其余 6 个文件不变。
+- **往返幂等**：对 strip 后的副本重建，7 个 ON 文件**逐字节复现**。
+- **两态对拍**（开发树全量 `node --test`）：失败名集合 `ON-only = 0 / OFF-only = 0`（与 1.2.0 相同的判据）。
+- **AI 行为**：`test/match/mod_bot.test.js` + 机器人相关套件 **43/43 通过**；`test/content/{mod_rhodes,mod_toggle,mod_danmaku}.test.js` 30 通过 / 2 跳过 / 0 失败。
+
+### 打包
+
+- `payload/` **52 → 54 个自有文件**：OFF/ON 快照由 6 个文件 × 2 变成 7 个文件 × 2。
+- 补丁文件仍为 **19 个**（本版没有新增被改的官方文件），但 hunk 数与改动量随 AI 收敛更新为 **41 个 hunk / +615 −20**。
+- **修掉一个打包泄漏**：`payload/mod/toggles.json`（标题页那个开关的登记表）以前是**整份复制**开发树的那份，而开发树是所有 MOD 共用的 —— 于是本包里会多出一个并不包含其数据与快照的**弹幕 MOD** 开关（点了会失败）。现在 `build.mjs` 从开发树里**只挑本 MOD 这一条**重新生成它，并对结果加了一条自检（`verify.mjs`：载荷里这份登记表必须**只**含 `rhodes`，且与安装结果逐字节一致）。现在整个包里（`payload/` + `patches/`）**不含任何弹幕 MOD 的痕迹**。
+- 版本号 `1.2.0` → `1.3.0`；README 的简介、补丁表、开关说明、卸载清单与徽章同步更新。
+
 ## 1.2.0
 
 让**匹配 AI 学会打「罗德岛」**。此前 AI 只把罗德岛当成一个普通盟约，凑到 3 名就停手；而罗德岛真正的收益在 **6 名**（溢出治疗转屏障 + 屏障引爆）。现在 AI 一旦决定走罗德岛，就会主动往 6 名凑；阿米娅（医疗）还会优先转职。

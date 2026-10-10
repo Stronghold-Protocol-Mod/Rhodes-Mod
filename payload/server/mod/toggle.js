@@ -16,7 +16,7 @@
 //     (applyToggle `matches`), because the browser re-fetches /data/*.json on reload and would then be out of step
 //     with the field it is watching.
 //
-// Everything here is mod-owned: the six files, the registry (mod/toggles.json) and the snapshots (mod/variants/).
+// Everything here is mod-owned: the files, the registry (mod/toggles.json) and the snapshots (mod/variants/).
 
 import fs from 'node:fs';
 import path from 'node:path';

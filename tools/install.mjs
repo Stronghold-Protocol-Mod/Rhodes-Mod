@@ -1,4 +1,4 @@
-// tools/install.mjs — 把「罗德岛 MOD」装进一份《卫戍协议：盟约》官方 0.2.1 里。
+// tools/install.mjs — 把「罗德岛 MOD」装进一份《卫戍协议：盟约》官方 0.2.3 里。
 //
 //   node tools/install.mjs                    自动找游戏目录，装好并把 mod 打开
 //   node tools/install.mjs --game <路径>       指定游戏根目录

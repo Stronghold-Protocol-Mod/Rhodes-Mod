@@ -2,7 +2,7 @@
   "file": "data/assets.json",
   "requires": {
     "version": 1,
-    "hash": "7ae1d03466cb"
+    "hash": "cf275d509d29"
   },
   "note": "装机时按此结构差量合入；hash 由合并后的 body 重算（tools/assets/manifest.mjs contentHash）",
   "setValues": {

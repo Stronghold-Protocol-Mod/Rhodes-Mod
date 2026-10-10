@@ -5,7 +5,7 @@
  import http from 'node:http';
  import { getData, loadData } from './data.js';
 +import { setLiveBundle, liveBundle } from './mod/toggle.js';
- import { ROOT, listenAddress, serveDirs, makeLogger, parseTrustProxy } from './http/config.js';
+ import { ROOT, listenAddress, bindCandidates, serveDirs, makeLogger, parseTrustProxy } from './http/config.js';
  import { WS_MAX_PAYLOAD, createSessionStack, attachWebSocket } from './http/websocket.js';
  import { DATA_SHIM_JS, createStaticHandler } from './http/static.js';
 @@ -63,7 +64,11 @@

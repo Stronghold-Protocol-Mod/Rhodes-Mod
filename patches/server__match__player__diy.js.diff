@@ -1,6 +1,6 @@
 --- a/server/match/player/diy.js
 +++ b/server/match/player/diy.js
-@@ -139,11 +139,17 @@
+@@ -141,11 +141,17 @@
     *   widen it to slot an operator whose kit is still being written)
     * @returns {boolean} false when the picks are malformed (nothing changes) or the player is a bot
     */

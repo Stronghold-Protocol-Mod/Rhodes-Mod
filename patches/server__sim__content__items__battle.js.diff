@@ -1,6 +1,6 @@
 --- a/server/sim/content/items/battle.js
 +++ b/server/sim/content/items/battle.js
-@@ -834,6 +834,60 @@
+@@ -835,6 +835,60 @@
      });
      S.on('death', (c) => { if (c.unit === u) { st.bonus = 0; st.armed = false; } });
    },

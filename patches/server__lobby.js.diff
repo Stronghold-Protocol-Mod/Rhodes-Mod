@@ -1,6 +1,6 @@
 --- a/server/lobby.js
 +++ b/server/lobby.js
-@@ -101,6 +101,7 @@
+@@ -105,6 +105,7 @@
  import { getData as defaultGetData, lookup } from './data.js';
  import { Match as DefaultMatch } from './match/Match.js';
  import { KITTED_CHARS } from './sim/content/kits/index.js';
@@ -8,7 +8,7 @@
  
  /** Room code alphabet: uppercase letters without I and O (and no digits, so no 0/1). */
  export const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-@@ -628,7 +629,8 @@
+@@ -691,7 +692,8 @@
     * start.
     */
    diy(session, { picks }) {
@@ -18,7 +18,7 @@
      if (!res || !('ok' in res)) return fail(ERR.BAD_MSG, res && res.detail);
      const kept = freezeDiy(res.picks);
      session.diy = kept;
-@@ -642,7 +644,7 @@
+@@ -705,7 +707,7 @@
  
    /** Extra fields of every `welcome` (net.js): the operators a 自选 slot may field (shared/diy.js `kitted`). */
    welcomeInfo() {
@@ -27,7 +27,7 @@
    }
  
    // ---------------------------------------------------------------------------------------------------
-@@ -1085,4 +1087,22 @@
+@@ -1152,4 +1154,22 @@
      if (!session || session.roomCode !== room.code) return false;
      return sendSession(session, msg);
    }

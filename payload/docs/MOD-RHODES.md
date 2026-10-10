@@ -262,6 +262,25 @@ rebuild keeps them.
 > Guard: `test/data.test.js` checks every `assets.items` URL is site-absolute, resolves from its record, and exists on>   
 > disk; `test/render/assets.test.js` + `test/ui/assetUrls.test.js` fail if a manifest entry goes missing.
 
+## The 0.2.3 re-base (2026-10-10)
+
+The mod was re-based again onto the author's **0.2.3** (0.2.1 → 0.2.3). 0.2.3 adds the 自选 operator 克莱门莎
+(`char_4231_clemnt`), the 黍 / 乌尔比安 modules, `server/sim/detmath.js`, a stats page, the PWA icons and a large
+batch of battle and UI fixes — 394 files changed, 142 added. **MOD content is unchanged**; what was redone is the
+delivery: all 18 patches were regenerated against the 0.2.3 originals, and the `data/assets.json` structural delta
+was recomputed from 0.2.3's manifest.
+
+The data transplant is conflict-free by construction. The mod's contributions to
+`bonds` / `effects` / `garrisons` / `tokens` / `items` are append-only, and 0.2.3's edits to those files never touch
+the mod's keys, so the mod delta re-applies verbatim. `chess.json` is the one file both sides changed — and on
+**different fields**: the mod only appends to `bonds` (the four extra 盟约 members), while 0.2.3 rewrote
+`talents` / `talentsBase` / `potDown` / `modules`. A **per-field three-way merge** therefore keeps both: the mod's
+bond membership survives and 0.2.3's retuned talents win.
+
+The variants are re-frozen: **`off/*` is byte-identical to the author's v0.2.3 `data/*`** and `on/*` to the modded
+tree, which is exactly what the toggle writes and what `build-mod-variants.mjs --check` asserts. Everything below
+about the 0.2.1 integration still holds — 0.2.3 changed none of the mechanism, only the baseline it sits on.
+
 ## The 0.2.1 integration (toggle, 2026-10-07)
 
 The mod was re-based onto the author's **0.2.1** (whole-directory replace of 0.1.3, then re-apply). 0.2.1 moved the  
@@ -280,7 +299,7 @@ The strip is the *exact* inverse: besides chess / bonds / effects / garrisons it
 (`isMod` records `token_10050_monstr_prosts` 重构体 / `token_10066_closur_ourbase` 指挥中心 / `token_10068_kalts2_mtship`  
 战术锚点) and the 4 equipment records (`chess_item_3_13_e_a/_b` 罗德岛急救包, `chess_item_6_12_e_a/_b` 罗德岛徽章) it  
 wrote, plus the `effects.json` entries those items point at. After a strip both `data/tokens.json` and `data/items.json`  
-are **byte-identical to the author's v0.2.1 release**, which is what keeps the author's `op_{monstr,closur,kalts2}.test.js`,  
+are **byte-identical to the author's v0.2.3 release**, which is what keeps the author's `op_{monstr,closur,kalts2}.test.js`,  
 `playtest6_summons` and `feedback5-we2-placement` green with the mod off.
 
 **1a. The three summons share the author's own 自选 ids.** The author 0.2.1 also ships 可露希尔 / Mon3tr / 凯尔希·思衡托 as  
@@ -367,7 +386,7 @@ variants of **six** files into `data/`, which is exactly what the two npm script
 | --- | --- |
 | `mod/toggles.json` | the registry the server reads: `id`, display names, `files` (the six), `marker` (`bonds.rhodesShip`). Adding a second mod is a registry entry + a `mod/variants/<id>/` |
 | `mod/variants/<id>/on/*.json` | the state `npm run mod:rhodes` writes (taken from the live `data/`) |
-| `mod/variants/<id>/off/*.json` | the state `npm run mod:rhodes:strip` writes — **byte-identical to the author's v0.2.1 release** |
+| `mod/variants/<id>/off/*.json` | the state `npm run mod:rhodes:strip` writes — **byte-identical to the author's v0.2.3 release** |
 | `server/mod/toggle.js` | the engine: registry, state, the atomic swap, the live-bundle holder, the loopback check |
 | `server/mod/api.js` | `GET /mod/state`, `POST /mod/toggle` (mod-owned; `server/http/routes.js` only dispatches to it) |
 | `tools/local-extract/build-mod-variants.mjs` | writes the variants; `--check` verifies them; `--ref <dir>` asserts OFF ≡ an official release |
@@ -421,7 +440,7 @@ the badge), `public/css/screens/title.css` (a block at the end).
 ### Commands
 
 ```bash
-node tools/local-extract/build-mod-variants.mjs --ref /path/to/Stronghold-Protocol-0.2.1   # after mod:rhodes or assets
+node tools/local-extract/build-mod-variants.mjs --ref /path/to/Stronghold-Protocol-0.2.3   # after mod:rhodes or assets
 node tools/local-extract/build-mod-variants.mjs --check                                     # or: node --test test/content/mod_toggle.test.js
 ```
 
@@ -763,7 +782,7 @@ that needed more than a count:
 - **`test/sim/loadout.test.js` (kit-coverage).** The kits are keyed by **chessId** (`KITS`), not by the author's    
   charId-keyed `OPERATOR_KITS` — so the kit-less count is the mod's counted base records with no `KITS` entry at all    
   (暴行 only), and `summary.defaultCovered === summary.defaults − that count` holds in both states.
-- **`test/golden.test.js`.** The golden store is the author's v0.2.1 corpus + sim digests, which the mod's data    
+- **`test/golden.test.js`.** The golden store is the author's v0.2.3 corpus + sim digests, which the mod's data    
   necessarily invalidates, so the scenario-list and per-family digest tests skip themselves while the mod is ON    
   (`npm run golden:update` would write a *mod* store that the OFF toggle then breaks — the store is the author's    
   artifact, so the OFF state keeps it authoritative). This is the only intentional pass-count difference between the    

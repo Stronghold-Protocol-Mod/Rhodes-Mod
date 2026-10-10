@@ -18,7 +18,7 @@
  //   act1autochess_gar_event_addition_cnt (魔王)  layerGain: a 'garrison' gain whose source stands on the tile in front
  //                       of 魔王 (range_id 1-1) — or was knocked out there this instant (幽灵鲨 "被击倒时"; engine ctx.tile)
  //                       — gets +extra_cnt per bond (the extra does not count toward the source's per-battle cap).
-@@ -361,9 +372,79 @@
+@@ -368,9 +379,79 @@
    // grants are resolved in install(); 风丸's rule lives in the prep economy
    ADD_BOND() {},
    NONE() {},

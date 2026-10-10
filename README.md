@@ -1,9 +1,9 @@
 # 罗德岛 MOD · 卫戍协议：盟约
 
-《卫戍协议：盟约 · Stronghold Protocol》的**非官方数据 MOD**：在官方 **0.2.1** 之上追加「罗德岛」阵营 —— **7 名干员 · 1 个盟约 · 2 件装备**，装完即用，随时可开可关。
+《卫戍协议：盟约 · Stronghold Protocol》的**非官方数据 MOD**：在官方 **0.2.3** 之上追加「罗德岛」阵营 —— **7 名干员 · 1 个盟约 · 2 件装备**，装完即用，随时可开可关。
 
-![version](https://img.shields.io/badge/version-1.0.0-2ea44f)
-![base](https://img.shields.io/badge/base%20game-0.2.1-blue)
+![version](https://img.shields.io/badge/version-1.1.0-2ea44f)
+![base](https://img.shields.io/badge/base%20game-0.2.3-blue)
 ![license](https://img.shields.io/badge/code%20license-GPL--3.0--or--later-blue)
 ![node](https://img.shields.io/badge/node-22%20%7C%2024-339933)
 
@@ -27,7 +27,7 @@
 
 ## 简介
 
-本 MOD 在官方「卫戍协议：盟约」的**数据层**上追加了一个完整的「罗德岛」阵营：它不重写游戏逻辑，只把 7 名干员、1 个盟约、2 件装备按官方数据表的格式投影进游戏，再由一小段**常驻但惰性**的 JS 让它们生效。**MOD 关闭时游戏就是原版** —— 6 个数据文件会切回与官方 0.2.1 逐字节相同的快照。
+本 MOD 在官方「卫戍协议：盟约」的**数据层**上追加了一个完整的「罗德岛」阵营：它不重写游戏逻辑，只把 7 名干员、1 个盟约、2 件装备按官方数据表的格式投影进游戏，再由一小段**常驻但惰性**的 JS 让它们生效。**MOD 关闭时游戏就是原版** —— 6 个数据文件会切回与官方 0.2.3 逐字节相同的快照。
 
 组成一览：
 
@@ -139,19 +139,19 @@ tools/
 
 |  |  |
 | --- | --- |
-| **适配版本** | 官方 **0.2.1**（`package.json` → `"stronghold-protocol-alliance"` / `"0.2.1"`） |
+| **适配版本** | 官方 **0.2.3**（`package.json` → `"stronghold-protocol-alliance"` / `"0.2.3"`） |
 | **前置要求** | 已装好并能正常启动的官方游戏本体；**Node.js 22 或 24 LTS**（游戏本身也依赖它） |
 | **体积** | 下载的 ZIP 约 1.9 MB，解压后约 7.4 MB（其中 MOD 独占美术素材 27 个 / 约 1.9 MB） |
 | **平台** | Windows（`install.bat`）· macOS / Linux（`install.sh`） |
 
-> 官方 0.2.1 之外的其他版本**未必能直接装**：安装器会逐个文件比对 `baseSha256`，对不上就会**报错并停止**，不会把游戏改坏。届时等 MOD 跟进即可。
+> 官方 0.2.3 之外的其他版本**未必能直接装**：安装器会逐个文件比对 `baseSha256`，对不上就会**报错并停止**，不会把游戏改坏。届时等 MOD 跟进即可。
 
 ### 步骤
 
-1. 下载本仓库（`Code` → `Download ZIP`，或 `git clone`），解压到一个**不会被误删**的目录。
+1. 下载本仓库（`Code` → `Download ZIP`，或 `git clone`），解压到**游戏目录里面**（推荐 —— 这样终端里的开关脚本也在正确位置）。
 2. 双击 **`install.bat`**。
 
-就这样，安装器会自己找到游戏目录。找不着的时候有两条退路：
+就这样，安装器会自己找到游戏目录。如果你把 MOD 解压到了别的地方，有两条退路：
 
 - 把**游戏文件夹直接拖到 `install.bat` 上**松手；
 - 命令行里指定：`install.bat "D:\你的路径\Stronghold-Protocol"`。
@@ -174,19 +174,20 @@ macOS / Linux 用 `./install.sh`，参数一样。
 
 ## 开关
 
-MOD 是**数据驱动**的：那套 JavaScript 永远随游戏加载，但**只有数据存在时才工作**。开关做的事情，就是在 6 个数据文件（`chess` / `bonds` / `effects` / `garrisons` / `tokens` / `items`）的「ON 快照」和「OFF 快照」之间切换 —— **OFF 快照与官方 0.2.1 原件逐字节相同**，所以关掉之后游戏就是原版，不是「近似原版」。
+MOD 是**数据驱动**的：那套 JavaScript 永远随游戏加载，但**只有数据存在时才工作**。开关做的事情，就是在 6 个数据文件（`chess` / `bonds` / `effects` / `garrisons` / `tokens` / `items`）的「ON 快照」和「OFF 快照」之间切换 —— **OFF 快照与官方 0.2.3 原件逐字节相同**，所以关掉之后游戏就是原版，不是「近似原版」。
 
 三种开关方式，随你顺手：
 
 ```bat
-:: 命令行（在游戏目录里）
+:: 命令行（在游戏目录里；MOD 解压到别处就换下面第三条）
 npm run mod:rhodes            :: 开
 npm run mod:rhodes:strip      :: 关
 npm run mod:rhodes:status     :: 看状态
 ```
 
-- **游戏内**：标题界面的 MOD 徽标，点一下切换（仅本机回环地址可切，对局进行中禁止切换）。
+- **游戏内（推荐，不用终端）**：标题界面的 MOD 徽标，点一下切换（仅本机回环地址可切，对局进行中禁止切换）。
 - **HTTP**：`POST /mod/toggle?id=rhodes&on=1`（`0` 为关闭），`GET /mod/state` 读状态。
+- **MOD 目录里**：`node tools/mod-toggle.mjs on|off|status --game <游戏目录>`，任何解压位置都能用。
 
 反复开关是幂等的 —— 开 → 关 → 开之后，数据文件与第一次开时**逐字节一致**。
 
@@ -194,6 +195,7 @@ npm run mod:rhodes:status     :: 看状态
 
 ```bat
 npm run mod:rhodes:strip
+:: 或从 MOD 目录：node tools/mod-toggle.mjs off --game <游戏目录>
 ```
 
 游戏就回到原版了。想彻底清理，再删掉这些 MOD 新增的文件 / 目录：

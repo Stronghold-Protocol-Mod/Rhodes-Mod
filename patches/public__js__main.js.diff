@@ -8,7 +8,7 @@
  import { ToastHost, toast, toastError, describeError } from './ui/toasts.js';
  import { net, identity, NetError } from './net.js';
  import { store, useStore, emptyMatch, selectRoute, sessionResetNotice, isSpectating } from './store.js';
-@@ -211,6 +212,9 @@
+@@ -222,6 +223,9 @@
    net.on('replaced', () => toast(t('该身份已在其他页面登录，本页已断开'), 'warn', { ttl: 6000 }));
    net.on('unhandledError', (err) => toastError(err));
    net.on('room.state', onRoomState);

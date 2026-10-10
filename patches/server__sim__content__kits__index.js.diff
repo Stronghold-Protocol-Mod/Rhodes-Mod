@@ -16,7 +16,7 @@
  
  export const KIT_FILES = Object.freeze([
    // tier 1
-@@ -153,6 +162,17 @@
+@@ -154,6 +163,17 @@
  ]);
  
  /**
@@ -34,7 +34,7 @@
   * The 预备干员 whose every skill the generic kit covers exactly (冲锋号令, 攻击力 / 防御力 / 治疗强化, 战术咏唱, 一击即退 —
   * test/content/standin.test.js): fielded with no kit file, as 补位 stand-ins and as tier-5 自选 picks.
   */
-@@ -171,6 +191,7 @@
+@@ -172,6 +192,7 @@
  const MODULES = await Promise.all(KIT_FILES.map((group) => Promise.all(group.map(loadKitFile))));
  const STANDIN_MODULES = await Promise.all(STANDIN_KIT_FILES.map(loadKitFile));
  const OPERATOR_MODULES = await Promise.all(OPERATOR_KIT_FILES.map(loadKitFile));
@@ -42,7 +42,7 @@
  const registryOf = (m) => (m && m.default && typeof m.default === 'object' ? m.default : {});
  
  /** The registry of each tier group (index 0 = tier 1): baseChessId → kit builder, in KIT_FILES order. */
-@@ -182,11 +203,14 @@
+@@ -183,11 +204,14 @@
  /** The 自选 operator kits: owned-6★ charId → kit builder, in OPERATOR_KIT_FILES order. */
  export const OPERATOR_KITS = Object.freeze(Object.assign({}, ...OPERATOR_MODULES.map(registryOf)));
  

@@ -1,11 +1,11 @@
 --- a/public/i18n/en.json
 +++ b/public/i18n/en.json
-@@ -1055,5 +1055,17 @@
-   "选择「{name}」的朝向": "Choose {name}'s facing",
-   "选择朝向": "Choose a facing",
-   "朝向：{dir}": "Facing: {dir}",
--  "开发版 · 不稳定，请勿用于公开服务器": "Development build · unstable, not for public servers"
-+  "开发版 · 不稳定，请勿用于公开服务器": "Development build · unstable, not for public servers",
+@@ -1207,5 +1207,17 @@
+   "请等待所有玩家连接后再发起投票": "Wait for all players to connect before starting a vote.",
+   "同意重刷": "Agree to reroll",
+   "拒绝重刷": "Reject reroll",
+-  "取消投票": "Cancel vote"
++  "取消投票": "Cancel vote",
 +  "有对局正在进行，无法切换 MOD": "A match is running — the MOD cannot be switched",
 +  "只有运行服务器的本机可以切换 MOD": "Only the machine running the server can switch the MOD",
 +  "切换失败": "Switch failed",

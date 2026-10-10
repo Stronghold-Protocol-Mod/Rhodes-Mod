@@ -1,25 +1,25 @@
 {
   "name": "rhodes-mod",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "base": {
     "name": "stronghold-protocol-alliance",
-    "version": "0.2.1"
+    "version": "0.2.3"
   },
   "files": {
-    "docs/MOD-RHODES.md": "a8f4d7dbbda7b3a24caffe4aa11d34e91b8ab0b16616062fcb0f9f83e79ca40f",
+    "docs/MOD-RHODES.md": "54b3c867db332c6c7cab3b27ee20ea33488471d542d03e85b6b5df7da1776a60",
     "mod/toggles.json": "7802ece631b1af07559ec6f8a7b2f2d504b23cfd0c7b68230a45482032cdec0e",
     "mod/variants/rhodes/on/bonds.json": "2609c842ef45a906eabc29553bc780ce1a6e1fbceeb09fe74bba6890e95ec53b",
     "mod/variants/rhodes/off/bonds.json": "53a22f4724771b6ff40041635e907c0af39790731f661b0439fc593f5a91c94c",
-    "mod/variants/rhodes/on/chess.json": "13e7c3c045a8523f8dbc5f6bb9c531494d1d02a2e385bb2e6cda1ee07b644c80",
-    "mod/variants/rhodes/off/chess.json": "34338e7cd766981ce43d3e4049d9a60b3d2aea017e00f5cfea8682bcfe54461b",
+    "mod/variants/rhodes/on/chess.json": "0c771f9cf3fbaa5897e97bad35a26b77c2d637c6c09e346481a713a7c2faf6bb",
+    "mod/variants/rhodes/off/chess.json": "fd463d31c21d3f40524058abb47fe64b6c32ebed22956586a50bee672e6dfa79",
     "mod/variants/rhodes/on/effects.json": "98cad4458ef10023fe8a721f5a355b800efeef56e7a0ce5a424a93c77473a713",
     "mod/variants/rhodes/off/effects.json": "96e28be614f04da6d58c9e95706d742863c756b94dcad498e808c3410ba620e3",
     "mod/variants/rhodes/on/garrisons.json": "df565cc59c9a712a0eea580d6c23a808276177ea16ccffcfc22972323e5ac313",
     "mod/variants/rhodes/off/garrisons.json": "f5b1f5558a263c95abcf36411c31e781efd3ebb1bebdced99ad1f242c2a960e3",
     "mod/variants/rhodes/on/items.json": "cc149800d96f41465f7f1d23863b8afe1a67e07541f8681aad1a14eb91e4d6fc",
     "mod/variants/rhodes/off/items.json": "6122a3cd75531f551a03082f000426a2d6b8028788fbd1abbaea5286592fbba4",
-    "mod/variants/rhodes/on/tokens.json": "72814efa1462200aabc03459fb19043eb0a0099deaa99b255694653d912c94d2",
-    "mod/variants/rhodes/off/tokens.json": "ca98a1189d62c3221e3bc9d149f8ba67d44cab5a6c5e780251fb162177d6519c",
+    "mod/variants/rhodes/on/tokens.json": "cf7519f445bb61e2b14b18d11d7b0ec4a3c43637784c3be43dde6a8882ad0c3a",
+    "mod/variants/rhodes/off/tokens.json": "9e3501357b07d754711fcfd8506286efa32b7774d98e419fdcff48c1f6729b39",
     "public/js/ui/modBadge.js": "c29a6537a8b1ff704d7d76bc2260920de19529abbd08719ba79f910ba13e2f77",
     "server/mod/api.js": "424300ac42f61c164729e7234fc79a4bdc3389ea7d155b7baca79697e357cbcc",
     "server/mod/toggle.js": "df1f3c6adc36c2e500224c1443734d6660f0e8704c84776b33c1dabde264d179",
@@ -62,40 +62,40 @@
   "patches": {
     "package.json": {
       "patch": "patches/package.json.diff",
-      "baseSha256": "850f762c9dea2c74b1e8cf78e713afbbbce4332e3597776c99d92cfa6ccddcae",
-      "resultSha256": "baeaddb94c0c82bdf61aac45bfb61cb3a696b601e8f62180bfaf4789819f0dc2",
+      "baseSha256": "14fca9cd252160abdfb0da5142ea7ab3aaa2d8d6b6909b84de36332b6f55e5a1",
+      "resultSha256": "e90ff454936aa001cab6281b3b4817ff70cc41fc849f8c735c7f433a64a2208c",
       "hunks": 1,
       "added": 3,
       "removed": 0
     },
     "public/css/screens/title.css": {
       "patch": "patches/public__css__screens__title.css.diff",
-      "baseSha256": "9f8a8e326b103304400b2ced438605ea6cecaae658ac01d87f09a8f8dae8d565",
-      "resultSha256": "f385db4720115ca6c589a64ecd061c3f7e8d6dd1ad33cf953bd4bba36a7264b1",
+      "baseSha256": "99ec3da4a2acbe91d89c4dcc6636b6dd9952b0ce25848593e171013bbc300b5b",
+      "resultSha256": "cc94c10eca6005dccb1cfaf37c5df9296a4dd2c8fb81858517e68f11b4246260",
       "hunks": 1,
       "added": 56,
       "removed": 0
     },
     "public/i18n/en.json": {
       "patch": "patches/public__i18n__en.json.diff",
-      "baseSha256": "61c036e1077c0f0b0e2cba424692ec9f94dc3e4ccf34162f23d1be99d1dced43",
-      "resultSha256": "153c18b8c8df42bdfc8995fa296076f882c971d4e09dcd40b4ed0a1e0d2674c3",
+      "baseSha256": "6a2d262df995dc00f9d35ff8fc75aeb11676c78ea23230374e146d8639bb36c1",
+      "resultSha256": "c3cccef467e7199ac8c222f999473f53d17bc0a705631eb62d88e8e5eaf7b5ef",
       "hunks": 1,
       "added": 13,
       "removed": 1
     },
     "public/js/main.js": {
       "patch": "patches/public__js__main.js.diff",
-      "baseSha256": "29f9f299a6b162b104c5222bcf4f43e631a79e03b59c8ec2ce6d42b216874a5f",
-      "resultSha256": "df31cf71895a11335335cdb14d6d687f00319063e734571d97ba769a91e48db2",
+      "baseSha256": "431235fa43477a48b8bd3494ee050fcd1419a9de07d6b3c578af8d793e9b38ca",
+      "resultSha256": "403984c67b47a679a101ae6f93532dee4e346e423d8fa368ee6481a332b67b58",
       "hunks": 2,
       "added": 4,
       "removed": 0
     },
     "public/js/screens/title.js": {
       "patch": "patches/public__js__screens__title.js.diff",
-      "baseSha256": "53c72a2268e03bc043b63c30b44f840bbdd8bd9542ef754a3012a0ab66a4a9b7",
-      "resultSha256": "bf47c2b5d86ce90c6db27a7372fd2eef953f753c318cc1ecfd48d62f7bedb26f",
+      "baseSha256": "15a0992cd05a7591ec4489ff47dc7bcebff0c3aedf4030fc1f1c3cd87b56f0eb",
+      "resultSha256": "283b96a12e049b87cbf47992ad366c6cbce4eaf6da9cf549427ab39bde09a067",
       "hunks": 2,
       "added": 3,
       "removed": 0
@@ -126,24 +126,24 @@
     },
     "server/index.js": {
       "patch": "patches/server__index.js.diff",
-      "baseSha256": "b4d44ac161db9cbf58fb67ee54a7c9bcaf7db244496be63bbe94c5d196acead6",
-      "resultSha256": "e57c3e79a7d2f3b48681cb667740f1e32d994b7f2dccb4131da019fd18352f75",
+      "baseSha256": "78368f7e970960b94867a1d8fe3527b8e02f10e6c5acb03b87bc9d1caa5f0518",
+      "resultSha256": "540bcc5e34b2665a55b9b9379c422053b5ecce264829643b6e61cdd814c02544",
       "hunks": 2,
       "added": 6,
       "removed": 1
     },
     "server/lobby.js": {
       "patch": "patches/server__lobby.js.diff",
-      "baseSha256": "f4d482eb038a1aeaa21ef6a1d30585c7f99b0819d8e987a9d235e5bcb2511991",
-      "resultSha256": "6eba605afc794fb4e32ad320f1251b639fb21cfe3ff0b3d1c2a1e65553613fa5",
+      "baseSha256": "ea18a04542a43df5cbfb449c9c6dbe694bc941dc98134ce9ccb3744abecf1e61",
+      "resultSha256": "53955ad97d8241f7860b232415a785b6e9b1720c478808efd40c928797a267c9",
       "hunks": 4,
       "added": 22,
       "removed": 2
     },
     "server/match/player/diy.js": {
       "patch": "patches/server__match__player__diy.js.diff",
-      "baseSha256": "3cf51b18a679e384b81fd4da52faca089a0a2c56c13b454f678f23ac8b445799",
-      "resultSha256": "532af3f33d04d6df0c651d2e566927d70f9375679e6d12bc534ef13484998ce1",
+      "baseSha256": "500fba6cb6030c7a923b777b233ca1919c9b87310104035ea3e70863dccd1d7c",
+      "resultSha256": "556b4d2f211accf44644571afb771fbc13c40774086f1874777a8b6ef35cd987",
       "hunks": 1,
       "added": 8,
       "removed": 2
@@ -158,8 +158,8 @@
     },
     "server/sim/content/garrisons/battle.js": {
       "patch": "patches/server__sim__content__garrisons__battle.js.diff",
-      "baseSha256": "bbd17d3aefbb3f1009414c54f21c11d5bd895a62e2adea2819a85400add022cd",
-      "resultSha256": "83ced0228be0ea895d5c850753a7dd42c98c4f82c05cb166a30821ea6eaab78b",
+      "baseSha256": "0dbb5f8617cf0c9ebf85ec44acd4c0fec02e480bfe44d244474fd5271bcd1a7d",
+      "resultSha256": "b4fa59caac022bb2a25706b005a882c2d835caa2f947d74b614e1cf87e722e09",
       "hunks": 2,
       "added": 81,
       "removed": 0
@@ -174,32 +174,32 @@
     },
     "server/sim/content/items/battle.js": {
       "patch": "patches/server__sim__content__items__battle.js.diff",
-      "baseSha256": "c2f88f182681824b5418c5fe7893f2eca6d0131503b4f53c04318f589db176e5",
-      "resultSha256": "839fc4284218b596279cf90946027351116c0cc3066c53b7cfac23cf5d00e9aa",
+      "baseSha256": "55ea322caa5ee22cae2f4a4980d814418ab3b18f2febbea96de1a9c1bdebec14",
+      "resultSha256": "9a29e745698f455d3c5498d7516a17f09a2242954c3c1624347a36b13afe5044",
       "hunks": 1,
       "added": 54,
       "removed": 0
     },
     "server/sim/content/kits/index.js": {
       "patch": "patches/server__sim__content__kits__index.js.diff",
-      "baseSha256": "17dd63f999eb00bbdc935050e6510a976d244e8eb61513a38bb5107fa50f946c",
-      "resultSha256": "fc98ad96bc96e5044d587dade13ec29aa70b2155368149252f437fadd3a98572",
+      "baseSha256": "8d243e9823d83f902193b3aaf27a032a4cbf268895509d9ade17eecae9e23b80",
+      "resultSha256": "5da52c92eaef5208ce00745530e22d28bcb8ceb342656a615d48b5ce0f2d523c",
       "hunks": 4,
       "added": 26,
       "removed": 2
     },
     "server/sim/content/tokens.js": {
       "patch": "patches/server__sim__content__tokens.js.diff",
-      "baseSha256": "414db8c4487690f5898e5b7581f94dde2c8c3ed50998f85696de71143798b1d4",
-      "resultSha256": "724d4317f2122238a047e000c197581f62e9279ef2f0ea1f1cb104f6ffd4f91c",
+      "baseSha256": "9397e1943a1569457bc8eb1da0242d7fd95bbc0eb723a7d42e15164922a14291",
+      "resultSha256": "33f77c6f79c6810ef5c705c5e4ead063dbf9a21ad4d26812409aab96c8b9ac29",
       "hunks": 4,
       "added": 153,
       "removed": 2
     },
     "shared/protocol.js": {
       "patch": "patches/shared__protocol.js.diff",
-      "baseSha256": "c2970f19380fafa1cc6e60d564d11340a0dc2cd3619154a25418e334baa49cdc",
-      "resultSha256": "c6ed120f17d487b28fced7d60c43265795146bae88b2a85b7057e7f4a38e00e9",
+      "baseSha256": "79a0a64ef8c1d99551f313ed386f9cd696dee8128fe77a6b20ae155da47d68a4",
+      "resultSha256": "a115fc514f49d640d01e9e3e0cd69be83e91b26170a93f5577a641d690ed9159",
       "hunks": 1,
       "added": 4,
       "removed": 0

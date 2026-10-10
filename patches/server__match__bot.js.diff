@@ -1,0 +1,170 @@
+--- a/server/match/bot.js
++++ b/server/match/bot.js
+@@ -66,6 +66,14 @@
+ //   6. resolve the temp slots (a 突变细胞 left there — it comes back after every transformation — gets a hand slot made
+ //      for it, makeHandRoom, instead of being destroyed), keep one hand slot free (freeHandSlot: a kept bounty Art goes
+ //      before a chess on a bot's own seat, never on a human's seat under AI 托管), then Ready.
++// 罗德岛 MOD (docs/MOD-RHODES.md; every rule below is inert while its data is stripped, so the mod OFF bot takes
++// exactly the author's decisions). `rhodesShip` is a *commit* bond: its first threshold (3 distinct members) only widens
++// the heals a member receives, while the barrier, the 「罗德岛医疗可以对友军回血」 rule and the operators' layer 特质 need
++// 6 — so once the plan is built around it (bondPlan focus) the bot pushes its members all the way to the top threshold,
++// on the board (lineupScore: a 6-member set is worth ~30 points more than the same board with 4) and in the shop
++// (bondValue) alike. Its 转职 pairing (equipMorphPair): 变形同构体 alone grants nothing — the carrier is a member of the
++// bond of the OTHER item it wears (bondsMeta.pieceBonds) — so the bot dedicates one operator to the pair, 阿米娅·医疗
++// first (her 特质 funds every bond she has active, so a second bond is worth most on her) and the 奥术 item before 精准.
+ // Strategy (botPickBand): weighted by starting LP among the offered bands; never one whose mechanic rides on a bond the
+ // mode switches off (gd.bandBondIds = bands.json bondIds: the bond its text names in <…> or its blackboards name — 标准's
+ // 潘格尼尼, 克莱门莎, 玛恩纳; DESIGN §21.26); alone, 老鲤's withheld first-round funds only rarely (× 0.02).
+@@ -134,6 +142,29 @@
+ const DEFAULT_MELEE_RANGE = [[0, 0], [0, 1]];
+ 
+ /**
++ * 罗德岛 MOD (docs/MOD-RHODES.md). `rhodesShip` is the mod's own core bond and its presence in the data is the mod's
++ * marker (`server/sim/content/kits/mod.js modActive`), so every helper below keys on it and does nothing while the mod
++ * is stripped — the two-state parity the mod's test suite requires (OFF = the author's own decisions, byte for byte).
++ */
++const RHODES_BOND = 'rhodesShip';
++const modOn = (gd) => !!(gd && typeof gd.bond === 'function' && gd.bond(RHODES_BOND));
++/**
++ * A bond whose payoff sits at its TOP member threshold rather than at its first one. 罗德岛 is the only one: at 3 distinct
++ * members the bond only boosts the heals a member receives — the barrier (6), the 「罗德岛医疗可以对友军回血」 rule (6) and
++ * the operators' layer 特质 are the faction. The bot commits such a bond all the way up instead of banking its first tier.
++ */
++const isCommit = (m, bondId) => bondId === RHODES_BOND && modOn(m.gd);
++/** Value per member of a commit bond on the way to its top threshold, and the bonus once it really holds it (lineupScore). */
++const COMMIT_MEMBER = 18;
++const COMMIT_DONE = 12;
++/** Buy-side bonus of a commit-bond member below the top threshold (bondValue) — keeps the shopping up all the way. */
++const COMMIT_BUY = 8;
++/** The operator the MOD's 转职 (变形同构体 + a `giveBondId` item) targets first: 阿米娅·医疗 (`char_1037_amiya3`). */
++const MORPH_HOST_CHAR = 'char_1037_amiya3';
++/** The bond items a 罗德岛 转职 takes, in order: 奥术 (逻各斯's bond) before 精准 (可露希尔's). */
++const MORPH_BOND_PREF = Object.freeze(['arcaneShip', 'preciShip']);
++
++/**
+  * Band pick among the strategies the mode offers (gd.bandIds): weighted by starting LP (sturdier strategies are
+  * preferred). Alone, a band that withholds the first rounds' funds (老鲤 "资金暂存": no operator in R1–R2, every enemy
+  * leaks) is avoided — only 联防 teammates cover that. A band whose mechanic rides on a bond the mode switches off
+@@ -370,8 +401,12 @@
+     if (!b || !b.isCore || m.gd.modeInactiveBonds.has(id)) continue;
+     const k = owned.counts.get(id) || 0;
+     if (!k) continue;
++    // a commit bond (罗德岛): what decides is not the members held but how near owned + reachable sits to the TOP
++    // threshold — a Rhodes board that can be woken at 6 is the plan, a half-built one is not
++    const commit = isCommit(m, id) && Array.isArray(b.thresholds) && b.thresholds.length
++      ? Math.min(10, Math.max(0, k + (pool.reach.get(id) || 0) - b.thresholds[0]) * 2) : 0;
+     const s = k * 10 + Math.min(4, pool.reach.get(id) || 0) + Math.min(6, (ps.layers[id] || 0) / 10)
+-      + (id === prev ? 6 : 0) - (mates.has(id) ? 6 : 0) + Math.min(0.9, (pool.supply.get(id) || 0) / 100);
++      + (id === prev ? 6 : 0) - (mates.has(id) ? 6 : 0) + Math.min(0.9, (pool.supply.get(id) || 0) / 100) + commit;
+     if (s > bestS) { bestS = s; focus = id; }
+   }
+   let second = null;
+@@ -444,7 +479,8 @@
+     if (hits) v += 10 * w;
+     else if (th.some((t) => t > n + 1 && t - (n + 1) <= 1)) v += 3 * w;
+     if (bond.thresholdTemplate === 'count_threshold_downward') v -= n > 0 ? 12 : 0; // 独行 breaks with a second member
+-    if (b === focus) v += 10;
++    // a commit bond (罗德岛) keeps paying until its top threshold: 4 and 5 members are worth little on their own
++    if (b === focus) v += 10 + (isCommit(m, b) && n + 1 <= th[th.length - 1] ? COMMIT_BUY : 0);
+     else if (b === second) v += 4;
+     else if (committed && bond.isCore && !hits) v -= 4;
+   }
+@@ -514,11 +550,15 @@
+   let v = 0;
+   for (const p of set) v += unitBase(m, p, ctx);
+   for (const [id, b] of Object.entries(bonds)) {
+-    // every deployed focus member counts on the way to the next threshold (a swap alone never reaches the 6-member tier)
++    // every deployed focus member counts on the way to the next threshold (a swap alone never reaches the 6-member tier);
++    // a commit bond (罗德岛) weighs its members up to the TOP threshold heavily and pays a bonus once it is really there,
++    // so the deployed set reaches 6 instead of banking the first tier and filling the rest with stronger operators
+     if (id === ctx.focus) {
+       const bond = gd.bond(id);
+       const top = bond && Array.isArray(bond.thresholds) && bond.thresholds.length ? bond.thresholds[bond.thresholds.length - 1] : 3;
+-      v += FOCUS_MEMBER * Math.min(b.count || 0, top);
++      const n = Math.min(b.count || 0, top);
++      v += (isCommit(m, id) ? COMMIT_MEMBER : FOCUS_MEMBER) * n;
++      if (isCommit(m, id) && n >= top) v += COMMIT_DONE;
+     }
+     if (!b.tier) continue;
+     const bond = gd.bond(id);
+@@ -1761,6 +1801,9 @@
+   const rec = gd.item(item.id);
+   if (!rec) return null;
+   const key = itemEffect(rec);
++  // 罗德岛 MOD: a 变形同构体 grants nothing on its own (its bond comes from the item worn next to it), so equipMorphPair
++  // — which runs before the equip loop — owns it; here it is kept (null is this function's "keep it").
++  if (modOn(gd) && rec.canGiveBond) return null;
+   const value = new Map();
+   const val = (p) => { if (!value.has(p.uid)) value.set(p.uid, pieceValue(m, ps, p, ctx)); return value.get(p.uid); };
+   const deployed = [...ps.board.values()].filter((p) => p.kind === 'chess');
+@@ -1851,8 +1894,70 @@
+   if (key) { const [r, c] = parseKey(key); tryDo(() => ps.useArt(item.uid, r, c)); }
+ }
+ 
++/** A 变形同构体 (an item with `canGiveBond`): alone it grants nothing — worn with another item it makes the carrier a
++ *  member of that item's bond (bondsMeta.pieceBonds, server/match/bondsMeta.js). */
++const isMorphGrant = (gd, id) => !!(gd.item(id) || {}).canGiveBond;
++/** The bond a `giveBondId` item hands to a 变形同构体 wearer (null for any other item). */
++const grantBondOf = (gd, id) => { const r = gd.item(id); return r && typeof r.giveBondId === 'string' && gd.bond(r.giveBondId) ? r.giveBondId : null; };
++const wornMorph = (gd, p) => (p.items || []).some((it) => isMorphGrant(gd, it.id));
++const wornBond = (gd, p) => (p.items || []).some((it) => grantBondOf(gd, it.id));
++
++/**
++ * The operator a 罗德岛 转职 gathers on (equipMorphPair): 阿米娅·医疗 first — her 特质 (`modautochess_gar_event_heal`)
++ * pays a layer to EVERY bond she has active, so a second membership is worth most on her —, else whoever already wears
++ * half the pair. Deployed chess with a free slot only; null when there is no carrier (the morph stays in the hand).
++ */
++function morphHost(m, ps) {
++  const gd = ps?.gd || m.gd;
++  const free = (p) => (p.items || []).length < gd.equipPerChess;
++  const deployed = [...ps.board.values()].filter((p) => p.kind === 'chess' && free(p));
++  const ami = deployed.find((p) => (gd.chess(p.id) || {}).charId === MORPH_HOST_CHAR);
++  if (ami) return ami;
++  return deployed.find((p) => wornMorph(gd, p) || wornBond(gd, p)) || null;
++}
++
++/** The `giveBondId` item the host takes: the MOD's order for 阿米娅 (奥术 before 精准 — the bonds of 逻各斯 and 可露希尔,
++ *  the two operators her extra membership activates), else the highest tier. */
++function pickBondItem(gd, host, bonds) {
++  if ((gd.chess(host.id) || {}).charId === MORPH_HOST_CHAR) {
++    for (const b of MORPH_BOND_PREF) {
++      const it = bonds.find((p) => grantBondOf(gd, p.id) === b);
++      if (it) return it;
++    }
++  }
++  return bonds.slice().sort((a, b) => gd.tierOf(b.id) - gd.tierOf(a.id) || a.uid - b.uid)[0] || null;
++}
++
++/**
++ * 罗德岛 MOD · the 转职 pairing, run before the generic equip loop (which then keeps the morph, itemTarget). A
++ * 变形同构体 alone is a dead item and a `giveBondId` item alone is only its stat line; worn together on ONE operator
++ * the carrier counts as a member of that bond (bondsMeta.pieceBonds) — which is what a 罗德岛 board wants on 阿米娅·医疗
++ * (see the file header). Equips whichever half is missing, so it works the same in whichever order the two arrive.
++ */
++function equipMorphPair(m, ps) {
++  const gd = ps?.gd || m.gd;
++  if (!modOn(gd)) return;
++  const pending = [...ps.hand, ...ps.temp].filter((p) => p && p.kind === 'item' && canUseItem(m, ps, p));
++  const morphs = pending.filter((p) => isMorphGrant(gd, p.id));
++  const bonds = pending.filter((p) => grantBondOf(gd, p.id));
++  if (!morphs.length && !bonds.length) return;
++  const host = morphHost(m, ps);
++  if (!host) return;
++  if (!wornMorph(gd, host)) {
++    // the morph alone grants nothing: spend the slot only when the pair can really complete (a bond item in hand, or
++    // one the host already wears)
++    if (!morphs.length || (!bonds.length && !wornBond(gd, host))) return;
++    if (!tryDo(() => ps.equip(morphs[0].uid, host.uid))) return;
++  }
++  if (wornBond(gd, host)) return;
++  const bond = pickBondItem(gd, host, bonds);
++  if (bond) tryDo(() => ps.equip(bond.uid, host.uid));
++}
++
+ function equipItems(m, ps) {
+   const gd = ps?.gd || m.gd;
++  // 罗德岛 MOD: pair 变形同构体 with its bond item first — the generic loop below only sees the leftovers
++  equipMorphPair(m, ps);
+   const tried = new Set();
+   for (let guard = 0; guard < 12; guard++) {
+     const item = [...ps.hand, ...ps.temp].find((p) => p && p.kind === 'item' && canUseItem(m, ps, p) && !tried.has(p.uid));

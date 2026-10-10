@@ -569,6 +569,29 @@ box around every atlas region and the chibi broke apart.
   black block (a healthy control, char_1052_kalts2, behaves the same).
 
 
+## The bot plays the mod (2026-10-10)
+
+`server/match/bot.js` — the AI teammates and AI 托管 — knows the faction now. Both rules key on the data
+(`modOn(gd)` reads `bonds.rhodesShip`, the mod's presence marker), so a stripped checkout keeps the author's own
+decisions unchanged: the two-state parity of `test/match` still holds (same failure set on and off), and the author's
+own bot suites are untouched.
+
+- **罗德岛 is a commit bond.** Its first threshold (3 distinct members) only widens the heals a member *receives*; the
+  barrier, the 6-member medic rule and the operators' layer 特质 are the 6-member tier. Before this, the bot's generic
+  scoring banked the first tier and filled the rest of the board with stronger operators — on a mixed bench it capped at
+  4 members even owning all seven. Now, once `bondPlan` builds the plan around it, the bot pushes to the **top**
+  threshold: `bondValue` keeps paying for a member below 6 (`COMMIT_BUY`), `lineupScore` weighs committed members at
+  `COMMIT_MEMBER` (18, against `FOCUS_MEMBER` 4) up to the top threshold and pays `COMMIT_DONE` once the 6 really
+  stand, and `bondPlan` credits how near owned + reachable sits to it. The same mixed bench now fields every 罗德岛
+  member it owns (6 when it has 6).
+- **转职 — the 变形同构体 pairing.** 变形同构体 alone grants nothing: worn with a `giveBondId` item the carrier counts
+  as a member of that bond (`bondsMeta.pieceBonds`). `equipMorphPair` — run before the generic equip loop, which then
+  leaves the morph alone — gathers the pair on one operator: **阿米娅·医疗** first, because her 特质 pays a layer to
+  *every* bond she has active, so a second membership is worth most on her, and **奥术法阵** before **精准狙击镜**
+  (逻各斯's bond before 可露希尔's), which is exactly the pairing that wakes 奥术 on a Rhodes board. A half-pair is
+  held, never spent: with no bond item in play the morph stays in the hand.
+- `test/match/mod_bot.test.js` pins both (skipping itself while the mod is off).
+
 ## Known limitations
 
 - **The 网页端开关 is server-wide, and the operator's machine owns it.** One server process serves one data state, so

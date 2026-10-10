@@ -1,12 +1,12 @@
 {
   "name": "rhodes-mod",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "base": {
     "name": "stronghold-protocol-alliance",
     "version": "0.2.3"
   },
   "files": {
-    "docs/MOD-RHODES.md": "54b3c867db332c6c7cab3b27ee20ea33488471d542d03e85b6b5df7da1776a60",
+    "docs/MOD-RHODES.md": "d794f3d8272a0d4aaf15aaa1a6ad2a4a5ca6e7f93aa4946913e812c42b6f1e20",
     "mod/toggles.json": "7802ece631b1af07559ec6f8a7b2f2d504b23cfd0c7b68230a45482032cdec0e",
     "mod/variants/rhodes/on/bonds.json": "2609c842ef45a906eabc29553bc780ce1a6e1fbceeb09fe74bba6890e95ec53b",
     "mod/variants/rhodes/off/bonds.json": "53a22f4724771b6ff40041635e907c0af39790731f661b0439fc593f5a91c94c",
@@ -139,6 +139,14 @@
       "hunks": 4,
       "added": 22,
       "removed": 2
+    },
+    "server/match/bot.js": {
+      "patch": "patches/server__match__bot.js.diff",
+      "baseSha256": "ca8de1a60f2a0a206c117a8b039f0185844523188d804d61efad63eba0cb1f46",
+      "resultSha256": "be57abea607366b8412c477b4d8de1946ab33cdc5f1cae433b5aa8100a9ca6d9",
+      "hunks": 7,
+      "added": 109,
+      "removed": 4
     },
     "server/match/player/diy.js": {
       "patch": "patches/server__match__player__diy.js.diff",

@@ -15,7 +15,7 @@
 
 本仓库**不包含上游项目的源码**。上游的文件以两种形式携带：
 
-- **patch（补丁）** —— `patches/*.diff`，对上游 18 个文件的统一 diff；
+- **patch（补丁）** —— `patches/*.diff`，对上游 19 个文件的统一 diff；
 - **merge（结构差量）** —— `patches/data__assets.json.merge`，对上游单行压缩 JSON `data/assets.json` 的结构化增量。
 
 安装时（`tools/install.mjs`）把它们打在用户自己那份官方安装上，并在落地前逐个文件校验

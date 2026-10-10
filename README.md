@@ -2,7 +2,7 @@
 
 《卫戍协议：盟约 · Stronghold Protocol》的**非官方数据 MOD**：在官方 **0.2.3** 之上追加「罗德岛」阵营 —— **7 名干员 · 1 个盟约 · 2 件装备**，装完即用，随时可开可关。
 
-![version](https://img.shields.io/badge/version-1.1.0-2ea44f)
+![version](https://img.shields.io/badge/version-1.2.0-2ea44f)
 ![base](https://img.shields.io/badge/base%20game-0.2.3-blue)
 ![license](https://img.shields.io/badge/code%20license-GPL--3.0--or--later-blue)
 ![node](https://img.shields.io/badge/node-22%20%7C%2024-339933)
@@ -37,6 +37,8 @@
 - **开关引擎**：`GET /mod/state` 读状态、`POST /mod/toggle` 切换，标题界面另有一个可点的状态徽标。
 - **27 个独占美术素材**（约 1.9 MB）：7 名干员里有 5 名是官方赛季自带干员，素材官方包里已有，因此只需随附剩下 2 名的头像 / 立绘 / Spine。
 
+> **匹配 AI 也会打「罗德岛」**：MOD 开启时，对局机器人一旦决定走这条线，就会尽量凑满 **6 名**成员（罗德岛真正的收益在 6 名），并让**阿米娅**优先转职**奥术**、其次**精准**。MOD 关闭时 AI 与原版完全一致。
+
 <!-- 如果想补充「为什么做这个 MOD / 数值思路 / 更新计划 / 联系方式」，加在这一行下面 -->
 
 ### 对官方文件的改动
@@ -45,13 +47,13 @@ MOD 自身文件放在 `payload/`，原样复制进游戏目录；对官方文�
 
 | 形式 | 数量 | 说明 |
 | --- | --- | --- |
-| `patches/*.diff` | 18 个文件 / 34 个 hunk / +485 −16 | 全是**加挂点**性质：注册一个开关、转发几条路由、在标题界面挂一个徽标 |
+| `patches/*.diff` | 19 个文件 / 41 个 hunk / +594 −20 | 多数是**加挂点**性质：注册一个开关、转发几条路由、在标题界面挂一个徽标；另含对匹配 AI（`server/match/bot.js`）的改动 |
 | `patches/data__assets.json.merge` | 1 | `assets.json` 是单行压缩 JSON，文本 diff 会退化成整文件替换，故用**结构差量**合入 |
 
 关掉 MOD 后这些代码不会生效。
 
 <details>
-<summary>被改动的 18 个官方文件</summary>
+<summary>被改动的 19 个官方文件</summary>
 
 ```
 package.json
@@ -60,6 +62,7 @@ server/index.js
 server/http/routes.js
 server/http/websocket.js
 server/lobby.js
+server/match/bot.js
 server/match/player/diy.js
 server/sim/content/bonds.js
 server/sim/content/tokens.js
@@ -85,7 +88,7 @@ payload/                      MOD 自有文件，原样复制进游戏目录
   ├─ mod/                      开关清单 + ON/OFF 数据快照
   ├─ public/                   徽标 UI + 27 个独占美术素材
   └─ server/                   MOD 服务端逻辑（盟约、开关、路由）
-patches/                      对官方文件的补丁（18 个 .diff）与 assets 结构差量（.merge）
+patches/                      对官方文件的补丁（19 个 .diff）与 assets 结构差量（.merge）
 tools/
   ├─ install.mjs               安装器（--check / --off / --restore / --force / --game）
   ├─ mod-toggle.mjs            开关 CLI（on / off / status）
@@ -163,7 +166,7 @@ macOS / Linux 用 `./install.sh`，参数一样。
 按顺序三件事，每一步对不上就停下报错：
 
 1. 把 MOD 的 **52 个自有文件**放进游戏目录（已是最新的会跳过）；
-2. 给你那份官方源码打 **18 个文件的补丁**，并把 `data/assets.json` 按**结构差量**合入（逐文件校验 SHA-256，结果哈希对不上就回滚）；
+2. 给你那份官方源码打 **19 个文件的补丁**，并把 `data/assets.json` 按**结构差量**合入（逐文件校验 SHA-256，结果哈希对不上就回滚）；
 3. 把 MOD **打开**。
 
 装之前，会被改动的官方文件会先备份到 `<游戏目录>/.rhodes-mod-backup/<时间戳>/`。
@@ -206,7 +209,7 @@ npm run mod:rhodes:strip
 - `docs/MOD-RHODES.md`、`tools/{install,mod-toggle,game-root,diff}.mjs`、`tools/manifest.json`
 - `install.bat` / `install.sh`（如果你把仓库文件放在了游戏目录里）
 
-那 18 个被打了补丁的官方文件，用 `.rhodes-mod-backup/<时间戳>/` 里的备份覆盖回去即可。
+那 19 个被打了补丁的官方文件，用 `.rhodes-mod-backup/<时间戳>/` 里的备份覆盖回去即可。
 `tools/manifest.json` 记录了每个文件的 `baseSha256` / `resultSha256`，可以自行核对。
 
 ## 许可证

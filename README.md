@@ -148,7 +148,7 @@ tools/
 
 ### 步骤
 
-1. 下载本仓库（`Code` → `Download ZIP`，或 `git clone`），解压到**游戏目录里面**（推荐 —— 这样终端里的开关脚本也在正确位置）。
+1. 从 [Releases](https://github.com/Stronghold-Protocol-Mod/Rhodes-Mod/releases) 下载 `rhodes-mod-<版本>.zip`（或 `Code` → `Download ZIP`），解压到**游戏目录里面**（推荐 —— 这样终端里的开关脚本也在正确位置）。
 2. 双击 **`install.bat`**。
 
 就这样，安装器会自己找到游戏目录。如果你把 MOD 解压到了别的地方，有两条退路：

@@ -164,5 +164,53 @@ export function install(battle) {
  * Prep side: the bond has no 休整期 behaviour of its own. Its layers come from the generic prep sources (buying /
  * selling, 休整期 income) and from the layer 特质 of its operators — not from this file, and (since 2026-10-06) not
  * from healing either.
+ *
+ * Plus the 阿米娅升变任务 (shared/amiyaQuest.js, 2026-10-09 design): the FIRST caster (`chess_rhodes_amiya`) a player
+ * gains in a match opens the quest (a persistent EffectRef whose `data` carries the state; transparent to the client
+ * through effectsView's `data` passthrough — the 升变面板 renders from it). Two quests, ONE is picked and its reward
+ * transforms the caster in place (Match.amiyaQuest, server/match/match/amiya.js — g.amiya pick/claim):
+ *   〈继承之剑〉blade: Amiya herself 8000 cumulative damage → 近卫形态
+ *   〈以伤害的方式拯救〉lamp: Amiya herself 6000 damage AND the team 8000 healing → 医疗形态
+ * Progress folds from every onBattleResult (any `chess_rhodes_amiya*` unit's dmg + the player's healingDone), so a
+ * merged / transformed Amiya keeps counting. Inert while the mod is off: no `chess_rhodes_amiya` record exists then,
+ * so the global handler never matches. All numbers are the mod's own (shared/amiyaQuest.js), not official data.
  */
-export function registerMeta() {}
+import {
+  AMIYA_QUESTS, AMIYA_QUEST_EFFECT_ID, AMIYA_QUEST_EFFECT_KEY,
+  foldAmiyaQuestResult, amiyaQuestDone, newAmiyaQuestState, isAmiyaChessId,
+} from '../../../../shared/amiyaQuest.js';
+
+const QUEST_NAME = '阿米娅的升变';
+const QUEST_DESC = '局内首次获得术士形态的阿米娅后开启。完成以下任一任务，即可手动将其升变：\n〈继承之剑〉阿米娅本人累计造成 8000 点伤害 → 近卫形态；\n〈以伤害的方式拯救〉阿米娅本人累计造成 6000 点伤害，且全队累计治疗 8000 点 → 医疗形态。';
+
+/** globals run on every hook: only onGain of an Amiya form matters (this dataset's `baseId` IS the `_a` id, so the
+ * family check is isAmiyaChessId — a transformed guard / medic re-firing onGain finds the effect and no-ops). */
+const AMIYA_QUEST_GAIN = {
+  onGain(ctx, ev) {
+    if (!ev || !ev.piece || ev.piece.kind !== 'chess' || !isAmiyaChessId(ev.piece.id)) return;
+    if (ctx.effect(AMIYA_QUEST_EFFECT_ID)) return; // idempotent — a later gain never resets the state
+    ctx.addEffect({
+      id: AMIYA_QUEST_EFFECT_ID, key: AMIYA_QUEST_EFFECT_KEY, name: QUEST_NAME, desc: QUEST_DESC,
+      iconKind: 'garrison', iconId: '', battle: false, data: newAmiyaQuestState(),
+    });
+    ctx.toast('阿米娅的升变任务已开启——在休整期打开升变面板，选择你的道路');
+  },
+};
+
+/** The quest EffectRef's own handler: every battle result folds into `data`; active + met ⇒ ready. */
+const AMIYA_QUEST_EFFECT = {
+  onBattleResult(ctx, ev) {
+    const d = ctx.source.ref && ctx.source.ref.data;
+    if (!d || d.state === 'done') return;
+    foldAmiyaQuestResult(d, ev && ev.result);
+    if (d.state !== 'active' || !amiyaQuestDone(d, d.quest)) return;
+    d.state = 'ready';
+    const q = AMIYA_QUESTS[d.quest];
+    ctx.toast(`任务「${q.name}」已完成——在休整期打开升变面板，让阿米娅升变为${q.formName}`);
+  },
+};
+
+export function registerMeta(registry) {
+  registry.global('modrhodes_amiya_quest', AMIYA_QUEST_GAIN);
+  registry.effect(AMIYA_QUEST_EFFECT_KEY.slice('effect:'.length), AMIYA_QUEST_EFFECT);
+}

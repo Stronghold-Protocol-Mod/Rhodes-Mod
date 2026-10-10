@@ -1,0 +1,22 @@
+--- a/server/match/match/platform.js
++++ b/server/match/match/platform.js
+@@ -4,7 +4,7 @@
+ // = elimination (_quit), dispose.
+ // Installed on Match.prototype by server/match/Match.js (a method container: never instantiated; `this` is the match).
+ 
+-import { C2S } from '../../../shared/protocol.js';
++import { C2S, MOD_C2S } from '../../../shared/protocol.js';
+ import { PHASE, ERR } from '../../../shared/constants.js';
+ import { syntheticResult } from '../fields.js';
+ import { FLOW_TICKER_PRIORITY, OK, fail } from './common.js';
+@@ -43,7 +43,9 @@
+       // (DESIGN §14 — an error frame without a rid would surface as a toast in the browser)
+       return this.clientCombat && msg && (msg.t === 'b.progress' || msg.t === 'b.result') ? OK : fail(ERR.WRONG_PHASE);
+     }
+-    if (!msg || typeof msg !== 'object' || typeof msg.t !== 'string' || !GAME_TYPES.has(msg.t)) return fail(ERR.BAD_MSG);
++    // a MOD's registered intent (MOD_C2S — filled at module load, amiya.js et al.) passes the gate like an author's
++    if (!msg || typeof msg !== 'object' || typeof msg.t !== 'string'
++      || !(GAME_TYPES.has(msg.t) || Object.hasOwn(MOD_C2S, msg.t))) return fail(ERR.BAD_MSG);
+     let res;
+     try {
+       res = this._handle(ps, msg);

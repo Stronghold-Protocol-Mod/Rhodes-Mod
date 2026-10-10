@@ -357,6 +357,402 @@
         "avatarE2": "/assets/char/avatar/char_230_savage_2.png",
         "portrait": "/assets/char/portrait/char_230_savage_1.png",
         "portraitE2": "/assets/char/portrait/char_230_savage_2.png"
+      },
+      "char_002_amiya": {
+        "spine": {
+          "front": {
+            "skel": "/assets/spine/op/char_002_amiya/front/char_002_amiya.skel",
+            "atlas": "/assets/spine/op/char_002_amiya/front/char_002_amiya.atlas",
+            "textures": [
+              "/assets/spine/op/char_002_amiya/front/char_002_amiya.png"
+            ],
+            "pma": false,
+            "anims": {
+              "idle": "Idle",
+              "deploy": "Start",
+              "attack": {
+                "begin": null,
+                "loop": "Attack",
+                "end": null
+              },
+              "attackDown": null,
+              "skill": {
+                "begin": "Skill_Begin",
+                "loop": "Skill",
+                "end": "Skill_End",
+                "index": 0,
+                "idle": null
+              },
+              "die": "Die",
+              "move": null,
+              "stun": {
+                "begin": null,
+                "loop": "Stun",
+                "end": null
+              },
+              "skills": {
+                "0": {
+                  "begin": "Skill_Begin",
+                  "loop": "Skill",
+                  "end": "Skill_End",
+                  "index": 0,
+                  "idle": null
+                },
+                "1": {
+                  "begin": "Skill_2_Begin",
+                  "loop": "Skill_2",
+                  "end": "Skill_2_End",
+                  "index": 1,
+                  "idle": null
+                },
+                "2": {
+                  "begin": "Skill_Begin",
+                  "loop": "Skill",
+                  "end": "Skill_End",
+                  "index": 2,
+                  "idle": null
+                }
+              }
+            },
+            "animations": {
+              "Attack": 1.767,
+              "Attack_Begin": 0.133,
+              "Attack_End": 0.133,
+              "Default": 0,
+              "Die": 1,
+              "Idle": 1,
+              "Skill": 1,
+              "Skill_2": 0.4,
+              "Skill_2_Begin": 0.133,
+              "Skill_2_End": 0.133,
+              "Skill_Begin": 0.167,
+              "Skill_End": 0.167,
+              "Start": 1,
+              "Stun": 0.8
+            },
+            "events": [
+              "OnAttack",
+              "OnStart"
+            ],
+            "hits": {
+              "Attack": [
+                0.633
+              ],
+              "Skill": [
+                0
+              ],
+              "Skill_2": [
+                0
+              ]
+            },
+            "bounds": {
+              "x": -125.402,
+              "y": -2.956,
+              "width": 287.041,
+              "height": 436.5
+            }
+          },
+          "back": {
+            "skel": "/assets/spine/op/char_002_amiya/back/char_002_amiya.skel",
+            "atlas": "/assets/spine/op/char_002_amiya/back/char_002_amiya.atlas",
+            "textures": [
+              "/assets/spine/op/char_002_amiya/back/char_002_amiya.png"
+            ],
+            "pma": false,
+            "anims": {
+              "idle": "Idle",
+              "deploy": "Start",
+              "attack": {
+                "begin": null,
+                "loop": "Attack",
+                "end": null
+              },
+              "attackDown": null,
+              "skill": {
+                "begin": "Skill_Begin",
+                "loop": "Skill",
+                "end": "Skill_End",
+                "index": 0,
+                "idle": null
+              },
+              "die": null,
+              "move": null,
+              "stun": null,
+              "skills": {
+                "0": {
+                  "begin": "Skill_Begin",
+                  "loop": "Skill",
+                  "end": "Skill_End",
+                  "index": 0,
+                  "idle": null
+                },
+                "1": {
+                  "begin": "Skill_2_Begin",
+                  "loop": "Skill_2",
+                  "end": "Skill_2_End",
+                  "index": 1,
+                  "idle": null
+                },
+                "2": {
+                  "begin": "Skill_Begin",
+                  "loop": "Skill",
+                  "end": "Skill_End",
+                  "index": 2,
+                  "idle": null
+                }
+              }
+            },
+            "animations": {
+              "Attack": 1.767,
+              "Attack_Begin": 0.133,
+              "Attack_End": 0.133,
+              "Default": 0,
+              "Idle": 1,
+              "Skill": 1,
+              "Skill_2": 0.4,
+              "Skill_2_Begin": 0.133,
+              "Skill_2_End": 0.133,
+              "Skill_Begin": 0.167,
+              "Skill_End": 0.167,
+              "Start": 1
+            },
+            "events": [
+              "OnAttack",
+              "OnStart"
+            ],
+            "hits": {
+              "Attack": [
+                0.633
+              ],
+              "Skill": [
+                0
+              ],
+              "Skill_2": [
+                0
+              ]
+            },
+            "bounds": {
+              "x": -124.577,
+              "y": -1.608,
+              "width": 231.498,
+              "height": 437
+            }
+          }
+        },
+        "avatar": "/assets/char/avatar/char_002_amiya.png",
+        "avatarE2": "/assets/char/avatar/char_002_amiya_2.png",
+        "portrait": "/assets/char/portrait/char_002_amiya_1.png",
+        "portraitE2": "/assets/char/portrait/char_002_amiya_2.png"
+      },
+      "char_1001_amiya2": {
+        "spine": {
+          "front": {
+            "skel": "/assets/spine/op/char_1001_amiya2/front/char_1001_amiya2.skel",
+            "atlas": "/assets/spine/op/char_1001_amiya2/front/char_1001_amiya2.atlas",
+            "textures": [
+              "/assets/spine/op/char_1001_amiya2/front/char_1001_amiya2.png"
+            ],
+            "pma": false,
+            "anims": {
+              "idle": "Idle",
+              "deploy": "Start",
+              "attack": {
+                "begin": null,
+                "loop": "Attack",
+                "end": null
+              },
+              "attackDown": null,
+              "skill": {
+                "begin": null,
+                "loop": "Skill_1",
+                "end": null,
+                "index": 0,
+                "idle": null
+              },
+              "die": "Die",
+              "move": null,
+              "stun": {
+                "begin": null,
+                "loop": "Stun",
+                "end": null
+              },
+              "skills": {
+                "0": {
+                  "begin": null,
+                  "loop": "Skill_1",
+                  "end": null,
+                  "index": 0,
+                  "idle": null
+                },
+                "1": {
+                  "begin": null,
+                  "loop": "Skill_2_Loop",
+                  "end": "Skill_2_End",
+                  "index": 1,
+                  "idle": "Skill_2_Idle"
+                },
+                "2": {
+                  "begin": null,
+                  "loop": "Attack",
+                  "end": null,
+                  "via": "attack",
+                  "index": 2,
+                  "idle": null
+                }
+              }
+            },
+            "animations": {
+              "Attack": 1.267,
+              "Default": 0,
+              "Die": 1,
+              "Idle": 4,
+              "Skill_1": 1.267,
+              "Skill_2": 3.067,
+              "Skill_2_End": 0.2,
+              "Skill_2_Idle": 4,
+              "Skill_2_Loop": 1.267,
+              "Start": 1,
+              "Stun": 1
+            },
+            "events": [
+              "OnAttack",
+              "OnStart"
+            ],
+            "hits": {
+              "Attack": [
+                0.567
+              ],
+              "Skill_1": [
+                0.367,
+                0.733
+              ],
+              "Skill_2": [
+                0.6,
+                0.767,
+                0.933,
+                1.1,
+                1.267,
+                1.433,
+                1.6,
+                1.767,
+                1.933,
+                2.333,
+                3.067
+              ],
+              "Skill_2_Loop": [
+                0.433
+              ]
+            },
+            "bounds": {
+              "x": -166.569,
+              "y": -1.169,
+              "width": 432.081,
+              "height": 459.505
+            }
+          },
+          "back": {
+            "skel": "/assets/spine/op/char_1001_amiya2/back/char_1001_amiya2.skel",
+            "atlas": "/assets/spine/op/char_1001_amiya2/back/char_1001_amiya2.atlas",
+            "textures": [
+              "/assets/spine/op/char_1001_amiya2/back/char_1001_amiya2.png"
+            ],
+            "pma": false,
+            "anims": {
+              "idle": "Idle",
+              "deploy": "Start",
+              "attack": {
+                "begin": null,
+                "loop": "Attack",
+                "end": null
+              },
+              "attackDown": null,
+              "skill": {
+                "begin": null,
+                "loop": "Skill_1",
+                "end": null,
+                "index": 0,
+                "idle": null
+              },
+              "die": null,
+              "move": null,
+              "stun": null,
+              "skills": {
+                "0": {
+                  "begin": null,
+                  "loop": "Skill_1",
+                  "end": null,
+                  "index": 0,
+                  "idle": null
+                },
+                "1": {
+                  "begin": null,
+                  "loop": "Skill_2_Loop",
+                  "end": "Skill_2_End",
+                  "index": 1,
+                  "idle": "Skill_2_Idle"
+                },
+                "2": {
+                  "begin": null,
+                  "loop": "Attack",
+                  "end": null,
+                  "via": "attack",
+                  "index": 2,
+                  "idle": null
+                }
+              }
+            },
+            "animations": {
+              "Attack": 1.267,
+              "Default": 0,
+              "Idle": 4,
+              "Skill_1": 1.267,
+              "Skill_2": 3.067,
+              "Skill_2_End": 0.2,
+              "Skill_2_Idle": 4,
+              "Skill_2_Loop": 1.267,
+              "Start": 1
+            },
+            "events": [
+              "OnAttack",
+              "OnStart"
+            ],
+            "hits": {
+              "Attack": [
+                0.567
+              ],
+              "Skill_1": [
+                0.367,
+                0.733
+              ],
+              "Skill_2": [
+                0.6,
+                0.767,
+                0.933,
+                1.1,
+                1.267,
+                1.433,
+                1.6,
+                1.767,
+                1.933,
+                2.333,
+                3.067
+              ],
+              "Skill_2_Loop": [
+                0.433
+              ]
+            },
+            "bounds": {
+              "x": -166.533,
+              "y": -1.666,
+              "width": 372.294,
+              "height": 459.503
+            }
+          }
+        },
+        "avatar": "/assets/char/avatar/char_1001_amiya2.png",
+        "avatarE2": "/assets/char/avatar/char_1001_amiya2_2.png",
+        "portrait": "/assets/char/portrait/char_1001_amiya2_1.png",
+        "portraitE2": "/assets/char/portrait/char_1001_amiya2_2.png"
       }
     },
     "tokens": {
@@ -459,13 +855,21 @@
     "skills": {
       "skchr_amiya3_1": "/assets/skill/skchr_amiya3_1.png",
       "skchr_amiya3_2": "/assets/skill/skchr_amiya3_2.png",
-      "skchr_savage_2": "/assets/skill/skchr_savage_2.png"
+      "skchr_savage_2": "/assets/skill/skchr_savage_2.png",
+      "skchr_amiya_2": "/assets/skill/skchr_amiya_2.png",
+      "skchr_amiya_3": "/assets/skill/skchr_amiya_3.png",
+      "skchr_amiya2_1": "/assets/skill/skchr_amiya2_1.png",
+      "skchr_amiya2_2": "/assets/skill/skchr_amiya2_2.png"
     },
     "skillsById": {
       "skchr_amiya3_1": "skchr_amiya3_1",
       "skchr_amiya3_2": "skchr_amiya3_2",
       "skchr_savage_1": "skcom_powerstrike[2]",
-      "skchr_savage_2": "skchr_savage_2"
+      "skchr_savage_2": "skchr_savage_2",
+      "skchr_amiya_2": "skchr_amiya_2",
+      "skchr_amiya_3": "skchr_amiya_3",
+      "skchr_amiya2_1": "skchr_amiya2_1",
+      "skchr_amiya2_2": "skchr_amiya2_2"
     }
   },
   "remove": {
@@ -481,11 +885,12 @@
     ]
   },
   "statsDelta": {
-    "files": 3,
-    "bytes": 29067,
-    "chars": 2,
-    "charsWithBack": 2,
+    "files": 7,
+    "bytes": 95771,
+    "chars": 4,
+    "charsWithBack": 4,
     "tokensWithSpine": 1,
-    "bonds": 1
+    "bonds": 1,
+    "skills": 4
   }
 }

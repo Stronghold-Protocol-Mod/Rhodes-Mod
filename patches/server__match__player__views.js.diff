@@ -1,0 +1,21 @@
+--- a/server/match/player/views.js
++++ b/server/match/player/views.js
+@@ -33,6 +33,9 @@
+       if (e.hidden) continue;
+       const v = { id: e.id, name: e.name || e.id, desc: e.desc || '', iconKind: e.iconKind || 'choice', iconId: e.iconId || e.id };
+       if (e.counter != null) v.counter = e.counter;
++      // `data` passthrough: a persistent effect may carry structured state the client renders (阿米娅升变任务's
++      // { state, quest, dmg, heal } — the 升变面板 reads it). Engine effects never set `data`.
++      if (e.data != null) v.data = e.data;
+       out.push(v);
+     }
+     for (const b of this.bounties) {
+@@ -115,7 +118,7 @@
+       ...(bossMate ? { bossMate } : {}),
+       stats: {
+         dmgDealt: Math.round(this.stats.dmgDealt), kills: this.stats.kills, leaks: this.stats.leaks, gold: this.stats.gold,
+-        refreshes: this.stats.refreshes, merges: this.stats.merges,
++        refreshes: this.stats.refreshes, buys: this.stats.buys, merges: this.stats.merges,
+       },
+     };
+   }

@@ -1,14 +1,14 @@
 {
   "name": "rhodes-mod",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "mod": {
     "id": "rhodes",
     "name": "罗德岛 MOD",
     "englishName": "Rhodes Island MOD"
   },
   "framework": {
-    "version": 1,
-    "digest": "933aeae71ed2ba2275841e61af62441e01b9022f913a08000342d0777efafc04",
+    "version": 2,
+    "digest": "c8acf535fb4dc2855b621b548b6a594fef9773ff127da266acf3b7cae5635e1f",
     "files": [
       "public/js/ui/modBadge.js",
       "server/mod/api.js",
@@ -29,6 +29,8 @@
       "server/http/websocket.js",
       "server/index.js",
       "server/lobby.js",
+      "server/match/match/platform.js",
+      "server/match/player/views.js",
       "shared/protocol.js"
     ]
   },
@@ -44,10 +46,10 @@
     "server/mod/toggle.js": "e2b9edcb779e4acc1e917dd763c8dbec1a0cf89cb66663f4217314365fe9259c",
     "tools/game-root.mjs": "57eecb7e34ad9ec93ba1841fbd6941590993cf0a632faebd4bfe3de8e4025460",
     "tools/mod-toggle.mjs": "fa36142165bf25a9ac999ceddf49a516a582d522f0944c31cdbb7c797c892937",
-    "docs/MOD-RHODES.md": "7ee8a1fdf3440fc14caac49aa030ef79f3b32dd54af4a40ddaf285b28bea88e1",
-    "mod/variants/rhodes/on/bonds.json": "2609c842ef45a906eabc29553bc780ce1a6e1fbceeb09fe74bba6890e95ec53b",
+    "docs/MOD-RHODES.md": "a115cdce453f42c93cfd63456d217b9942d33f628feb2b6f2d66d64163724303",
+    "mod/variants/rhodes/on/bonds.json": "a0f148fcc6334904c06c296685bf526f6ca32bb1b933fb984b13667fc3e87deb",
     "mod/variants/rhodes/off/bonds.json": "53a22f4724771b6ff40041635e907c0af39790731f661b0439fc593f5a91c94c",
-    "mod/variants/rhodes/on/chess.json": "0c771f9cf3fbaa5897e97bad35a26b77c2d637c6c09e346481a713a7c2faf6bb",
+    "mod/variants/rhodes/on/chess.json": "8b652adf832adba4c20c6e2b3ed5bcbb73e9e1492867fa2d2cefb33dccd8915e",
     "mod/variants/rhodes/off/chess.json": "fd463d31c21d3f40524058abb47fe64b6c32ebed22956586a50bee672e6dfa79",
     "mod/variants/rhodes/on/config.json": "696adeecb6b76b21e619203f09031e90bd29a73daa4c4be45a8d2c39e990589a",
     "mod/variants/rhodes/off/config.json": "c16504ca347c4a967d9cf3349d5e1ad081d2ae52d56b87b7841e33ea38853eef",
@@ -59,19 +61,32 @@
     "mod/variants/rhodes/off/items.json": "6122a3cd75531f551a03082f000426a2d6b8028788fbd1abbaea5286592fbba4",
     "mod/variants/rhodes/on/tokens.json": "cf7519f445bb61e2b14b18d11d7b0ec4a3c43637784c3be43dde6a8882ad0c3a",
     "mod/variants/rhodes/off/tokens.json": "9e3501357b07d754711fcfd8506286efa32b7774d98e419fdcff48c1f6729b39",
-    "server/sim/content/bonds/rhodes.js": "6e1b20cb849fe6e216f76a5fb146950c2c924108e5ba1e0fd11a309dedd9fd5c",
+    "public/js/ui/amiyaAscend.js": "d27f2409982ed04991eceba2304cb1352ccc5a007f7350f2a6b242f697987e00",
+    "server/sim/content/bonds/rhodes.js": "e2edc358829556dbdb17a0447a347093193abfd86a0995b3d8b2b2a7a24aff12",
     "server/sim/content/kits/mod.js": "19f64f2e3bdbc31c4ed8dc961ea8eb36d2121aed7305ee54f975209738f1d155",
+    "server/sim/content/kits/ops/mod-rhodes-amiya.js": "48488f584c178c0cd259ce7f3172fb4dbdc835d99703df5f290b9f0dec0b304d",
+    "server/sim/content/kits/ops/mod-rhodes-amiya2.js": "025a34ec278ecde1ef1a08cae52ea9b74e8b99d9ecf401aca0aedd746c76d283",
     "server/sim/content/kits/ops/mod-rhodes-amiya3.js": "a613da560a7a83e4c2d708ef0bbdde16a59ab29d384d13973058cede91601ad3",
     "server/sim/content/kits/ops/mod-rhodes-ascln.js": "21d58aebe1c1ec7949756da1ee4ea2e53e6ffe58a0f4180542db2c757eb9c643",
     "server/sim/content/kits/ops/mod-rhodes-closur.js": "605f027ee4e50cbec19e4848b19e12955b5159852d8d36720c8d2d0ec519e27c",
     "server/sim/content/kits/ops/mod-rhodes-kalts2.js": "8f74a1d6184481d9a84d6523da54caa0308f4251b742a6439ebe851ce87c8317",
     "server/sim/content/kits/ops/mod-rhodes-logos.js": "d5caa7f277398e99ff452059120d59acb2c568b600f7665b1f262b580b0aa570",
     "server/sim/content/kits/ops/mod-rhodes-monstr.js": "f2954b1f5c47345a2a685f65d416e961bb8b697b1dfc712879ced94c34ab4bbf",
-    "mod/toggles.d/rhodes.json": "fbe2cf3841b2b784c8d55f2a842b6e5b57fb9627e39e51b00009f37028b7c712",
+    "server/match/match/amiya.js": "e54b052ca49dec0a455bd5b1264b58e6a5d520333657403307667b18ecde8ad7",
+    "shared/amiyaQuest.js": "0068410e0e6ac1b86614bf6d61ee5134b2cce615bda8a5ddfa3d9196c7a2a307",
+    "mod/toggles.d/rhodes.json": "91a321356dbeec3c8fa5f1176452bc26268fc2381a9633f0b1d55a7deecac486",
     "public/assets/bond/rhodesShip.png": "c1aafd771ed19a83ef254f5baa446f76ca2d39391e98b3447ff0432f532ca5e6",
+    "public/assets/char/avatar/char_002_amiya.png": "cf3529aa76413865f3adcca74daa07807412c4833509991cde46c700d67e626d",
+    "public/assets/char/avatar/char_002_amiya_2.png": "d42f6939859a9f4c6d74299779475d0a28e1c89601e80dd87ea62540e664619d",
+    "public/assets/char/avatar/char_1001_amiya2.png": "2b77061edb0ca5b9cdec5ad181f500880289dbf96e97817d22381e48b938bf17",
+    "public/assets/char/avatar/char_1001_amiya2_2.png": "7c28950faba605c67deff4322f494adb686927f447b27171946d875e1311865f",
     "public/assets/char/avatar/char_1037_amiya3_2.png": "52118a69c8f67a0ed92ed9da3ba2222770f5ee2b90609a8a20a40d7b3b7db30d",
     "public/assets/char/avatar/char_230_savage.png": "3ecdc911a812cf01315caab7decf29863594a825d74191bcbc0cbb16ffd0fda6",
     "public/assets/char/avatar/char_230_savage_2.png": "9e889c1bd60a450d96cee4303d0d575b5defdff72d9bbc5ae351d121828d5e09",
+    "public/assets/char/portrait/char_002_amiya_1.png": "56f7d9d3450c56e4f299365dbbdf0f3496d8e1474ba6d41dc545003c068943fb",
+    "public/assets/char/portrait/char_002_amiya_2.png": "f95bee8afb21e2237f69e5985dbf3ebe32e852ccd9d2c612d4c4a5a947ce31a4",
+    "public/assets/char/portrait/char_1001_amiya2_1.png": "ccce02b304a364c5ec2cf74cfbb28c2a7a110643942a3722e956c43c7d54033d",
+    "public/assets/char/portrait/char_1001_amiya2_2.png": "ccce02b304a364c5ec2cf74cfbb28c2a7a110643942a3722e956c43c7d54033d",
     "public/assets/char/portrait/char_1037_amiya3_2.png": "376ad72ece4ac8fe63d4334687728dee70a29dce177321c4ded3f7d60bce0e9e",
     "public/assets/char/portrait/char_230_savage_1.png": "5efaafa9f134de6d8c3a03b163fcd87045a9ef35fa18ed2e30647c57fd362dcf",
     "public/assets/char/portrait/char_230_savage_2.png": "a7779c25b587d2174ad5e6725cca073485331d5bd24dc6780ef527511441c0ea",
@@ -80,6 +95,22 @@
     "public/assets/skill/skchr_amiya3_1.png": "6655d1e70c29d00644a8ca3d592604ff513e134d28cef9bb5655dd3919c1b334",
     "public/assets/skill/skchr_amiya3_2.png": "6d0466da14490404162f9ad03c8266d8812ae94ac8eac20c01fd8f632e13de1f",
     "public/assets/skill/skchr_savage_2.png": "dae2ebdf83b885e48bc7c1fd6388b9e357d3581e96bdc2cdf90807e99eac5cc3",
+    "public/assets/skill/skchr_amiya_2.png": "cb11d869a675662abd45ed0a63ea02057879b2ffcd752b25d069c08281ee949b",
+    "public/assets/skill/skchr_amiya_3.png": "79710223bc98adcd3555ae0f87f9745bb1d415808239705323e7be0d25d8f6b9",
+    "public/assets/skill/skchr_amiya2_1.png": "d9b33687c5ec4f2b00f8e0035cbea2155df1d587bdd627f1163310f499725e32",
+    "public/assets/skill/skchr_amiya2_2.png": "4b1d6a3a7f4e8ff0467faa42549f6fec6a44cad0fcd58e6ae568d188722c0f6a",
+    "public/assets/spine/op/char_002_amiya/back/char_002_amiya.atlas": "cfa68d73f8c63b83145615a3225c64805b8879dfb35b9f348bf9c0f273bb048d",
+    "public/assets/spine/op/char_002_amiya/back/char_002_amiya.png": "cb6d63f70a5e029adb66c19055fd1b2ece184ac44ac11f57bcbc0fe00f0e9fb2",
+    "public/assets/spine/op/char_002_amiya/back/char_002_amiya.skel": "b77967d964f2d7a3f363dddeef2d1d1b92ed55f985ff6fc3e5305fd6b470b40c",
+    "public/assets/spine/op/char_002_amiya/front/char_002_amiya.atlas": "0ef28cf525cf0f21f42ba43180488195eef2a6c59d7555fb5b3cb8917615a580",
+    "public/assets/spine/op/char_002_amiya/front/char_002_amiya.png": "ef559dd70d0b5506df42a4785d895fc13d2ce3cfc9ddebc859f4d181118ac5f5",
+    "public/assets/spine/op/char_002_amiya/front/char_002_amiya.skel": "db049b479a3812517419c60d29751a6d7193c174fd128718bcaecc67fe064284",
+    "public/assets/spine/op/char_1001_amiya2/back/char_1001_amiya2.atlas": "53c08ff98a4b912257ec9000a5f8236e1bd17febeb98884bd79bbfe4a947f65b",
+    "public/assets/spine/op/char_1001_amiya2/back/char_1001_amiya2.png": "be8881b15eef2caa07b4c993b1a4bfa71afb88d9efb9c10cf65a4e4077ad4ead",
+    "public/assets/spine/op/char_1001_amiya2/back/char_1001_amiya2.skel": "cbad1278c6abf45f0f8a3a7f707e0b9b4f16af2ab5060033f9de74eef2621b92",
+    "public/assets/spine/op/char_1001_amiya2/front/char_1001_amiya2.atlas": "c7073786af70893df7b80a8d53430a6181be71297cd7d72a12565e623cfbe15c",
+    "public/assets/spine/op/char_1001_amiya2/front/char_1001_amiya2.png": "17467d95c76c58420adc1843b25a954c2f197f1e16948cf8f3ecbcd88c86c1e1",
+    "public/assets/spine/op/char_1001_amiya2/front/char_1001_amiya2.skel": "ea3a08f158caa2694dc37ec6d466147615c63aa8a0c78fee856197bb5e1684d2",
     "public/assets/spine/op/char_1037_amiya3/back/char_1037_amiya3.atlas": "9a091fc70fe566ac5f742a99f127691cad4d4b6ffcb0d4f58b2f6287329fb1ef",
     "public/assets/spine/op/char_1037_amiya3/back/char_1037_amiya3.png": "e5578becc147b19ab86f9668f1c73f72968ec7ce64185ef8ba09bcf456bd28d0",
     "public/assets/spine/op/char_1037_amiya3/back/char_1037_amiya3.skel": "e80d96f6b542b26cae91596613ddd290c54c41d803e93dd301c39e4638a81e69",
@@ -187,11 +218,38 @@
       "added": 22,
       "removed": 2
     },
+    "server/match/match/platform.js": {
+      "layer": "F",
+      "patch": "patches/server__match__match__platform.js.diff",
+      "baseSha256": "7bd0b5456f800ea073f919d999e91cc4fe8830929acef3a9baa19bcd7c94c9cb",
+      "resultSha256": "c0673bf4e783f4babbc1a5e93ab368f460a745c5f8f5a96fc202e59723a9aa16",
+      "hunks": 2,
+      "added": 4,
+      "removed": 2
+    },
+    "server/match/player/views.js": {
+      "layer": "F",
+      "patch": "patches/server__match__player__views.js.diff",
+      "baseSha256": "2a5d0bc0acf9f583bc037f0997b736ebc9642ffa4780b28d72966a244882d950",
+      "resultSha256": "1cd390b80b36860403c2d354bb9e74cc369e60652cd97b6f77f1f37b56e8c673",
+      "hunks": 2,
+      "added": 4,
+      "removed": 1
+    },
     "shared/protocol.js": {
       "layer": "F",
       "patch": "patches/shared__protocol.js.diff",
       "baseSha256": "79a0a64ef8c1d99551f313ed386f9cd696dee8128fe77a6b20ae155da47d68a4",
-      "resultSha256": "a115fc514f49d640d01e9e3e0cd69be83e91b26170a93f5577a641d690ed9159",
+      "resultSha256": "f59b2aeaa9d755d57d9dc7c8b317378ba56368fb0d05fc771bca203a99862a9b",
+      "hunks": 3,
+      "added": 14,
+      "removed": 1
+    },
+    "server/match/PlayerState.js": {
+      "layer": "M",
+      "patch": "patches/server__match__PlayerState.js.diff",
+      "baseSha256": "1b8e59e1d1c8c45921820f1813f7ce4b0d420741fd71ee4d283b709afff84b29",
+      "resultSha256": "c38e60230d9dfabc1c269c4ba600ba60051940b0b8e5851a7aa9445cf5d36ab9",
       "hunks": 1,
       "added": 4,
       "removed": 0
@@ -204,6 +262,42 @@
       "hunks": 7,
       "added": 130,
       "removed": 4
+    },
+    "server/match/match/intents.js": {
+      "layer": "M",
+      "patch": "patches/server__match__match__intents.js.diff",
+      "baseSha256": "ca1da57d95689c9067b407d8067e9962df010df82e0a58551229c3dc5ca75f75",
+      "resultSha256": "75119aa74003ebd659674400bee33521cc54e60478337d1e114238085a1427dd",
+      "hunks": 1,
+      "added": 2,
+      "removed": 0
+    },
+    "server/match/player/acquire.js": {
+      "layer": "M",
+      "patch": "patches/server__match__player__acquire.js.diff",
+      "baseSha256": "f3b592a546f61e833ae925e3925723a65d44cde57e490c4678e8c00a1180ac1c",
+      "resultSha256": "08d4ccd6d639d6da222ebfa78758ac813f0610917968575cd744077b72888b38",
+      "hunks": 1,
+      "added": 8,
+      "removed": 1
+    },
+    "server/match/player/diy.js": {
+      "layer": "M",
+      "patch": "patches/server__match__player__diy.js.diff",
+      "baseSha256": "500fba6cb6030c7a923b777b233ca1919c9b87310104035ea3e70863dccd1d7c",
+      "resultSha256": "21747edbdad738648948dd90e39921af90948b2b851e8f93cdc3982fd96d550a",
+      "hunks": 1,
+      "added": 17,
+      "removed": 2
+    },
+    "server/match/player/economy.js": {
+      "layer": "M",
+      "patch": "patches/server__match__player__economy.js.diff",
+      "baseSha256": "61b8d8b38f0adba88dd6d6c41d5fd03dfb9a330bd5b666bf5dd9b2d8b6131710",
+      "resultSha256": "8aa1e303bbf8d0ce46c157de6ad7cf8f28ae9f1cd2205b093e44a146e31f9f2e",
+      "hunks": 1,
+      "added": 4,
+      "removed": 1
     },
     "server/sim/content/bonds.js": {
       "layer": "M",
@@ -245,7 +339,7 @@
       "layer": "M",
       "patch": "patches/server__sim__content__kits__index.js.diff",
       "baseSha256": "8d243e9823d83f902193b3aaf27a032a4cbf268895509d9ade17eecae9e23b80",
-      "resultSha256": "5da52c92eaef5208ce00745530e22d28bcb8ceb342656a615d48b5ce0f2d523c",
+      "resultSha256": "ed413f003427cdb81350ce0945de809abc18c341acbf2a4d787b8612905f0fda",
       "hunks": 4,
       "added": 26,
       "removed": 2
@@ -268,7 +362,9 @@
       "setValues": {
         "chars": [
           "char_1037_amiya3",
-          "char_230_savage"
+          "char_230_savage",
+          "char_002_amiya",
+          "char_1001_amiya2"
         ],
         "tokens": [
           "token_10050_monstr_prosts",
@@ -285,13 +381,21 @@
         "skills": [
           "skchr_amiya3_1",
           "skchr_amiya3_2",
-          "skchr_savage_2"
+          "skchr_savage_2",
+          "skchr_amiya_2",
+          "skchr_amiya_3",
+          "skchr_amiya2_1",
+          "skchr_amiya2_2"
         ],
         "skillsById": [
           "skchr_amiya3_1",
           "skchr_amiya3_2",
           "skchr_savage_1",
-          "skchr_savage_2"
+          "skchr_savage_2",
+          "skchr_amiya_2",
+          "skchr_amiya_3",
+          "skchr_amiya2_1",
+          "skchr_amiya2_2"
         ]
       },
       "remove": {
@@ -307,12 +411,13 @@
         ]
       },
       "statsDelta": {
-        "files": 3,
-        "bytes": 29067,
-        "chars": 2,
-        "charsWithBack": 2,
+        "files": 7,
+        "bytes": 95771,
+        "chars": 4,
+        "charsWithBack": 4,
         "tokensWithSpine": 1,
-        "bonds": 1
+        "bonds": 1,
+        "skills": 4
       }
     }
   },
@@ -320,6 +425,22 @@
     {
       "path": "/assets/bond/rhodesShip.png",
       "size": 988
+    },
+    {
+      "path": "/assets/char/avatar/char_002_amiya.png",
+      "size": 58057
+    },
+    {
+      "path": "/assets/char/avatar/char_002_amiya_2.png",
+      "size": 64881
+    },
+    {
+      "path": "/assets/char/avatar/char_1001_amiya2.png",
+      "size": 46817
+    },
+    {
+      "path": "/assets/char/avatar/char_1001_amiya2_2.png",
+      "size": 45910
     },
     {
       "path": "/assets/char/avatar/char_1037_amiya3_2.png",
@@ -332,6 +453,22 @@
     {
       "path": "/assets/char/avatar/char_230_savage_2.png",
       "size": 54525
+    },
+    {
+      "path": "/assets/char/portrait/char_002_amiya_1.png",
+      "size": 122789
+    },
+    {
+      "path": "/assets/char/portrait/char_002_amiya_2.png",
+      "size": 120681
+    },
+    {
+      "path": "/assets/char/portrait/char_1001_amiya2_1.png",
+      "size": 4684299
+    },
+    {
+      "path": "/assets/char/portrait/char_1001_amiya2_2.png",
+      "size": 4684299
     },
     {
       "path": "/assets/char/portrait/char_1037_amiya3_2.png",
@@ -364,6 +501,70 @@
     {
       "path": "/assets/skill/skchr_savage_2.png",
       "size": 20383
+    },
+    {
+      "path": "/assets/skill/skchr_amiya_2.png",
+      "size": 16797
+    },
+    {
+      "path": "/assets/skill/skchr_amiya_3.png",
+      "size": 12697
+    },
+    {
+      "path": "/assets/skill/skchr_amiya2_1.png",
+      "size": 20065
+    },
+    {
+      "path": "/assets/skill/skchr_amiya2_2.png",
+      "size": 17145
+    },
+    {
+      "path": "/assets/spine/op/char_002_amiya/back/char_002_amiya.atlas",
+      "size": 3067
+    },
+    {
+      "path": "/assets/spine/op/char_002_amiya/back/char_002_amiya.png",
+      "size": 39301
+    },
+    {
+      "path": "/assets/spine/op/char_002_amiya/back/char_002_amiya.skel",
+      "size": 115804
+    },
+    {
+      "path": "/assets/spine/op/char_002_amiya/front/char_002_amiya.atlas",
+      "size": 5610
+    },
+    {
+      "path": "/assets/spine/op/char_002_amiya/front/char_002_amiya.png",
+      "size": 69739
+    },
+    {
+      "path": "/assets/spine/op/char_002_amiya/front/char_002_amiya.skel",
+      "size": 179880
+    },
+    {
+      "path": "/assets/spine/op/char_1001_amiya2/back/char_1001_amiya2.atlas",
+      "size": 4379
+    },
+    {
+      "path": "/assets/spine/op/char_1001_amiya2/back/char_1001_amiya2.png",
+      "size": 62495
+    },
+    {
+      "path": "/assets/spine/op/char_1001_amiya2/back/char_1001_amiya2.skel",
+      "size": 138356
+    },
+    {
+      "path": "/assets/spine/op/char_1001_amiya2/front/char_1001_amiya2.atlas",
+      "size": 8149
+    },
+    {
+      "path": "/assets/spine/op/char_1001_amiya2/front/char_1001_amiya2.png",
+      "size": 79915
+    },
+    {
+      "path": "/assets/spine/op/char_1001_amiya2/front/char_1001_amiya2.skel",
+      "size": 214644
     },
     {
       "path": "/assets/spine/op/char_1037_amiya3/back/char_1037_amiya3.atlas",

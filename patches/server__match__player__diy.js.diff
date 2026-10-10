@@ -1,0 +1,29 @@
+--- a/server/match/player/diy.js
++++ b/server/match/player/diy.js
+@@ -200,9 +200,24 @@
+     return { stock, banned: Object.freeze(banned) };
+   }
+ 
+-  /** The copy accounting of base chess `baseId` for this player: its own stock for a slotted DIY slot, else the shared pool. */
++  /** The copy accounting of base chess `baseId` for this player: its own stock for a slotted DIY slot; a shop-swap
++   * offer id (ps.poolSwap — the 罗德岛 MOD's 阿米娅升变) borrows its caster base's shared-pool entry, so buy / merge /
++   * sell / elimination of the ascended form all draw from and return to the very copies the 术士 would have used;
++   * else the shared pool. */
+   poolOf(baseId) {
+-    return this.diyStock && this.diyStock.has(baseId) ? this.diyStock : this.m.pool;
++    if (this.diyStock && this.diyStock.has(baseId)) return this.diyStock;
++    const alt = this.poolSwap && this.poolSwap.pool.get(baseId);
++    if (alt) {
++      const pool = this.m.pool;
++      return {
++        has: () => pool.has(alt),
++        cap: () => pool.cap(alt),
++        left: () => pool.left(alt),
++        take: (_id, n) => pool.take(alt, n),
++        give: (_id, n) => pool.give(alt, n),
++      };
++    }
++    return this.m.pool;
+   }
+ 
+   /**

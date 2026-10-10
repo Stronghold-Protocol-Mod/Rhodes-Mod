@@ -26,8 +26,8 @@
 + * and merged into KITS last; inert while the mod's data is stripped (see the MOD note above).
 + */
 +export const MOD_KIT_FILES = Object.freeze([
-+  'mod-rhodes-amiya3.js', 'mod-rhodes-ascln.js', 'mod-rhodes-closur.js',
-+  'mod-rhodes-kalts2.js', 'mod-rhodes-logos.js', 'mod-rhodes-monstr.js',
++  'mod-rhodes-amiya.js', 'mod-rhodes-amiya2.js', 'mod-rhodes-amiya3.js', 'mod-rhodes-ascln.js',
++  'mod-rhodes-closur.js', 'mod-rhodes-kalts2.js', 'mod-rhodes-logos.js', 'mod-rhodes-monstr.js',
 +]);
 +
 +/**

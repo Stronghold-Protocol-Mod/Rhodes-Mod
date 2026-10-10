@@ -11,10 +11,10 @@ are chosen by the mod (tier, price, shop order, phase/level, the bond).
 
 |               |                                                                                                                                                                                                                                                                                                                                                                   |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Operators** | 暴行 (T1 WARRIOR 强攻手) · 可露希尔 (T3 PIONEER 战术家) · 阿米娅 (T3 MEDIC 咒愈师) · Mon3tr (T4 MEDIC 链愈师) · 阿斯卡纶 (T5 SPECIAL 伏击客) · 凯尔希·思衡托 (T6 MEDIC 守望者) · 逻各斯 (T6 CASTER 中坚术师) — 14 chess records (normal + 精锐)                                                                                                                                                                 |
-| **Bond**      | `rhodesShip` 「罗德岛」 — thresholds **3 / 6** distinct members, 11 members (4 official + 7 mod)                                                                                                                                                                                                                                                                       |
+| **Operators** | 暴行 (T1 WARRIOR 强攻手) · 可露希尔 (T3 PIONEER 战术家) · Mon3tr (T4 MEDIC 链愈师) · 阿斯卡纶 (T5 SPECIAL 伏击客) · 凯尔希·思衡托 (T6 MEDIC 守望者) · 逻各斯 (T6 CASTER 中坚术师) · **阿米娅的三形态** (术士 T2 CASTER 中坚术师 → 近卫 T5 WARRIOR 术战者 / 医疗 T5 MEDIC 咒愈师, 阿米娅的升变) — 18 chess records (9 operators × normal + 精锐; the ascended forms are `isHidden`, quest-only)          |
+| **Bond**      | `rhodesShip` 「罗德岛」 — thresholds **3 / 6** distinct members, 13 members (4 official + 9 mod)                                                                                                                                                                                                                                                                       |
 | **Effect**    | `bondeffect_rhodes`, implemented in `server/sim/content/bonds/rhodes.js`                                                                                                                                                                                                                                                                                          |
-| **特质**        | 暴行 `SERVER_ADD_BOND_CHESS_ALL` · 逻各斯 `act1autochess_gar_eff_attrByBond` · 阿米娅 `modautochess_gar_event_heal` · 可露希尔 `modautochess_gar_prep_gain_chess_by_bond` · 阿斯卡纶 `act1autochess_gar_event_selfkillenemy` · 凯尔希·思衡托 `act1autochess_gar_event_useskill` · Mon3tr `act1autochess_gar_event_useskill` (normal + 精锐 variants, 14 records) — every operator has one |
+| **特质**        | 暴行 `SERVER_ADD_BOND_CHESS_ALL` · 逻各斯 `act1autochess_gar_eff_attrByBond` · 阿米娅·医疗 `modautochess_gar_event_heal` · 可露希尔 `modautochess_gar_prep_gain_chess_by_bond` · 阿斯卡纶 `act1autochess_gar_event_selfkillenemy` · 凯尔希·思衡托 `act1autochess_gar_event_useskill` · Mon3tr `act1autochess_gar_event_useskill` (normal + 精锐 variants, 14 records) — every operator except the 三形态 Amiya has one (their 层数特质 is an open question) |
 | **Equipment** | 2 items × normal/精锐 = 4 records — 罗德岛急救包 (T3 `chess_item_3_13_e`, the bond's low-tier `giveBondId` piece) and 罗德岛徽章 (T6 `chess_item_6_12_e`, the 盟约签名件), implemented in `server/sim/content/items/battle.js`                                                                                                                                                      |
 
 > 凯尔希·思衡托 (`char_1052_kalts2`, 守望者) is **not** 凯尔希 (`char_003_kalts`, 医师) — different operator,>
@@ -661,6 +661,38 @@ it *is* a 核心盟约 (`isCore`, listed on every mode's roster, see above). Wha
   held, never spent: with no bond item in play the morph stays in the hand.
 - `test/match/mod_bot.test.js` pins both (skipping itself while the mod is off).
 
+## 阿米娅的升变 · the Amiya ascension quest (2026-10-11)
+
+The mod's own take on 明日方舟's three Amiyas (user design, 2026-10-09/11): **a player cannot buy the 医疗 or 近卫
+Amiya** — the shop only ever offers the 术士. Every Amiya starts as the caster, and ascension is **earned, then chosen**:
+
+- First in-match purchase of a caster Amiya opens a persistent quest (an EffectRef, `modrhodes:amiya-quest`, whose
+  `data` the client panel reads through the `effects[].data` view passthrough). The panel auto-opens; it offers a
+  **二选一** that locks the route (〈继承之剑〉 / 〈以伤害的方式拯救〉), shows live progress, and a **升变** button
+  once the quest is `ready`. The state machine is `choose → (pick) → active → (onBattleResult) → ready → (claim) → done`,
+  prep phases only; definitions and pure helpers live in `shared/amiyaQuest.js`.
+- **〈继承之剑〉(blade)** — 奎隆之剑, 「争斗在此止歇」: Amiya herself deals **8000** cumulative damage → the caster
+  becomes the **近卫形态** (`char_1001_amiya2`, 影霄 twin blades, once-per-battle 绝影).
+- **〈以伤害的方式拯救〉(lamp)** — 「以战斗的方式治愈，以伤害的方式拯救」: Amiya herself deals **6000** damage **and**
+  the team heals **8000** → the caster becomes the **医疗形态** (`char_1037_amiya3`, the 咒愈师 of chapter 14).
+  Any `chess_rhodes_amiya*` defId counts as "Amiya herself", so transformed / merged Amiyas keep counting.
+- **Price 3 across all three forms** (pay once, transform free). The ascended forms ship as complete `isHidden`
+  records (`chess_rhodes_amiya2/3_*`, tier 5) — outside the shop pool exactly like the author's hidden chess.
+- `claim` transforms **in place** (`transformChess` — equipment, summons, tile and pool copies survive; `_b` caster →
+  `_b` form), falling back to a plain grant when the caster was lost mid-quest.
+- **The shop follows the ascension** (2026-10-11): after the claim the claimant's shop offers the ascended form
+  wherever it would have offered the 术士 — shelf cards re-face at once, later rolls (`economy.js _rollChessSlot`,
+  `acquire.js pushRewardOffer`) draw the form in the caster's stead, and the form's copy accounting (buy / merge /
+  sell / elimination) rides the caster's shared-pool entries through a `poolOf` facade (`diy.js`). It is a
+  **per-player** swap (`ps.poolSwap`, installed by `server/match/match/amiya.js`): other players' shops keep the
+  术士, and nobody can buy an ascended form without finishing the quest.
+- New intents ride the framework's neutral **`MOD_C2S`** registry (shared/protocol.js): a MOD registers its own C2S
+  schemas at import time — `server/match/match/amiya.js` on the server, the panel module on the client — so the
+  author-owned `C2S` table stays free of per-MOD entries. `g.amiya { action: pick|claim, quest: blade|lamp }`.
+- The panel (`public/js/ui/amiyaAscend.js`) is the rhodes toggle's `client` (self-mounting, CSS injected by the
+  module). Art for the 近卫 form (avatars, portrait, front/back spine, skill icons) and the caster's two missing
+  skill icons came from PRTS (`torappu.prts.wiki/assets/skill_icon|char_spine`, `media.prts.wiki`).
+
 ## Known limitations
 
 - **The 网页端开关 is server-wide, and the operator's machine owns it.** One server process serves one data state, so
@@ -670,7 +702,7 @@ it *is* a 核心盟约 (`isCore`, listed on every mode's roster, see above). Wha
   access to `data/`. If a room host should also be able to, the gate is the single `isLoopback` call in
   `server/mod/api.js`. Outside its reach: `data/assets.json` (never reverted, see 网页端开关), and any file edited
   by hand outside the builder is in neither variant — `--check` catches the drift on the seven it does cover.
-- **Kits.** Six of the seven mod operators ship a **hand-authored kit** (the seventh, 暴行, runs the generic kit).
+- **Kits.** Eight of the nine mod operators ship a **hand-authored kit** (the ninth, 暴行, runs the generic kit).
   The three detailed here are the ones whose kits are pure additions on top of the profession profile:
   - 逻各斯 (`chess_rhodes_logos`, `kits/ops/mod-rhodes-logos.js`): S1 殁亡 is a toggle execution aura (0.1 s sweeps, one attempt per target
     per entry into the range, echo = the executed target's remaining HP as arts on a random other enemy), S2 提喻 locks

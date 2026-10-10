@@ -1,0 +1,11 @@
+--- a/server/match/match/intents.js
++++ b/server/match/match/intents.js
+@@ -46,6 +46,8 @@
+       case 'g.pause': return this.setPause(ps, !!msg.on);
+       // the stats the board's units start their next battle with (the detail card in prep, user playtest #4 item 7)
+       case 'g.unitStats': return this.unitStats(ps, msg.seq ?? null);
++      // 罗德岛 MOD's 阿米娅升变任务: pick one of the two quests / claim the transformation (MatchAmiya.amiyaQuest)
++      case 'g.amiya': return this.amiyaQuest(ps, msg);
+       case 'g.leave': this.onLeave(ps.playerId); return OK;
+       case 'b.progress': return this._onProgress(ps, msg);
+       case 'b.result': return this._onResult(ps, msg);

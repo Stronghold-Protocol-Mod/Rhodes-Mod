@@ -7,7 +7,8 @@
       "englishName": "Rhodes Island MOD",
       "description": "7 名罗德岛干员与 rhodesShip 盟约（docs/MOD-RHODES.md）",
       "files": ["chess", "bonds", "effects", "garrisons", "tokens", "items", "config"],
-      "marker": { "file": "bonds", "key": "rhodesShip" }
+      "marker": { "file": "bonds", "key": "rhodesShip" },
+      "client": "js/ui/amiyaAscend.js"
     }
   ]
 }

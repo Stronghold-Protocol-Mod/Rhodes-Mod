@@ -1,0 +1,14 @@
+--- a/server/match/player/economy.js
++++ b/server/match/player/economy.js
+@@ -62,7 +62,10 @@
+ 
+   _rollChessSlot() {
+     // the slotted 自选 pieces join the draw once the 调度中心 reaches their slot's level (player/diy.js diyRollEntries)
+-    const id = this.m.pool.roll(this.m.rngShop, { maxTier: this.shop.level, extra: this.diyRollEntries() });
++    const drew = this.m.pool.roll(this.m.rngShop, { maxTier: this.shop.level, extra: this.diyRollEntries() });
++    // a per-player shop swap (ps.poolSwap, match/amiya.js): the ascended form is offered in the caster's stead —
++    // the drawn copies ARE the caster's, the swap only changes the body on the card
++    const id = (drew && this.poolSwap && this.poolSwap.roll.get(drew)) || drew;
+     return id ? { kind: 'chess', id, basePrice: this.gd.chessPrice(id), frozen: false, sold: false } : null;
+   }
+ 

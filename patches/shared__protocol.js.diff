@@ -11,3 +11,31 @@
    'm.public', 'm.private', 'm.field', 'm.toast', 'm.ticker', 'm.emote', 'm.result',
    // m.unitStats { seq, round, units: [unitStatsEntry] } — the answer to g.unitStats (the requester only)
    'm.unitStats',
+@@ -485,10 +489,12 @@
+ /**
+  * Validate a decoded client message. Returns `null` when valid, otherwise a short reason string.
+  * Extra unknown fields are ignored (not copied by handlers).
++ * MOD-intent schemas live in MOD_C2S (below): a MOD registers its own entries at import time, keeping the
++ * author-owned C2S table free of per-MOD knowledge — the framework layer ships the registry, not the entries.
+  */
+ export function validateC2S(msg) {
+   if (!msg || typeof msg !== 'object' || Array.isArray(msg)) return 'not an object';
+-  const spec = typeof msg.t === 'string' && Object.hasOwn(C2S, msg.t) ? C2S[msg.t] : null;
++  const spec = typeof msg.t === 'string' ? (Object.hasOwn(C2S, msg.t) ? C2S[msg.t] : Object.hasOwn(MOD_C2S, msg.t) ? MOD_C2S[msg.t] : null) : null;
+   if (!spec) return `unknown type ${String(msg.t).slice(0, 32)}`;
+   if (msg.rid != null && !isInt(msg.rid, 0, 2 ** 31)) return 'bad rid';
+   const optional = spec.$optional || [];
+@@ -501,6 +507,13 @@
+   return null;
+ }
+ 
++/**
++ * Per-MOD C2S schemas, keyed like C2S ({ fields: check, $optional?: [...] }). A MOD's server-side module registers
++ * its entries at import time (always loaded via Match.js), and its client module does the same before it can send —
++ * the framework owns the registry and knows no individual MOD (FRAMEWORK.md contract).
++ */
++export const MOD_C2S = Object.create(null);
++
+ // Event tuple kinds inside `b.ev` (DESIGN §8.2).
+ export const EV = Object.freeze({
+   SPAWN: 'spawn', ATK: 'atk', DMG: 'dmg', HEAL: 'heal', SKILL: 'skill', ENGAGE: 'engage', DIE: 'die', LEAK: 'leak',

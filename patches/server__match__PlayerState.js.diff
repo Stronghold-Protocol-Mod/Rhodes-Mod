@@ -1,0 +1,13 @@
+--- a/server/match/PlayerState.js
++++ b/server/match/PlayerState.js
+@@ -182,6 +182,10 @@
+     this.diyBanned = Object.freeze([]);
+     if (!this.isBot && seat.diy) this.setDiy(seat.diy);
+     this.shop = { level: 1, upgradePrice: this.gd.upgradeBase(1) ?? 0, slots: [], frozen: false, freeRefreshes: 0 };
++    /** Per-player shop swap (null until an effect installs one — the 罗德岛 MOD's 阿米娅升变, match/amiya.js):
++     *  { roll: Map<poolId, offerId>, pool: Map<offerId, poolId> } — shop rolls offer `offerId` in `poolId`'s stead
++     *  and poolOf routes `offerId`'s copy accounting back to `poolId`'s shared-pool entry. */
++    this.poolSwap = null;
+     /** reward offers queue (merge rewards, special refreshes): { tier, source, label, slots: [{ kind, id, price, sold }] } */
+     this.offers = [];
+     /** @type {Array<any>} */

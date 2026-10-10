@@ -16,14 +16,22 @@
 //     (applyToggle `matches`), because the browser re-fetches /data/*.json on reload and would then be out of step
 //     with the field it is watching.
 //
-// Everything here is mod-owned: the files, the registry (mod/toggles.json) and the snapshots (mod/variants/).
+// Everything here is mod-owned: the data files, the registry and the snapshots (mod/variants/).
+//
+// THE REGISTRY IS ONE FILE PER MOD (`mod/toggles.d/<id>.json`, server/mod/registry.js) and a mod owns a DISJOINT set of
+// data files. That is exactly what makes two mods independent: switching a toggle only ever writes the files IT lists,
+// so 弹幕 OFF / 罗德岛 ON / both / neither are four states nothing can leak between. A legacy aggregate
+// `mod/toggles.json` is still read (a tree installed by 0.1.x has one) but the fragments win.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, DATA_DIR, getData, resetData } from '../data.js';
+import { publicToggle, readRegistryAt, registryPaths } from './registry.js';
 
-/** The registry: `mod/toggles.json` next to the snapshots. */
-export const REGISTRY_FILE = path.join(ROOT, 'mod', 'toggles.json');
+/** The legacy aggregate registry: `mod/toggles.json` (still read; the fragments take priority). */
+export const REGISTRY_FILE = registryPaths(ROOT).baseFile;
+/** The per-mod fragments: `mod/toggles.d/<id>.json` — one file per mod, so installing a second mod never rewrites the first one's entry. */
+export const REGISTRY_DIR = registryPaths(ROOT).dir;
 /** The snapshots: `mod/variants/<id>/{on,off}/<file>.json`. */
 export const VARIANTS_DIR = path.join(ROOT, 'mod', 'variants');
 
@@ -37,9 +45,9 @@ export const REFUSE = Object.freeze({
 });
 
 /**
- * A toggle as the registry describes it.
+ * A toggle as the registry describes it (server/mod/registry.js is the one implementation of the format).
  * @typedef {{ id: string, name: string, englishName: string, description: string, files: string[],
- *   marker: { file: string, key: string } }} Toggle
+ *   marker: { file: string, key: string }, client: string|null }} Toggle
  */
 
 /** @type {{ at: number, list: Toggle[] } | null} */
@@ -47,31 +55,16 @@ let registryCache = null;
 const REGISTRY_TTL_MS = 1000;
 
 /**
- * The toggles of mod/toggles.json (cached briefly, so a dropped-in registry is picked up without a restart).
- * A malformed registry yields `[]` — never throws, the game must run without it (a checkout without the mod).
+ * The toggles of this checkout: every `mod/toggles.d/*.json` fragment (one mod each), plus a legacy `mod/toggles.json`
+ * for the ids no fragment names. Cached briefly, so a dropped-in fragment is picked up without a restart.
+ * A malformed fragment yields fewer toggles — never throws, the game must run without it (a checkout without the mod).
  * @returns {Toggle[]}
  */
 export function listToggles() {
   const now = Date.now();
   if (registryCache && now - registryCache.at < REGISTRY_TTL_MS) return registryCache.list;
-  /** @type {Toggle[]} */
-  let list = [];
-  try {
-    const raw = JSON.parse(fs.readFileSync(REGISTRY_FILE, 'utf8'));
-    const entries = Array.isArray(raw.toggles) ? raw.toggles : [];
-    list = entries.filter((t) => t && typeof t.id === 'string' && /^[A-Za-z0-9_-]{1,32}$/.test(t.id)
-      && Array.isArray(t.files) && t.files.length > 0 && t.files.every((f) => typeof f === 'string' && /^[A-Za-z0-9_-]{1,32}$/.test(f))
-      && t.marker && typeof t.marker.file === 'string' && typeof t.marker.key === 'string')
-      .map((t) => /** @type {Toggle} */ ({
-        id: t.id, name: String(t.name ?? t.id), englishName: String(t.englishName ?? t.name ?? t.id),
-        description: String(t.description ?? ''), files: t.files.slice(), marker: { file: t.marker.file, key: t.marker.key },
-      }));
-  } catch (e) {
-    if (e && e.code !== 'ENOENT') console.error(`[mod] cannot read mod/toggles.json: ${e.message}`);
-    list = [];
-  }
-  registryCache = { at: now, list };
-  return list;
+  registryCache = { at: now, list: readRegistryAt(ROOT) };
+  return registryCache.list;
 }
 
 /** Drop the registry cache (tests, and a tool that just rewrote it). */
@@ -105,9 +98,7 @@ export function status(data, { canToggle = true, matches = 0, reason = null } = 
     matches,
     canToggle,
     reason,
-    toggles: listToggles().map((t) => ({
-      id: t.id, name: t.name, englishName: t.englishName, description: t.description, on: isOn(t, data),
-    })),
+    toggles: listToggles().map((t) => ({ ...publicToggle(t), on: isOn(t, data) })),
   };
 }
 

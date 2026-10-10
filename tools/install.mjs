@@ -8,9 +8,13 @@
 //
 // 它做三件事，顺序固定：
 //   1. 覆盖安装 mod 自己的文件（payload/，全部是新增文件，不会动作者任何东西）
+//      —— 其中一部分是**中立的开关框架**（server/mod/*、public/js/ui/modBadge.js、tools/mod-toggle.mjs …），
+//         每一个 MOD 的包都带、且逐字节相同，所以两个 MOD 都有装时后装的那个只会「已是最新」地跳过；
+//         另一部分才是本 MOD 自己的（数据快照、盟约与 kit、美术）。
 //   2. 给作者文件打补丁（patches/，统一 diff；data/assets.json 走结构化合入）
-//      —— 每一步都按 SHA-256 自校验：打完的结果必须与打包时一致，否则整步失败并报出是哪个文件
-//   3. 把 mod 打开（data/ 从官方原样切到 ON 快照）
+//      —— 每一步都按 SHA-256 自校验：打完的结果必须与打包时一致，否则整步失败并报出是哪个文件。
+//         框架占的那些补丁文件，两个 MOD 的包内容一致；本 MOD 只patch自己那几行，所以两家互不覆盖。
+//   3. 把**本包这个** mod 打开（manifest 的 mod.id；data/ 从官方原样切到 ON 快照）。
 //
 // 作者文件在改之前会备份到 <游戏>/.rhodes-mod-backup/<时间戳>/。
 
@@ -185,20 +189,24 @@ for (const [relPath, meta] of Object.entries(MANIFEST.merge)) {
 // ---------------------------------------------------------------- 3. 开关 -----
 
 header('== 3/3  mod 开关 ==');
-const toggle = listToggles(root)[0];
+// This package switches ITS OWN mod (manifest `mod.id`), never "the first toggle of the checkout": a player who also
+// installed another mod must still get this one's switch flipped, whatever the registry order is.
+const TOGGLE_ID = MANIFEST.mod && MANIFEST.mod.id;
+const toggles = await listToggles(root);
+const toggle = TOGGLE_ID ? toggles.find((t) => t.id === TOGGLE_ID) : null;
 if (!toggle) {
-  problems.push('mod/toggles.json 读不出开关');
-  log('  × 注册表读不出');
+  problems.push(`注册表里没有本 MOD 的开关 "${TOGGLE_ID}"（读出：${toggles.map((t) => t.id).join(', ') || '（无）'}）`);
+  log(`  × 注册表里没有 "${TOGGLE_ID}"`);
 } else {
   const state = readModState(root, toggle);
   if (CHECK) {
     log(`  ${toggle.name || toggle.id}: ${state === null ? '读不出' : state ? '已开启 (ON)' : '已关闭 (OFF)'}`);
   } else if (KEEP_OFF) {
-    const r = setModState(root, { id: toggle.id, on: false });
+    const r = await setModState(root, { id: toggle.id, on: false });
     log(r.ok ? `  ${toggle.name}: 已在 OFF（--off）` : `  × ${r.detail}`);
     if (!r.ok) problems.push(r.detail);
   } else {
-    const r = setModState(root, { id: toggle.id, on: true });
+    const r = await setModState(root, { id: toggle.id, on: true });
     log(r.ok ? `  ${toggle.name}: ${r.changed ? '已开启 (ON)' : '本来就是 ON'}` : `  × ${r.detail}`);
     if (!r.ok) problems.push(r.detail);
   }
@@ -222,6 +230,7 @@ if (CHECK) {
   log('下一步：');
   log('  1. 启动服务器（Windows 双击 scripts\\start-windows.bat，或 npm start）');
   log('  2. 打开 http://localhost:3000');
-  log('  3. 标题页右下角的徽标就是开关，点一下切换 罗德岛 开/关');
-  log('     终端里也可以用：npm run mod:rhodes / npm run mod:rhodes:strip');
+  log(`  3. 标题页右下角的徽标就是开关，点一下切换 ${(MANIFEST.mod && MANIFEST.mod.name) || '本 MOD'} 开/关`);
+  log(`     终端里也可以用：npm run mod -- on ${TOGGLE_ID || '<id>'} / npm run mod -- off ${TOGGLE_ID || '<id>'}`);
+  log('     （装了别的 MOD 也走同一个 CLI：npm run mod:status 看全部开关）');
 }

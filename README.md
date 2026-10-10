@@ -2,7 +2,7 @@
 
 《卫戍协议：盟约 · Stronghold Protocol》的**非官方数据 MOD**：在官方 **0.2.3** 之上追加「罗德岛」阵营 —— **7 名干员 · 1 个盟约 · 2 件装备**，装完即用，随时可开可关。
 
-![version](https://img.shields.io/badge/version-1.3.0-2ea44f)
+![version](https://img.shields.io/badge/version-1.4.0-2ea44f)
 ![base](https://img.shields.io/badge/base%20game-0.2.3-blue)
 ![license](https://img.shields.io/badge/code%20license-GPL--3.0--or--later-blue)
 ![node](https://img.shields.io/badge/node-22%20%7C%2024-339933)
@@ -34,7 +34,7 @@
 - **7 名干员 / 14 条记录**（每名含普通与精锐两档）：暴行、可露希尔、阿米娅（医疗）、Mon3tr、阿斯卡纶、凯尔希·思衡托、逻各斯。
 - **1 个盟约「罗德岛」**（`rhodesShip`）：阈值 3 / 6，共 11 名成员（7 名本 MOD + 4 名被追加盟约的官方干员）。它是**核心盟约**——`isCore: true`，与官方 8 个势力盟约同级：上「核心盟约」名单、被调和 +1 加持、算进核心盟约层数类特质、每个模式的盟约名册里也有它。
 - **2 件装备 × 普通 / 精锐**：罗德岛急救包（T3）、罗德岛徽章（T6）。
-- **开关引擎**：`GET /mod/state` 读状态、`POST /mod/toggle` 切换，标题界面另有一个可点的状态徽标。
+- **一个中立的开关框架**：`GET /mod/state` 读状态、`POST /mod/toggle` 切换，标题界面另有一个可点的状态徽标。这一层**不认任何具体 MOD 的名字**，本 MOD 与别的数据 MOD 装的都是同一份，所以两个 MOD 可以各自单独装、单独开关，也可以一起装、任意顺序装。
 - **27 个独占美术素材**（约 1.9 MB）：7 名干员里有 5 名是官方赛季自带干员，素材官方包里已有，因此只需随附剩下 2 名的头像 / 立绘 / Spine。
 
 > **匹配 AI 也会打「罗德岛」**：MOD 开启时，对局机器人一旦决定走这条线，就会尽量凑满 **6 名**成员（罗德岛真正的收益在 6 名），并让**阿米娅**优先转职**奥术**、其次**精准**。在 AI 眼里它就是一个核心盟约——和 炎 / 萨尔贡 / 维多利亚 走同一条决策路径，只是收益落在最高档而不是第一档。MOD 关闭时 AI 与原版完全一致。
@@ -47,35 +47,36 @@ MOD 自身文件放在 `payload/`，原样复制进游戏目录；对官方文�
 
 | 形式 | 数量 | 说明 |
 | --- | --- | --- |
-| `patches/*.diff` | 19 个文件 / 41 个 hunk / +615 −20 | 多数是**加挂点**性质：注册一个开关、转发几条路由、在标题界面挂一个徽标；另含对匹配 AI（`server/match/bot.js`）的改动 |
+| `patches/*.diff` | 18 个文件 / 41 个 hunk / +610 −19 | **11 个是中立的开关框架**（每个 MOD 的包都一模一样的那些：登记一个开关、转发几条路由、挂一个徽标、让大厅读活数据），**7 个是本 MOD 自己的**（盟约注册、6 个 kit 文件、召唤物、两处驻地、一件装备，以及匹配 AI） |
 | `patches/data__assets.json.merge` | 1 | `assets.json` 是单行压缩 JSON，文本 diff 会退化成整文件替换，故用**结构差量**合入 |
 
 关掉 MOD 后这些代码不会生效。
 
 <details>
-<summary>被改动的 19 个官方文件</summary>
+<summary>被改动的 18 个官方文件</summary>
 
 ```
-package.json
-shared/protocol.js
-server/index.js
-server/http/routes.js
-server/http/websocket.js
-server/lobby.js
-server/match/bot.js
-server/match/player/diy.js
-server/sim/content/bonds.js
-server/sim/content/tokens.js
-server/sim/content/garrisons/battle.js
-server/sim/content/garrisons/meta.js
-server/sim/content/items/battle.js
-server/sim/content/kits/index.js
-public/js/main.js
-public/js/store.js
-public/js/screens/title.js
-public/css/screens/title.css
-public/i18n/en.json
+package.json                        框架 · 中立的 mod / mod:status 两个脚本
+public/css/screens/title.css        框架 · 徽标样式
+public/i18n/en.json                 框架 · 徽标文案
+public/js/main.js                   框架 · installModState 挂载点
+public/js/screens/title.js          框架 · 渲染徽标
+public/js/store.js                  框架 · store.mod
+server/http/routes.js               框架 · 把 /mod/* 分派给开关接口
+server/http/websocket.js            框架 · 让大厅读「活数据」
+server/index.js                     框架 · setLiveBundle
+server/lobby.js                     框架 · 开关变更广播 + 自选池规则
+shared/protocol.js                  框架 · S2C 增加 mod.state
+server/match/bot.js                 本 MOD · 匹配 AI 走核心盟约逻辑
+server/sim/content/bonds.js         本 MOD · 注册 rhodesShip
+server/sim/content/garrisons/battle.js  本 MOD · 阿米娅·医疗的驻地事件
+server/sim/content/garrisons/meta.js    本 MOD · 可露希尔的驻地事件
+server/sim/content/items/battle.js      本 MOD · 两件罗德岛装备
+server/sim/content/kits/index.js        本 MOD · 注册 6 个 kit 文件
+server/sim/content/tokens.js            本 MOD · 8 个召唤物
 ```
+
+前 11 个是**开关框架**的挂载点，与 MOD 内容无关，每个 MOD 的包都带、且逐字节相同；后 7 个才是本 MOD 自己的。装另一个数据 MOD 不会碰到这里任何一行。
 
 </details>
 
@@ -85,16 +86,19 @@ public/i18n/en.json
 install.bat / install.sh      一键安装（双击 / 把游戏文件夹拖上来）
 payload/                      MOD 自有文件，原样复制进游戏目录
   ├─ docs/MOD-RHODES.md        MOD 详细文档（随 MOD 一并装入游戏）
-  ├─ mod/                      开关清单 + ON/OFF 数据快照
+  ├─ mod/toggles.d/rhodes.json 本 MOD 的开关登记（一个 MOD 一片）
+  ├─ mod/variants/rhodes/      ON / OFF 两套数据快照（7 个文件 × 2）
   ├─ public/                   徽标 UI + 27 个独占美术素材
-  └─ server/                   MOD 服务端逻辑（盟约、开关、路由）
-patches/                      对官方文件的补丁（19 个 .diff）与 assets 结构差量（.merge）
+  ├─ server/mod/               开关框架：注册表 / 引擎 / HTTP 接口（每个 MOD 的包都带）
+  ├─ server/                   MOD 自己的逻辑（盟约、6 个 kit、两件装备、驻地）
+  └─ tools/                    玩家侧的开关 CLI + 定位游戏目录（框架层）
+patches/                      对官方文件的补丁（18 个 .diff = 11 框架 + 7 本 MOD）与 assets 结构差量（.merge）
 tools/
   ├─ install.mjs               安装器（--check / --off / --restore / --force / --game）
-  ├─ mod-toggle.mjs            开关 CLI（on / off / status）
+  ├─ mod-toggle.mjs            开关 CLI（on <id> / off <id> / status）
   ├─ game-root.mjs             定位游戏目录
   ├─ diff.mjs                  纯 JS 的 unified diff 生成 / 应用
-  └─ manifest.json             全部文件的哈希与补丁元数据
+  └─ manifest.json             全部文件的哈希、补丁元数据与 framework.digest
 ```
 
 ## 干员介绍
@@ -165,9 +169,9 @@ macOS / Linux 用 `./install.sh`，参数一样。
 
 按顺序三件事，每一步对不上就停下报错：
 
-1. 把 MOD 的 **54 个自有文件**放进游戏目录（已是最新的会跳过）；
-2. 给你那份官方源码打 **19 个文件的补丁**，并把 `data/assets.json` 按**结构差量**合入（逐文件校验 SHA-256，结果哈希对不上就回滚）；
-3. 把 MOD **打开**。
+1. 把 MOD 的 **58 个自有文件**放进游戏目录（已是最新的会跳过 —— 其中 7 个是中立的开关框架，装过别的 MOD 的话它们会直接跳过）；
+2. 给你那份官方源码打 **18 个文件的补丁**，并把 `data/assets.json` 按**结构差量**合入（逐文件校验 SHA-256，结果哈希对不上就回滚）；
+3. 把**本 MOD 这个**开关**打开**（只切 `rhodes` 一个，不会碰别的 MOD 的开关）。
 
 装之前，会被改动的官方文件会先备份到 `<游戏目录>/.rhodes-mod-backup/<时间戳>/`。
 
@@ -182,34 +186,40 @@ MOD 是**数据驱动**的：那套 JavaScript 永远随游戏加载，但**只�
 三种开关方式，随你顺手：
 
 ```bat
-:: 命令行（在游戏目录里；MOD 解压到别处就换下面第三条）
-npm run mod:rhodes            :: 开
-npm run mod:rhodes:strip      :: 关
-npm run mod:rhodes:status     :: 看状态
+:: 命令行（在游戏目录里；MOD 解压到别处就加 --game <游戏目录>）
+npm run mod -- on rhodes      :: 开
+npm run mod -- off rhodes     :: 关
+npm run mod:status            :: 看全部开关的状态
 ```
 
 - **游戏内（推荐，不用终端）**：标题界面的 MOD 徽标，点一下切换（仅本机回环地址可切，对局进行中禁止切换）。
 - **HTTP**：`POST /mod/toggle?id=rhodes&on=1`（`0` 为关闭），`GET /mod/state` 读状态。
-- **MOD 目录里**：`node tools/mod-toggle.mjs on|off|status --game <游戏目录>`，任何解压位置都能用。
+- **MOD 目录里**：`node tools/mod-toggle.mjs on rhodes --game <游戏目录>`，任何解压位置都能用。
 
 反复开关是幂等的 —— 开 → 关 → 开之后，数据文件与第一次开时**逐字节一致**。
+
+> **和别的 MOD 一起装也没问题。** 开关机制是一层**中立的框架**：注册表按 MOD 分片（`mod/toggles.d/<id>.json`，一个 MOD 一片），框架代码里不出现任何 MOD 的名字。所以装第二个数据 MOD 既不会覆盖罗德岛的登记、也不会动罗德的 7 个数据文件；两个 MOD 可以**单独装、单独开关，也可以一起装、任意顺序装**。本机有多个开关时，命令行**必须写明 id**（不写会直接拒绝，不会替你猜）。
 
 ## 卸载
 
 ```bat
-npm run mod:rhodes:strip
-:: 或从 MOD 目录：node tools/mod-toggle.mjs off --game <游戏目录>
+npm run mod -- off rhodes
+:: 或：node tools/mod-toggle.mjs off rhodes --game <游戏目录>
 ```
 
 游戏就回到原版了。想彻底清理，再删掉这些 MOD 新增的文件 / 目录：
 
-- `mod/`（开关清单与 ON/OFF 快照）
-- `server/mod/`、`server/sim/content/bonds/rhodes.js`、`server/sim/content/kits/mod.js`、`server/sim/content/kits/ops/mod-rhodes-*.js`（6 个）
-- `public/js/ui/modBadge.js`、`public/assets/` 下 MOD 新增的素材（27 个，见 `tools/manifest.json` 的 `assets`）
+- `mod/toggles.d/rhodes.json`、`mod/variants/rhodes/`（本 MOD 的登记与 ON/OFF 快照）
+- `server/sim/content/bonds/rhodes.js`、`server/sim/content/kits/mod.js`、`server/sim/content/kits/ops/mod-rhodes-*.js`（6 个）
+- `public/assets/` 下 MOD 新增的素材（27 个，见 `tools/manifest.json` 的 `assets`）
 - `docs/MOD-RHODES.md`、`tools/{install,mod-toggle,game-root,diff}.mjs`、`tools/manifest.json`
 - `install.bat` / `install.sh`（如果你把仓库文件放在了游戏目录里）
 
-那 19 个被打了补丁的官方文件，用 `.rhodes-mod-backup/<时间戳>/` 里的备份覆盖回去即可。
+**这些是多个 MOD 共用的开关框架，只有确定不再装任何 MOD 时才删**：`server/mod/`（4 个文件：
+`api.js` / `kitted.js` / `registry.js` / `toggle.js`）、`public/js/ui/modBadge.js`、`tools/mod-toggle.mjs`。
+删了它们，别的 MOD 的开关也会一起坏掉。
+
+那 18 个被打了补丁的官方文件，用 `.rhodes-mod-backup/<时间戳>/` 里的备份覆盖回去即可。
 `tools/manifest.json` 记录了每个文件的 `baseSha256` / `resultSha256`，可以自行核对。
 
 ## 许可证

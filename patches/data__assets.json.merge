@@ -1,5 +1,6 @@
 {
   "file": "data/assets.json",
+  "layer": "M",
   "requires": {
     "version": 1,
     "hash": "cf275d509d29"

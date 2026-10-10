@@ -15,7 +15,7 @@
 
 本仓库**不包含上游项目的源码**。上游的文件以两种形式携带：
 
-- **patch（补丁）** —— `patches/*.diff`，对上游 19 个文件的统一 diff；
+- **patch（补丁）** —— `patches/*.diff`，对上游 18 个文件的统一 diff；
 - **merge（结构差量）** —— `patches/data__assets.json.merge`，对上游单行压缩 JSON `data/assets.json` 的结构化增量。
 
 安装时（`tools/install.mjs`）把它们打在用户自己那份官方安装上，并在落地前逐个文件校验
@@ -23,7 +23,7 @@
 
 因此本仓库中的补丁与差量文件是**上游 GPL 代码的衍生片段**，随上游一同以 GPL-3.0-or-later 发布。
 
-`payload/` 下是 MOD 自己新增的文件（开关引擎、盟约实现、干员 kits、徽标 UI、素材与文档）。
+`payload/` 下是 MOD 自己新增的文件（开关框架、盟约实现、干员 kits、徽标 UI、素材与文档）。
 
 ## 2. 代码许可证：GPL-3.0-or-later
 

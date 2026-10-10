@@ -1,4 +1,5 @@
-// public/js/ui/modBadge.js — the 内容开关 badge of the title screen (docs/MOD-RHODES.md §开关).
+// public/js/ui/modBadge.js — the 内容开关 badge of the title screen (docs/MOD-RHODES.md §开关). FRAMEWORK, not a mod:
+// it knows no mod by name, only the registry (mod/toggles.d/*.json, server/mod/registry.js).
 //
 // Shows whether each data mod of THIS server is on, and lets the machine running the server switch it without a
 // terminal. The state comes from GET /mod/state (server/mod/api.js), which answers without a session — the title
@@ -6,6 +7,11 @@
 // while it is on screen (a tiny no-store JSON; the screen is transient) and also honours the `mod.state` push the
 // server sends to every connected session when someone switches (main.js installModState) — which is how a shared
 // server's guests learn that the host changed something under them.
+//
+// It ALSO mounts the mods' own client code: a registry entry may name `client` ('js/ui/<x>.js', relative to the site
+// root — server/mod/registry.js), a module that exports `mount()` and attaches itself. Every ON entry's module is
+// loaded here and every OFF entry's is unmounted again, so main.js / screens/title.js name no mod at all, and the two
+// mods never have to patch the same file just to be mounted.
 //
 // Switching is POST /mod/toggle?id=&on= (loopback only: the reply of a refused request says why — `REMOTE` for an
 // address that is not the server's own machine, `a match is running` while a match refuses the change). A successful
@@ -36,6 +42,55 @@ function sameToggles(a, b) {
   return a.every((x, i) => x.id === b[i].id && x.on === b[i].on);
 }
 
+// ---- the mods' own client modules (the `client` field of a registry entry) ------------------------
+
+/** What a mod's client module must export: `mount()` returns its own cleanup (or nothing). */
+/** @typedef {{ mount?: () => (void | (() => void)) }} ModClient */
+
+/** path → the imported module, or `null` once a load failed (never retried; a reload tries afresh). */
+const clientModules = new Map();
+/** toggle id → the cleanup of its mounted client module. */
+const mountedClients = new Map();
+
+/**
+ * Load + `mount()` the client module of every ON toggle, and unmount the ones that went OFF. Idempotent: it runs on
+ * every /mod/state read, but a module is imported once and mounted once. A module that fails to load is reported and
+ * left off — a broken mod must never take the page with it.
+ * @param {{ id: string, on: boolean, client?: string|null }[]} toggles
+ */
+async function syncClients(toggles) {
+  for (const tg of toggles) {
+    if (!tg.on || !tg.client || mountedClients.has(tg.id)) continue;
+    const path = `/${String(tg.client).replace(/^\/+/, '')}`;
+    if (!clientModules.has(path)) {
+      try {
+        clientModules.set(path, await import(/* webpackIgnore: true */ path));
+      } catch (err) {
+        clientModules.set(path, null);
+        console.warn(`[mod] ${tg.id}: client module ${path} failed to load`, err);
+      }
+    }
+    const mod = /** @type {ModClient|null} */ (clientModules.get(path));
+    if (!mod) continue;
+    try {
+      const cleanup = typeof mod.mount === 'function' ? mod.mount() : undefined;
+      mountedClients.set(tg.id, typeof cleanup === 'function' ? cleanup : () => {});
+    } catch (err) {
+      console.warn(`[mod] ${tg.id}: mount() failed`, err);
+      mountedClients.set(tg.id, () => {});
+    }
+  }
+  for (const [id, cleanup] of [...mountedClients]) {
+    const tg = toggles.find((x) => x.id === id);
+    if (tg && tg.on) continue;
+    try { cleanup(); } catch { /* a cleanup that throws must not block the others */ }
+    mountedClients.delete(id);
+  }
+}
+
+/** Everything mounted so far — for tests / debugging. */
+export function mountedModClients() { return [...mountedClients.keys()]; }
+
 /**
  * Adopt a /mod/state body (or a pushed mod.state frame) into the store.
  * `pushed` marks a change somebody else made: the page's /data/*.json are then stale and it offers a reload.
@@ -47,7 +102,10 @@ export function adoptModState(body, { pushed = false } = {}) {
   const prev = store.get().mod || EMPTY_MOD;
   const toggles = body.toggles
     .filter((tg) => tg && typeof tg.id === 'string')
-    .map((tg) => ({ id: tg.id, name: String(tg.name ?? tg.id), englishName: String(tg.englishName ?? tg.name ?? tg.id), on: !!tg.on }));
+    .map((tg) => ({
+      id: tg.id, name: String(tg.name ?? tg.id), englishName: String(tg.englishName ?? tg.name ?? tg.id),
+      on: !!tg.on, client: typeof tg.client === 'string' ? tg.client : null,
+    }));
   const changedElsewhere = pushed && prev.ready && !sameToggles(prev.toggles, toggles);
   store.patch('mod', {
     ready: true,
@@ -57,6 +115,8 @@ export function adoptModState(body, { pushed = false } = {}) {
     toggles,
     stale: prev.stale || changedElsewhere,
   });
+  // The mods' own client code follows the same state (the `client` field of their registry entry).
+  void syncClients(toggles);
 }
 
 /** Read GET /mod/state. Never throws; a failure leaves the store untouched (the badge just stays hidden). */

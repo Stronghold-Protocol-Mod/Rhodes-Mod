@@ -33,38 +33,46 @@ const gridOf = (chess, skillId) => skillRec(chess, skillId)?.rangeGrid ?? null;
 
 function amiyaCaster(bb, chess) {
   const t0 = talentBb(chess, 0); // 情绪吸收 (elite records only; the normal's slot is the ??? placeholder — empty bb)
-  const s1rec = skillRec(chess, 'skcom_magic_rage[3]');
   const grid3 = gridOf(chess, 'skchr_amiya_3');
-  return {
-    skills: lazySkills({
-      // S1 战术咏唱·γ型 — bb is the SELECTED skill's blackboard, so the plain aspd buff reads it directly.
-      'skcom_magic_rage[3]': () => ({
-        kind: 'duration',
-        mods: modsOut({ aspd: num(bb.attack_speed) }),
-      }),
-      // S2 精神爆发 — `attack@`-prefixed keys (the official sub-bb namespace); the post-skill stun is the self-debuff
-      // the description states (and the reason the AUTO skill is a gamble).
-      skchr_amiya_2: () => ({
-        kind: 'duration',
-        attack: { hits: Math.max(1, Math.round(num(bb['attack@times'], 1))), atkScale: num(bb['attack@atk_scale'], 1) },
-        onEnd({ battle, unit }) {
-          const stun = num(bb.stun, 0);
-          if (!(stun > 0)) return;
-          battle.addBuff(unit, { key: 'amiya:burstStun', duration: stun, flags: { stun: true }, visible: true, source: unit });
-        },
-      }),
-      // S3 奇美拉 — true-damage attacks on the skill's own wider grid; the forced retreat at the end IS the cost.
-      skchr_amiya_3: () => ({
-        kind: 'duration',
-        mods: modsOut({ atkPct: num(bb.atk), hpPct: num(bb.max_hp) }),
-        attack: { dmgType: 'true' },
-        ...(grid3 ? { trigger: { rule: 'SKILL_RANGE', grid: grid3 } } : {}),
-        onEnd({ battle, unit }) { battle.retreat(unit, { reason: 'amiya:chimera' }); },
-      }),
+  // Per-id specs, each a builder of the SELECTED skill's bb (only the selected id is ever read: selectSkillSpec
+  // looks up `skills[selected]`, or takes the top-level `skill` when the selected skill IS the record's default).
+  const spec = {
+    // S1 战术咏唱·γ型 — bb is the SELECTED skill's blackboard, so the plain aspd buff reads it directly.
+    'skcom_magic_rage[3]': () => ({
+      kind: 'duration',
+      mods: modsOut({ aspd: num(bb.attack_speed) }),
     }),
-    // The default skill (isDefault) is the highest-index unlocked one: S2 on the 2本 normal, S3 on the 精锐 — the
-    // engine picks it from the record, so the kit only needs the per-id specs above.
-    skill: null,
+    // S2 精神爆发 — `attack@`-prefixed keys (the official sub-bb namespace); the post-skill stun is the self-debuff
+    // the description states (and the reason the AUTO skill is a gamble).
+    skchr_amiya_2: () => ({
+      kind: 'duration',
+      attack: { hits: Math.max(1, Math.round(num(bb['attack@times'], 1))), atkScale: num(bb['attack@atk_scale'], 1) },
+      onEnd({ battle, unit }) {
+        const stun = num(bb.stun, 0);
+        if (!(stun > 0)) return;
+        battle.addBuff(unit, { key: 'amiya:burstStun', duration: stun, flags: { stun: true }, visible: true, source: unit });
+      },
+    }),
+    // S3 奇美拉 — true-damage attacks on the skill's own wider grid (targeting: the live range IS the skill's grid
+    // while it runs); the forced retreat at the end IS the cost.
+    skchr_amiya_3: () => ({
+      kind: 'duration',
+      mods: modsOut({ atkPct: num(bb.atk), hpPct: num(bb.max_hp) }),
+      attack: { dmgType: 'true' },
+      targeting: grid3 ? { rangeGrid: grid3 } : undefined,
+      ...(grid3 ? { trigger: { rule: 'SKILL_RANGE', grid: grid3 } } : {}),
+      onEnd({ battle, unit }) { battle.retreat(unit, { reason: 'amiya:chimera' }); },
+    }),
+  };
+  // The record's default skill rides the top-level `skill` (the kit contract — selectSkillSpec consults the
+  // `skills` map only for NON-default picks): S2 精神爆发 on the 2本 normal, S3 奇美拉 on the 精锐.
+  const defaultId = (chess?.skills ?? []).find((s) => s && s.isDefault)?.skillId ?? null;
+  const selected = chess?.skill?.skillId ?? defaultId;
+  const map = { ...spec };
+  if (defaultId) delete map[defaultId];
+  return {
+    skills: lazySkills(map),
+    skill: selected === defaultId && spec[selected] ? spec[selected]() : null,
     talents: [{
       install(battle, unit) {
         // 情绪吸收 — "成功造成伤害后额外回复{sp}点技力，消灭敌人后额外获得{killSp}点技力". An empty bb (the normal's

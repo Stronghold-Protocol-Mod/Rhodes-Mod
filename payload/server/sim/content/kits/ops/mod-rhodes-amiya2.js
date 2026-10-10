@@ -31,24 +31,26 @@ function amiyaGuard(bb, chess) {
   const t0 = talentBb(chess, 0); // 青色怒火 { atk, def }
   const s1bb = skillBbOf(chess, 'skchr_amiya2_1'); // 影霄·奔夜's own blackboard (the dodge chance lives there)
   const grid2 = gridOf(chess, 'skchr_amiya2_2');
-  return {
-    skills: lazySkills({
-      // S1 影霄·奔夜 — two hits per attack at full scale (the official is a plain 二连击); the arts dodge is armed by
-      // onStart and disarmed by onEnd (the talent's hit hook reads the flag), so it lives exactly while the skill does.
-      skchr_amiya2_1: () => ({
-        kind: 'duration',
-        mods: modsOut({ atkPct: num(bb.atk) }),
-        attack: { hits: 2 },
-        onStart({ unit }) { unit.mem.amiya2Dodge = true; },
-        onEnd({ unit }) { unit.mem.amiya2Dodge = false; },
-      }),
-      // S2 影霄·绝影 — the burst runs in onStart (explicit amounts, so the skill's true-damage attack override does
-      // not touch the nine arts slashes); the true override covers her OWN attacks for the rest of the duration, which
-      // is exactly the official "接下来的伤害类型变为真实".
-      skchr_amiya2_2: () => ({
-        kind: 'duration',
-        attack: { dmgType: 'true' },
-        ...(grid2 ? { trigger: { rule: 'SKILL_RANGE', grid: grid2 } } : {}),
+  // Per-id specs, each a builder of the SELECTED skill's bb (only the selected id is ever read).
+  const spec = {
+    // S1 影霄·奔夜 — two hits per attack at full scale (the official is a plain 二连击); the arts dodge is armed by
+    // onStart and disarmed by onEnd (the talent's hit hook reads the flag), so it lives exactly while the skill does.
+    skchr_amiya2_1: () => ({
+      kind: 'duration',
+      mods: modsOut({ atkPct: num(bb.atk) }),
+      attack: { hits: 2 },
+      onStart({ unit }) { unit.mem.amiya2Dodge = true; },
+      onEnd({ unit }) { unit.mem.amiya2Dodge = false; },
+    }),
+    // S2 影霄·绝影 — the burst runs in onStart (explicit amounts, so the skill's true-damage attack override does
+    // not touch the nine arts slashes); the true override covers her OWN attacks for the rest of the duration, which
+    // is exactly the official "接下来的伤害类型变为真实". targeting: while it runs her live range IS the skill's
+    // own forward grid (21 tiles on the projected record).
+    skchr_amiya2_2: () => ({
+      kind: 'duration',
+      attack: { dmgType: 'true' },
+      targeting: grid2 ? { rangeGrid: grid2 } : undefined,
+      ...(grid2 ? { trigger: { rule: 'SKILL_RANGE', grid: grid2 } } : {}),
         onStart({ battle, unit, skill }) {
           const times = Math.max(1, Math.round(num(bb.times, 1)));
           const scale = num(bb.atk_scale, 1);
@@ -82,8 +84,16 @@ function amiyaGuard(bb, chess) {
         // "整场战斗中该技能只能释放一次" — the engine has no once-per-battle flag (the amiya3 pattern).
         onEnd({ unit }) { unit.skill.noSkill = true; },
       }),
-    }),
-    skill: null,
+  };
+  // The record's default skill rides the top-level `skill` (the kit contract — selectSkillSpec consults the
+  // `skills` map only for NON-default picks): on BOTH forms the default is S2 影霄·绝影 (isDefault in data).
+  const defaultId = (chess?.skills ?? []).find((s) => s && s.isDefault)?.skillId ?? null;
+  const selected = chess?.skill?.skillId ?? defaultId;
+  const map = { ...spec };
+  if (defaultId) delete map[defaultId];
+  return {
+    skills: lazySkills(map),
+    skill: selected === defaultId && spec[selected] ? spec[selected]() : null,
     talents: [{
       install(battle, unit) {
         // 青色怒火 — an aura whose value DOUBLES while one of her skills runs (both skills carry `talent_scale`).

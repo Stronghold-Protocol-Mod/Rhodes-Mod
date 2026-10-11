@@ -20,7 +20,7 @@
  // Strategy (botPickBand): weighted by starting LP among the offered bands; never one whose mechanic rides on a bond the
  // mode switches off (gd.bandBondIds = bands.json bondIds: the bond its text names in <…> or its blackboards name — 标准's
  // 潘格尼尼, 克莱门莎, 玛恩纳; DESIGN §21.26); alone, 老鲤's withheld first-round funds only rarely (× 0.02).
-@@ -134,6 +147,42 @@
+@@ -134,6 +147,44 @@
  const DEFAULT_MELEE_RANGE = [[0, 0], [0, 1]];
  
  /**
@@ -56,14 +56,16 @@
 +const TOP_PAYOFF_BUY = 8;
 +/** The operator the MOD's 转职 (变形同构体 + a `giveBondId` item) targets first: 阿米娅·医疗 (`char_1037_amiya3`). */
 +const MORPH_HOST_CHAR = 'char_1037_amiya3';
-+/** The bond items a 罗德岛 转职 takes, in order: 奥术 (逻各斯's bond) before 精准 (可露希尔's). */
-+const MORPH_BOND_PREF = Object.freeze(['arcaneShip', 'preciShip']);
++/** The bond items a 罗德岛 转职 takes, in order: 精准 (可露希尔's bond). 奥术 is NOT here — 阿米娅·医疗 already
++ *  carries it (her 三形态盟约 are 罗德岛 + 奥术 + 助力), so pairing her with 奥术法阵 would add no membership, and a
++ *  second membership is the whole point (see the file header). No 精准 item in play → the generic highest tier.) */
++const MORPH_BOND_PREF = Object.freeze(['preciShip']);
 +
 +/**
   * Band pick among the strategies the mode offers (gd.bandIds): weighted by starting LP (sturdier strategies are
   * preferred). Alone, a band that withholds the first rounds' funds (老鲤 "资金暂存": no operator in R1–R2, every enemy
   * leaks) is avoided — only 联防 teammates cover that. A band whose mechanic rides on a bond the mode switches off
-@@ -370,8 +419,12 @@
+@@ -370,8 +421,12 @@
      if (!b || !b.isCore || m.gd.modeInactiveBonds.has(id)) continue;
      const k = owned.counts.get(id) || 0;
      if (!k) continue;
@@ -77,7 +79,7 @@
      if (s > bestS) { bestS = s; focus = id; }
    }
    let second = null;
-@@ -444,7 +497,9 @@
+@@ -444,7 +499,9 @@
      if (hits) v += 10 * w;
      else if (th.some((t) => t > n + 1 && t - (n + 1) <= 1)) v += 3 * w;
      if (bond.thresholdTemplate === 'count_threshold_downward') v -= n > 0 ? 12 : 0; // 独行 breaks with a second member
@@ -88,7 +90,7 @@
      else if (b === second) v += 4;
      else if (committed && bond.isCore && !hits) v -= 4;
    }
-@@ -514,11 +569,17 @@
+@@ -514,11 +571,17 @@
    let v = 0;
    for (const p of set) v += unitBase(m, p, ctx);
    for (const [id, b] of Object.entries(bonds)) {
@@ -108,7 +110,7 @@
      }
      if (!b.tier) continue;
      const bond = gd.bond(id);
-@@ -1761,6 +1822,9 @@
+@@ -1761,6 +1824,9 @@
    const rec = gd.item(item.id);
    if (!rec) return null;
    const key = itemEffect(rec);
@@ -118,7 +120,7 @@
    const value = new Map();
    const val = (p) => { if (!value.has(p.uid)) value.set(p.uid, pieceValue(m, ps, p, ctx)); return value.get(p.uid); };
    const deployed = [...ps.board.values()].filter((p) => p.kind === 'chess');
-@@ -1851,8 +1915,70 @@
+@@ -1851,8 +1917,70 @@
    if (key) { const [r, c] = parseKey(key); tryDo(() => ps.useArt(item.uid, r, c)); }
  }
  
@@ -144,8 +146,8 @@
 +  return deployed.find((p) => wornMorph(gd, p) || wornBond(gd, p)) || null;
 +}
 +
-+/** The `giveBondId` item the host takes: the MOD's order for 阿米娅 (奥术 before 精准 — the bonds of 逻各斯 and 可露希尔,
-+ *  the two operators her extra membership activates), else the highest tier. */
++/** The `giveBondId` item the host takes: for 阿米娅·医疗 the MOD's pick — 精准, 可露希尔's bond (奥术 is already hers,
++ *  so that pairing would add no membership) — else the highest tier. */
 +function pickBondItem(gd, host, bonds) {
 +  if ((gd.chess(host.id) || {}).charId === MORPH_HOST_CHAR) {
 +    for (const b of MORPH_BOND_PREF) {

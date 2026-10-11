@@ -680,8 +680,10 @@ it *is* a 核心盟约 (`isCore`, listed on every mode's roster, see above). Wha
 - **转职 — the 变形同构体 pairing.** 变形同构体 alone grants nothing: worn with a `giveBondId` item the carrier counts
   as a member of that bond (`bondsMeta.pieceBonds`). `equipMorphPair` — run before the generic equip loop, which then
   leaves the morph alone — gathers the pair on one operator: **阿米娅·医疗** first, because her 特质 pays a layer to
-  *every* bond she has active, so a second membership is worth most on her, and **奥术法阵** before **精准狙击镜**
-  (逻各斯's bond before 可露希尔's), which is exactly the pairing that wakes 奥术 on a Rhodes board. A half-pair is
+  *every* bond she has active, so a second membership is worth most on her, and **精准狙击镜** (可露希尔's bond) as the
+  pick — **奥术法阵 is no longer taken**: her 三形态盟约 already carry 奥术, so that pairing would add no membership,
+  which is the only thing the pair is for. With no 精准 item in play the pick falls back to the highest-tier bond item
+  (the generic rule), so the pair still completes. A half-pair is
   held, never spent: with no bond item in play the morph stays in the hand.
 - `test/match/mod_bot.test.js` pins both (skipping itself while the mod is off).
 

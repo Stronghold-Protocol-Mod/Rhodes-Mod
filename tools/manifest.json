@@ -46,7 +46,7 @@
     "server/mod/toggle.js": "e2b9edcb779e4acc1e917dd763c8dbec1a0cf89cb66663f4217314365fe9259c",
     "tools/game-root.mjs": "57eecb7e34ad9ec93ba1841fbd6941590993cf0a632faebd4bfe3de8e4025460",
     "tools/mod-toggle.mjs": "fa36142165bf25a9ac999ceddf49a516a582d522f0944c31cdbb7c797c892937",
-    "docs/MOD-RHODES.md": "174f09dc9df1bcffcc548bcaf843576648eec937d8a36058e8d7ebc1bcfcbc36",
+    "docs/MOD-RHODES.md": "284ddd14af8336f061b33d11df75a76b715e7cf4e75b3ba853e7c3a5968c3f28",
     "mod/variants/rhodes/on/bonds.json": "18243f42b65388387b566c9a5841f231944cdd61f44738cb054f68c641827485",
     "mod/variants/rhodes/off/bonds.json": "53a22f4724771b6ff40041635e907c0af39790731f661b0439fc593f5a91c94c",
     "mod/variants/rhodes/on/chess.json": "1348d9d776dd5f27aba2e2fb97cd1c6954504e0925a556aa6d53f241b55fc196",
@@ -258,9 +258,9 @@
       "layer": "M",
       "patch": "patches/server__match__bot.js.diff",
       "baseSha256": "ca8de1a60f2a0a206c117a8b039f0185844523188d804d61efad63eba0cb1f46",
-      "resultSha256": "20203231f3afaae2eaccf92a7c1657cad5e077515d14ae194be2d6e782af83a9",
+      "resultSha256": "1028f04700f83d127d17b21ffbfee8be67dc6e332c07b1a84a7c527c77077629",
       "hunks": 7,
-      "added": 130,
+      "added": 132,
       "removed": 4
     },
     "server/match/match/intents.js": {

@@ -14,7 +14,7 @@ are chosen by the mod (tier, price, shop order, phase/level, the bond).
 | **Operators** | 暴行 (T1 WARRIOR 强攻手) · 可露希尔 (T3 PIONEER 战术家) · Mon3tr (T4 MEDIC 链愈师) · 阿斯卡纶 (T5 SPECIAL 伏击客) · 凯尔希·思衡托 (T6 MEDIC 守望者) · 逻各斯 (T6 CASTER 中坚术师) · **阿米娅的三形态** (术士 T2 CASTER 中坚术师 → 近卫 T5 WARRIOR 术战者 / 医疗 T5 MEDIC 咒愈师, 阿米娅的升变) — 18 chess records (9 operators × normal + 精锐; the ascended forms are `isHidden`, quest-only)          |
 | **Bond**      | `rhodesShip` 「罗德岛」 — thresholds **3 / 6** distinct members, 13 members (4 official + 9 mod)                                                                                                                                                                                                                                                                       |
 | **Effect**    | `bondeffect_rhodes`, implemented in `server/sim/content/bonds/rhodes.js`                                                                                                                                                                                                                                                                                          |
-| **特质**        | 暴行 `SERVER_ADD_BOND_CHESS_ALL` · 逻各斯 `act1autochess_gar_eff_attrByBond` · 阿米娅·医疗 `modautochess_gar_event_heal` · 阿米娅（术师）`act1autochess_gar_event_useskill` · 阿米娅（近卫）`act1autochess_gar_eff_attrByBond` · 可露希尔 `modautochess_gar_prep_gain_chess_by_bond` · 阿斯卡纶 `act1autochess_gar_event_selfkillenemy` · 凯尔希·思衡托 `act1autochess_gar_event_useskill` · Mon3tr `act1autochess_gar_event_useskill` (normal + 精锐 variants, **18 records**) — all nine operators, the three Amiya forms included (2026-10-11) |
+| **特质**        | 暴行 `SERVER_ADD_BOND_CHESS_ALL` · 逻各斯 `act1autochess_gar_eff_attrByBond` · 阿米娅·医疗 `modautochess_gar_event_heal` · 阿米娅（术师）`act1autochess_gar_event_selfkillenemy` · 阿米娅（近卫）`act1autochess_gar_eff_attrByBond` · 可露希尔 `modautochess_gar_prep_gain_chess_by_bond` · 阿斯卡纶 `act1autochess_gar_event_selfkillenemy` · 凯尔希·思衡托 `act1autochess_gar_event_useskill` · Mon3tr `act1autochess_gar_event_useskill` (normal + 精锐 variants, **18 records**) — all nine operators, the three Amiya forms included (2026-10-11) |
 | **Equipment** | 2 items × normal/精锐 = 4 records — 罗德岛急救包 (T3 `chess_item_3_13_e`, the bond's low-tier `giveBondId` piece) and 罗德岛徽章 (T6 `chess_item_6_12_e`, the 盟约签名件), implemented in `server/sim/content/items/battle.js`                                                                                                                                                      |
 
 > 凯尔希·思衡托 (`char_1052_kalts2`, 守望者) is **not** 凯尔希 (`char_003_kalts`, 医师) — different operator,>
@@ -80,7 +80,7 @@ chess is banned only when *every* one of its bonds is drawn into the per-match d
 core bonds — so a 罗德岛-only record would vanish from the shop in the same 1/3 of matches that 罗德岛 itself is drawn,
 wiping the whole mod roster at once. With a second bond that drops to P(罗德岛) · P(second) ≈ 8.9 %:
 可露希尔 → 精准 + 投资人 (投资人's `weight` is 0, so it can never be drawn — she is unban-able by the draw) ·
-Mon3tr → 迅捷 · 阿米娅 → 助力 · 凯尔希·思衡托 → 远见 · 阿斯卡纶 → 独行 · 逻各斯 → 奥术.
+Mon3tr → 迅捷 · 阿米娅 → 奥术 (the 医疗 form adds 助力) · 凯尔希·思衡托 → 远见 · 阿斯卡纶 → 独行 · 逻各斯 → 奥术.
 
 **暴行 is the one exception** (2026-10-07, user ruling 「暴行去掉取消突袭盟约」). She was given 突袭 in the 2026-10-06
 pass, but her 特质 (`SERVER_ADD_BOND_CHESS_ALL`) pays +2 / +4 layers to *every* bond she belongs to, so 突袭 — an official
@@ -144,24 +144,26 @@ The nine hand-written 特质 (`data/garrisons.json`, one normal + one 精锐 rec
     S1 哀恸共情 on every ally in her 12-tile area), so the accumulator saturated every round. **User ruling: 「把罗德岛
     累加器删除」** — the accumulator is gone (`bonds/rhodes.js`; both bb keys dropped from `env_gbuff_new`), so healing
     can no longer move 罗德岛's layers at all. A round now moves it by exactly her 特质: **12 / 24**, and 24 with two
-    copies (12 + 24 → 36 on 罗德岛, 12 on 助力).
-- **阿米娅（术师）** — `act1autochess_gar_event_useskill`, the same OFFICIAL skill-driven event as 凯尔希·思衡托 / Mon3tr and
-  the same 罗德岛-pinned target as Mon3tr's (`bbStr.bond_type: bond_by_id` → `bond_id: rhodesShip`, `requireActive`):
-  every skill activation adds **+2** (+4 精锐), capped at **6 casts a battle** — declared as layers,
-  `max_add_count_per_battle` 12 / 24 = 6 × the per-cast count, the same contract Mon3tr's record uses (so
-  `fireGain` caps it and `fields.js layerAllowanceOf` accepts an honest client report). She is the form **every run
-  starts with** and the only Amiya the shop sells (T2, price 3), so this is the mod's most reachable in-battle layer
-  source: 战术咏唱's SP support and her 精锐 module (普攻命中精英/领袖回 1 点技力) keep the casts coming. Zero engine
-  change. **2026-10-11 ruling** — the 层数特质 of the two 升变 forms was the mod's last open question (both used to
-  carry no `garrisonIds` at all); see the ascension section for how the three forms now divide the layer economy.
+    copies — paid to **every** bond she has active (`bond_self`), so 罗德岛 + 奥术 take each 12 / 24 and 助力 too
+    (three memberships since 2026-10-11; it used to be 罗德岛 + 助力 only).
+- **阿米娅（术师）** — `act1autochess_gar_event_selfkillenemy`, the same OFFICIAL kill-driven event as 阿斯卡纶's and the
+  same 罗德岛-pinned target (`bbStr.bond_type: bond_by_id` → `bond_id: rhodesShip`, so a knock-out while 罗德岛 is dormant
+  adds nothing): **每击倒1名单位 +1** (+2 精锐), **uncapped** — the ceiling is the room under 999, which
+  `fields.js layerAllowanceOf` reads as Infinity for the bond it funds. She is the form **every run starts with** and the
+  only Amiya the shop sells (T2, price 3), so this is the mod's most reachable in-battle layer source. Zero engine change.
+  **2026-10-11 ruling, the trigger revised the same day after playtest:** it was `act1autochess_gar_event_useskill`
+  (开启技能时 +2 / +4, ≤6 casts, declared as 12 / 24 layers like Mon3tr's) — but 精神爆发 (S2, the 2本 normal's default)
+  costs **100** SP and 奇美拉 (S3) **120**, both `INCREASE_WITH_TIME`, so a battle saw 0–1 casts and the trait sat idle.
+  Kill-driven gain needs no SP at all. The two 升变 forms' 层数特质 were the mod's last open question (they used to carry
+  no `garrisonIds` at all); see the ascension section for how the three forms now divide the layer economy.
 - **阿米娅（近卫）** — `act1autochess_gar_eff_attrByBond`, the OFFICIAL reader (逻各斯's key) — the ascended form is a
   **layer SPENDER**: every **3** layers of 罗德岛 give **herself** 攻击力 / 最大生命 / 防御力 **+2 %** (+3 % 精锐) and
   攻击速度 **+1** (+2 精锐). The scale is the mod's deliberate **×2** of the official single-key readers — 拉特兰·坚守
   (防御力) / 维多利亚 (攻击速度) / 迷迭香 (攻击力+生命值) all sit at 1 % or +1 per 3 layers, and no official record
   carries more than TWO keys — applied to four keys at once, which is what makes her the carry the ascension promises.
-  `bbStr.bond_id` lists **罗德岛 alone**: her chess record also carries 助力 (`deputShip`), and 逻各斯's record sums
-  *every* bond its owner carries (`rhodesShip,arcaneShip`), but the user pinned this one to 罗德岛 so the trait reads
-  exactly as 「罗德岛层数转她的伤害」. Readers are skipped by `layerAllowanceOf`
+  `bbStr.bond_id` lists **罗德岛 alone**: her chess record carries 奥术 (`arcaneShip`) exactly like 逻各斯's, and HIS
+  record sums *every* bond its owner carries (`rhodesShip,arcaneShip`), but the user pinned this one to 罗德岛 so the
+  trait reads exactly as 「罗德岛层数转她的伤害」. Readers are skipped by `layerAllowanceOf`
   (`effectKey !== 'ADD_BOND'` with no `bond_add_count`), so this record never inflates the per-battle layer allowance.
   Zero engine change (`attrMods` applies every key with the same `k` = `floor(Σ layers / 3)`, recomputed on every
   `layerGain`).
@@ -715,13 +717,25 @@ Amiya** — the shop only ever offers the 术士. Every Amiya starts as the cast
   module). Art for the 近卫 form (avatars, portrait, front/back spine, skill icons) and the caster's two missing
   skill icons came from PRTS (`torappu.prts.wiki/assets/skill_icon|char_spine`, `media.prts.wiki`).
 - **The three forms divide the layer economy** (2026-10-11 user design — the last open question of the ascension). The
-  caster is the **feeder** every run starts with (`act1autochess_gar_event_useskill`, +2 / +4 a cast, ≤ 6 casts); the
-  近卫 is the **spender** the blade route buys (`act1autochess_gar_eff_attrByBond`, 每3层 → 攻/血/防 +2 % / +3 % and
-  攻速 +1 / +2 on herself, 罗德岛 layers only); the 医疗 keeps her heal-driven feeder (`modautochess_gar_event_heal`,
-  12 / 24 layers a round) **and** her 6-member support role. Because the ascension **replaces** the caster in place,
-  the fork is a real one: 「以伤害的方式拯救」 keeps a layer source on the board, 「继承之剑」 trades it for a carry —
-  the layers the rest of the team funds stop being pure barrier/aura fuel and start being her damage. Both records are
-  zero-engine-change (official events / readers), so the split cost no new code — see the 特质 section above.
+  caster is the **feeder** every run starts with (`act1autochess_gar_event_selfkillenemy`, 每击倒1名单位 +1 / +2,
+  uncapped — it was 开启技能时 +2 / +4 ≤ 6 casts until the user playtested it, see the 特质 section); the 近卫 is the
+  **spender** the blade route buys (`act1autochess_gar_eff_attrByBond`, 每3层 → 攻/血/防 +2 % / +3 % and 攻速 +1 / +2 on
+  herself, 罗德岛 layers only); the 医疗 keeps her heal-driven feeder (`modautochess_gar_event_heal`, 12 / 24 layers a
+  round) **and** her 6-member support role. Because the ascension **replaces** the caster in place, the fork is a real
+  one: 「以伤害的方式拯救」 keeps a layer source on the board, 「继承之剑」 trades it for a carry — the layers the rest of
+  the team funds stop being pure barrier/aura fuel and start being her damage. Both records are zero-engine-change
+  (official events / readers), so the split cost no new code — see the 特质 section above.
+- **Bonds of the three forms** (2026-10-11 ruling, revised): 术士 and 近卫 are **罗德岛 + 奥术** — identical, so a
+  〈继承之剑〉 transform never moves the bond board — while the 医疗 is **罗德岛 + 奥术 + 助力**: the extra membership is
+  worth the most on HER, because her 特质 (`bond_self`) pays a layer to every bond she has active, and it is the very
+  membership the bot's 变形同构体 pairing reaches for (see "The bot plays the mod"). The 奥术 / 助力 members are appended
+  to those OFFICIAL bonds' `members` / `visibleMembers` by the builder's `extraBonds` pass, and the strip removes them
+  again.
+- **The 术师 ships all three of her skills** — 战术咏唱·γ型 / 精神爆发 / 奇美拉. The 2本 normal sits at 精英1, where the
+  official 奇美拉 (S3, unlocked at 精英2) is still locked; the builder's `op.extraSkills` force-includes it, so the shop
+  form offers the same three as the 精锐 — **without** touching which one is the DEFAULT (精神爆发 on the normal, 奇美拉
+  on the 精锐: `defaultSkillIndex` still reads the unlock conditions). On a 2本, 奇美拉 is therefore a 干员调配 choice
+  (DESIGN §16) whose cash-out is 120 SP for true damage on an 18-tile grid at the cost of a forced retreat.
 
 ## Known limitations
 

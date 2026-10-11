@@ -9,9 +9,10 @@
 //   S2 精神爆发   (skchr_amiya_2)          — the 2本 NORMAL record's default (highest unlocked index at phase 1):
 //                                            each attack becomes `attack@times` hits at `attack@atk_scale`, then
 //                                            阿米娅 is stunned `stun` s. AUTO.
-//   S3 奇美拉     (skchr_amiya_3)          — the 精锐's default (phase 2): atk/maxHP up, range widens to the skill's
-//                                            own 3-4 grid, damage type becomes TRUE, and she is forced off the
-//                                            field when it ends.
+//   S3 奇美拉     (skchr_amiya_3)          — 真伤 (TRUE) attacks on the skill's own wider grid, atk/maxHP up, and she
+//                                            is forced off the field when it ends. Official 精英2 unlock, so it is the
+//                                            精锐's default — and, since the user's ruling of 2026-10-11, also a
+//                                            SELECTABLE third skill on the 2本 normal (the builder's `extraSkills`).
 //   天赋 情绪吸收 (elite only)             — +SP per damage instance dealt, more per kill.
 //
 // Simplifications (documented, the same convention as every kit here):

@@ -8,7 +8,7 @@
   },
   "framework": {
     "version": 2,
-    "digest": "c8acf535fb4dc2855b621b548b6a594fef9773ff127da266acf3b7cae5635e1f",
+    "digest": "0bfc268e1244c91e293d5082731fcfa284c6d76e853d0f6c848e8f3088ad7bf5",
     "files": [
       "public/js/ui/modBadge.js",
       "server/mod/api.js",
@@ -30,6 +30,7 @@
       "server/index.js",
       "server/lobby.js",
       "server/match/match/platform.js",
+      "server/net.js",
       "server/match/player/views.js",
       "shared/protocol.js"
     ]
@@ -46,7 +47,7 @@
     "server/mod/toggle.js": "e2b9edcb779e4acc1e917dd763c8dbec1a0cf89cb66663f4217314365fe9259c",
     "tools/game-root.mjs": "57eecb7e34ad9ec93ba1841fbd6941590993cf0a632faebd4bfe3de8e4025460",
     "tools/mod-toggle.mjs": "fa36142165bf25a9ac999ceddf49a516a582d522f0944c31cdbb7c797c892937",
-    "docs/MOD-RHODES.md": "06686c4894b9ded6f0676418b8546f9e693532348ee93f1bb513edd795d868b4",
+    "docs/MOD-RHODES.md": "997d4049a1b082438a492dfb36a59050598e774ae16b7ce3a1212d186bdb47b7",
     "mod/variants/rhodes/on/bonds.json": "18243f42b65388387b566c9a5841f231944cdd61f44738cb054f68c641827485",
     "mod/variants/rhodes/off/bonds.json": "53a22f4724771b6ff40041635e907c0af39790731f661b0439fc593f5a91c94c",
     "mod/variants/rhodes/on/chess.json": "1348d9d776dd5f27aba2e2fb97cd1c6954504e0925a556aa6d53f241b55fc196",
@@ -55,7 +56,7 @@
     "mod/variants/rhodes/off/config.json": "c16504ca347c4a967d9cf3349d5e1ad081d2ae52d56b87b7841e33ea38853eef",
     "mod/variants/rhodes/on/effects.json": "98cad4458ef10023fe8a721f5a355b800efeef56e7a0ce5a424a93c77473a713",
     "mod/variants/rhodes/off/effects.json": "96e28be614f04da6d58c9e95706d742863c756b94dcad498e808c3410ba620e3",
-    "mod/variants/rhodes/on/garrisons.json": "ce5b057768246e6eb7f4d98790070883c0d0f996034fdfc9181f3c5ae59d0a52",
+    "mod/variants/rhodes/on/garrisons.json": "c89745fcd9c1c77acaaffdab0f3ded7b9aab757d364a3660a2747890848889ba",
     "mod/variants/rhodes/off/garrisons.json": "f5b1f5558a263c95abcf36411c31e781efd3ebb1bebdced99ad1f242c2a960e3",
     "mod/variants/rhodes/on/items.json": "cc149800d96f41465f7f1d23863b8afe1a67e07541f8681aad1a14eb91e4d6fc",
     "mod/variants/rhodes/off/items.json": "6122a3cd75531f551a03082f000426a2d6b8028788fbd1abbaea5286592fbba4",
@@ -141,7 +142,7 @@
       "layer": "F",
       "patch": "patches/public__css__screens__title.css.diff",
       "baseSha256": "99ec3da4a2acbe91d89c4dcc6636b6dd9952b0ce25848593e171013bbc300b5b",
-      "resultSha256": "cc94c10eca6005dccb1cfaf37c5df9296a4dd2c8fb81858517e68f11b4246260",
+      "resultSha256": "8892914f07db4f378f4260cae0d3fdbd97dae7c1b47e88dfd6b81e9a7c02ff3d",
       "hunks": 1,
       "added": 56,
       "removed": 0
@@ -225,6 +226,15 @@
       "resultSha256": "c0673bf4e783f4babbc1a5e93ab368f460a745c5f8f5a96fc202e59723a9aa16",
       "hunks": 2,
       "added": 4,
+      "removed": 2
+    },
+    "server/net.js": {
+      "layer": "F",
+      "patch": "patches/server__net.js.diff",
+      "baseSha256": "dc527ba36a57b111f4f855299eac190aa71ca532ac00dc7e8720e6ff444b550c",
+      "resultSha256": "eed18e098f875d4635f8f0c4ac739a549ad26de62a4ec96227901ea27c42da63",
+      "hunks": 2,
+      "added": 6,
       "removed": 2
     },
     "server/match/player/views.js": {

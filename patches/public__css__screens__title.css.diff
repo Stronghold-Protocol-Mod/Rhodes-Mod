@@ -24,7 +24,7 @@
 +  height: .3rem;
 +  padding: 0 .14rem;
 +  font: inherit;
-+  font-size: .14rem;
++  font-size: calc(.14 * var(--t));
 +  line-height: 1;
 +  letter-spacing: .02em;
 +  color: var(--text-lo);

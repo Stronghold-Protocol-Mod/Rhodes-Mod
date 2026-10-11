@@ -47,13 +47,13 @@ MOD 自身文件放在 `payload/`，原样复制进游戏目录；对官方文�
 
 | 形式 | 数量 | 说明 |
 | --- | --- | --- |
-| `patches/*.diff` | 25 个文件 / 52 个 hunk / +636 −27 | **13 个是中立的开关框架**（每个 MOD 的包都一模一样的那些：登记一个开关、转发几条路由、挂一个徽标、让大厅读活数据、放行 MOD 自登记的消息、透出两个通用视图字段），**12 个是本 MOD 自己的**（盟约注册、商店刷新与复制池、升变任务容器、8 个 kit 文件的注册、召唤物、两处驻地、一件装备，以及匹配 AI） |
+| `patches/*.diff` | 26 个文件 / 54 个 hunk / +671 −29 | **14 个是中立的开关框架**（每个 MOD 的包都一模一样的那些：登记一个开关、转发几条路由、挂一个徽标、让大厅读活数据、放行 MOD 自登记的消息（传输层与比赛侧两道闸）、透出两个通用视图字段），**12 个是本 MOD 自己的**（盟约注册、商店刷新与复制池、升变任务容器、8 个 kit 文件的注册、召唤物、两处驻地、一件装备，以及匹配 AI） |
 | `patches/data__assets.json.merge` | 1 | `assets.json` 是单行压缩 JSON，文本 diff 会退化成整文件替换，故用**结构差量**合入 |
 
 关掉 MOD 后这些代码不会生效。
 
 <details>
-<summary>被改动的 25 个官方文件</summary>
+<summary>被改动的 26 个官方文件</summary>
 
 ```
 package.json                        框架 · 中立的 mod / mod:status 两个脚本
@@ -66,7 +66,8 @@ server/http/routes.js               框架 · 把 /mod/* 分派给开关接口
 server/http/websocket.js            框架 · 让大厅读「活数据」
 server/index.js                     框架 · setLiveBundle
 server/lobby.js                     框架 · 开关变更广播 + 自选池规则
-server/match/match/platform.js      框架 · 放行各 MOD 在 MOD_C2S 自登记的客户端消息
+server/match/match/platform.js      框架 · 放行各 MOD 在 MOD_C2S 自登记的客户端消息（比赛侧闸门）
+server/net.js                       框架 · 传输层同样认 MOD_C2S（否则 MOD 意图在进大厅前就被 BAD_MSG 挡掉）
 server/match/player/views.js        框架 · 两个通用视图透出（stats.buys / effects[].data）
 shared/protocol.js                  框架 · S2C 增加 mod.state + MOD_C2S 注册表
 server/match/PlayerState.js         本 MOD · 每名玩家的商店换形状态（ps.poolSwap）
@@ -83,7 +84,7 @@ server/sim/content/kits/index.js        本 MOD · 注册 8 个 kit 文件
 server/sim/content/tokens.js            本 MOD · 8 个召唤物
 ```
 
-前 13 个是**开关框架**的挂载点，与 MOD 内容无关，每个 MOD 的包都带、且逐字节相同；后 12 个才是本 MOD 自己的。装另一个数据 MOD 不会碰到这里任何一行。
+前 14 个是**开关框架**的挂载点，与 MOD 内容无关，每个 MOD 的包都带、且逐字节相同；后 12 个才是本 MOD 自己的。装另一个数据 MOD 不会碰到这里任何一行。
 
 </details>
 
@@ -99,7 +100,7 @@ payload/                      MOD 自有文件，原样复制进游戏目录
   ├─ server/mod/               开关框架：注册表 / 引擎 / HTTP 接口（每个 MOD 的包都带）
   ├─ server/                   MOD 自己的逻辑（升变任务容器、盟约、8 个 kit、两件装备、驻地）
   └─ tools/                    玩家侧的开关 CLI + 定位游戏目录（框架层）
-patches/                      对官方文件的补丁（25 个 .diff = 13 框架 + 12 本 MOD）与 assets 结构差量（.merge）
+patches/                      对官方文件的补丁（26 个 .diff = 14 框架 + 12 本 MOD）与 assets 结构差量（.merge）
 tools/
   ├─ install.mjs               安装器（--check / --off / --restore / --force / --game）
   ├─ mod-toggle.mjs            开关 CLI（on <id> / off <id> / status）
@@ -196,7 +197,7 @@ macOS / Linux 用 `./install.sh`，参数一样。
 按顺序三件事，每一步对不上就停下报错：
 
 1. 把 MOD 的 **87 个自有文件**放进游戏目录（已是最新的会跳过 —— 其中 7 个是中立的开关框架，装过别的 MOD 的话它们会直接跳过）；
-2. 给你那份官方源码打 **25 个文件的补丁**，并把 `data/assets.json` 按**结构差量**合入（逐文件校验 SHA-256，结果哈希对不上就回滚）；
+2. 给你那份官方源码打 **26 个文件的补丁**，并把 `data/assets.json` 按**结构差量**合入（逐文件校验 SHA-256，结果哈希对不上就回滚）；
 3. 把**本 MOD 这个**开关**打开**（只切 `rhodes` 一个，不会碰别的 MOD 的开关）。
 
 装之前，会被改动的官方文件会先备份到 `<游戏目录>/.rhodes-mod-backup/<时间戳>/`。
@@ -246,7 +247,7 @@ npm run mod -- off rhodes
 `api.js` / `kitted.js` / `registry.js` / `toggle.js`）、`public/js/ui/modBadge.js`、`tools/mod-toggle.mjs`。
 删了它们，别的 MOD 的开关也会一起坏掉。
 
-那 25 个被打了补丁的官方文件，用 `.rhodes-mod-backup/<时间戳>/` 里的备份覆盖回去即可。
+那 26 个被打了补丁的官方文件，用 `.rhodes-mod-backup/<时间戳>/` 里的备份覆盖回去即可。
 `tools/manifest.json` 记录了每个文件的 `baseSha256` / `resultSha256`，可以自行核对。
 
 ## 许可证

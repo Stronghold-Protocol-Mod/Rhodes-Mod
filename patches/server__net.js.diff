@@ -1,0 +1,24 @@
+--- a/server/net.js
++++ b/server/net.js
+@@ -39,7 +39,7 @@
+ 
+ import { randomBytes } from 'node:crypto';
+ import { isIP } from 'node:net';
+-import { C2S, validateC2S } from '../shared/protocol.js';
++import { C2S, MOD_C2S, validateC2S } from '../shared/protocol.js';
+ import { ERR, ERR_TEXT, NAME_MAX_LEN, PROTOCOL_VERSION } from '../shared/constants.js';
+ 
+ /** Tunables (all overridable through the Network / SessionRegistry constructors). */
+@@ -596,7 +596,11 @@
+     try { msg = JSON.parse(data.toString('utf8')); } catch { this.reply(conn, errorMsg(ERR.BAD_MSG, undefined, 'invalid json')); return; }
+     const rid = msg && typeof msg === 'object' ? msg.rid : undefined;
+     // Own-property check first: validateC2S alone would accept inherited keys like "constructor".
+-    if (!msg || typeof msg !== 'object' || Array.isArray(msg) || typeof msg.t !== 'string' || !Object.hasOwn(C2S, msg.t)) {
++    // A MOD's own intent (registered in MOD_C2S at import time, shared/protocol.js) clears this gate too: the transport
++    // must not be stricter than the gate behind it (server/match/match/platform.js reads the same registry), or every
++    // MOD intent would be answered with BAD_MSG before the match ever sees it.
++    if (!msg || typeof msg !== 'object' || Array.isArray(msg) || typeof msg.t !== 'string'
++      || !(Object.hasOwn(C2S, msg.t) || Object.hasOwn(MOD_C2S, msg.t))) {
+       const t = msg && typeof msg === 'object' ? String(msg.t).slice(0, 32) : typeof msg;
+       this.reply(conn, errorMsg(ERR.BAD_MSG, rid, `unknown type ${t}`));
+       return;

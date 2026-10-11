@@ -146,11 +146,14 @@ The nine hand-written 特质 (`data/garrisons.json`, one normal + one 精锐 rec
     can no longer move 罗德岛's layers at all. A round now moves it by exactly her 特质: **12 / 24**, and 24 with two
     copies — paid to **every** bond she has active (`bond_self`), so 罗德岛 + 奥术 take each 12 / 24 and 助力 too
     (three memberships since 2026-10-11; it used to be 罗德岛 + 助力 only).
-- **阿米娅（术师）** — `act1autochess_gar_event_selfkillenemy`, the same OFFICIAL kill-driven event as 阿斯卡纶's and the
-  same 罗德岛-pinned target (`bbStr.bond_type: bond_by_id` → `bond_id: rhodesShip`, so a knock-out while 罗德岛 is dormant
-  adds nothing): **每击倒1名单位 +1** (+2 精锐), **uncapped** — the ceiling is the room under 999, which
-  `fields.js layerAllowanceOf` reads as Infinity for the bond it funds. She is the form **every run starts with** and the
-  only Amiya the shop sells (T2, price 3), so this is the mod's most reachable in-battle layer source. Zero engine change.
+- **阿米娅（术师）** — `act1autochess_gar_event_selfkillenemy`, the same OFFICIAL kill-driven event as 阿斯卡纶's, but a
+  **`bond_self` target** (2026-10-11, the user's second revision of the same day): one knock-out funds **every bond she
+  has active** — 罗德岛 and 奥术, her two memberships — instead of 罗德岛 alone. `fireGain` still passes
+  `requireActive: true`, so a dormant bond takes nothing and a kill with no active bond is a no-op; 「已激活」 is the
+  actual gate. **每击倒1名单位 +1** (+2 精锐), **uncapped** — the ceiling is the room under 999, which
+  `fields.js layerAllowanceOf` reads as Infinity for the bonds it funds. She is the form **every run starts with** and the
+  only Amiya the shop sells (T2, price 3), so this is the mod's most reachable in-battle layer source, and 逻各斯 (奥术)
+  spends what she feeds just as the 近卫 spends 罗德岛. Zero engine change.
   **2026-10-11 ruling, the trigger revised the same day after playtest:** it was `act1autochess_gar_event_useskill`
   (开启技能时 +2 / +4, ≤6 casts, declared as 12 / 24 layers like Mon3tr's) — but 精神爆发 (S2, the 2本 normal's default)
   costs **100** SP and 奇美拉 (S3) **120**, both `INCREASE_WITH_TIME`, so a battle saw 0–1 casts and the trait sat idle.
@@ -721,12 +724,20 @@ Amiya** — the shop only ever offers the 术士. Every Amiya starts as the cast
 - New intents ride the framework's neutral **`MOD_C2S`** registry (shared/protocol.js): a MOD registers its own C2S
   schemas at import time — `server/match/match/amiya.js` on the server, the panel module on the client — so the
   author-owned `C2S` table stays free of per-MOD entries. `g.amiya { action: pick|claim, quest: blade|lamp }`.
+- **Both gates read that registry** (fix, 2026-10-11). The framework's first cut only taught `platform.js` — the
+  *match-side* gate — about `MOD_C2S`, while `server/net.js` validates every frame **before the lobby** and still
+  checked the author table alone. Result: the panel's both routes came back as **无效的请求**
+  (`BAD_MSG`, detail `unknown type g.amiya`) and the quest could never leave `choose` — the real playtest found what
+  the suites could not, because they call `m.handle()` *below* the transport. `server/net.js` is a framework patch
+  now, and `test/match/mod_amiya.test.js` boots a real server and sends the panel's own message so the layer stays
+  covered.
 - The panel (`public/js/ui/amiyaAscend.js`) is the rhodes toggle's `client` (self-mounting, CSS injected by the
   module). Art for the 近卫 form (avatars, portrait, front/back spine, skill icons) and the caster's two missing
   skill icons came from PRTS (`torappu.prts.wiki/assets/skill_icon|char_spine`, `media.prts.wiki`).
 - **The three forms divide the layer economy** (2026-10-11 user design — the last open question of the ascension). The
-  caster is the **feeder** every run starts with (`act1autochess_gar_event_selfkillenemy`, 每击倒1名单位 +1 / +2,
-  uncapped — it was 开启技能时 +2 / +4 ≤ 6 casts until the user playtested it, see the 特质 section); the 近卫 is the
+  caster is the **feeder** every run starts with (`act1autochess_gar_event_selfkillenemy`, 每击倒1名单位 +1 / +2 paid to
+  **every** bond she has active, uncapped — it was 开启技能时 +2 / +4 ≤ 6 casts until the user playtested it, see the
+  特质 section); the 近卫 is the
   **spender** the blade route buys (`act1autochess_gar_eff_attrByBond`, 每3层 → 攻/血/防 +2 % / +3 % and 攻速 +1 / +2 on
   herself, 罗德岛 layers only); the 医疗 keeps her heal-driven feeder (`modautochess_gar_event_heal`, 12 / 24 layers a
   round) **and** her 6-member support role. Because the ascension **replaces** the caster in place, the fork is a real

@@ -1,5 +1,27 @@
 # 更新日志
 
+## 1.6.1
+
+近卫阿米娅多带一条 **【不屈】** 副盟约 —— 三形态盟约就此定型：术士 = 罗德岛 + 奥术（喂层）· 近卫 = 罗德岛 + 奥术 + **不屈**（花层换四维）· 医疗 = 罗德岛 + 奥术 + 助力（喂层 + 治疗支撑）。
+
+### 变更
+
+- **近卫形态（`char_1001_amiya2`）的盟约：罗德岛 + 奥术 → 罗德岛 + 奥术 + 不屈**（`indomShip`，阈值 2 / 3）。近卫是三个形态里站前排的那个，【不屈】的「地面干员被击倒时，有概率立即重新部署（受层数影响）」正是前排的保险；〈继承之剑〉的换体因此**只加不减** —— 换体不会把盟约盘面挪走，只会多出一条。
+- **零引擎改动**：官方已有 `bondeffect_indom`。实现只有一处 —— 构建器 `OPS` 里给 `char_1001_amiya2` 的 `extraBonds` 加一个 `'indomShip'`；构建器的 `extraBonds` 段会把 `chess_rhodes_amiya2_a` 追加进 `indomShip` 的 `members` / `visibleMembers`，`strip` 时一并移除。
+- `data/{chess,bonds}.json` 与 `mod/variants/rhodes/{on,off}` 快照随之重建；`docs/MOD-RHODES.md` 的 `extraBonds` 清单与「Bonds of the three forms」段同步；`test/content/mod_rhodes.test.js` 的三形态盟约断言改为「近卫 = 罗德岛 + 奥术 + 不屈」，并新增 `modOf('indomShip').length === 1`。
+
+### 验证
+
+- **两态全量对拍**（开发树 ON vs OFF 孪生 `sp-dev023b`，判据是**失败名集合**）：两侧各 **3033 项**，失败集合**完全一致** —— 各 2 条既有环境类失败（`test/match/bot-emotes.test.js` 的环境开关断言、`test/match/playtest6-limits.test.js` 调 `matchrun.mjs` 的子进程用例），因此 **ON-only = 0 / OFF-only = 0**。
+- **golden 无需重冻**：全量（`GOLDEN_FULL=1`）**13/13**，六族 290 个场景的摘要一个都没变 —— 近卫是 `isHidden` 的升变目标，既不在商店池里，也不出现在任何已记录场景中。
+- **端到端安装校验**：干净官方 0.2.3 → `install.mjs` → `verify.mjs` 全绿（载荷 87/87 逐字节、补丁 25/25、官方文件 1299/1299 未动）。
+- 框架层**未改动**：`framework.digest` 仍是 `0bfc268e1244c91e…`（框架 7 文件 + 14 补丁），所以与其它 MOD 的共存性不受本版影响。
+
+### 打包
+
+- 载荷 87 个自有文件、补丁 **26 个**（14 框架 + 12 本 MOD）**均不变**；本版变的是数据快照（`payload/mod/variants/rhodes/on/{bonds,chess}.json`）、`payload/docs/MOD-RHODES.md` 与 `tools/manifest.json` 的版本号。
+- 版本号 `1.6.0` → `1.6.1`。
+
 ## 1.6.0
 
 阿米娅三形态的**层数特质**补齐，同时调整三形态的**技能表**与**盟约**：术士成为开局就能用的喂层来源（击杀叠层）并补齐第三个技能，近卫成为把全队层数转成自身四维的输出核心，医疗多带一条「助力」—— 9 名干员、18 条特质记录至此齐备（此前两个升变形态的层数特质是 MOD 最后一个悬置问题）。

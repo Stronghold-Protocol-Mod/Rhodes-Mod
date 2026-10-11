@@ -80,7 +80,8 @@ chess is banned only when *every* one of its bonds is drawn into the per-match d
 core bonds — so a 罗德岛-only record would vanish from the shop in the same 1/3 of matches that 罗德岛 itself is drawn,
 wiping the whole mod roster at once. With a second bond that drops to P(罗德岛) · P(second) ≈ 8.9 %:
 可露希尔 → 精准 + 投资人 (投资人's `weight` is 0, so it can never be drawn — she is unban-able by the draw) ·
-Mon3tr → 迅捷 · 阿米娅 → 奥术 (the 医疗 form adds 助力) · 凯尔希·思衡托 → 远见 · 阿斯卡纶 → 独行 · 逻各斯 → 奥术.
+Mon3tr → 迅捷 · 阿米娅 → 奥术 (the 近卫 form adds 不屈, the 医疗 form adds 助力) · 凯尔希·思衡托 → 远见 ·
+阿斯卡纶 → 独行 · 逻各斯 → 奥术.
 
 **暴行 is the one exception** (2026-10-07, user ruling 「暴行去掉取消突袭盟约」). She was given 突袭 in the 2026-10-06
 pass, but her 特质 (`SERVER_ADD_BOND_CHESS_ALL`) pays +2 / +4 layers to *every* bond she belongs to, so 突袭 — an official
@@ -744,12 +745,13 @@ Amiya** — the shop only ever offers the 术士. Every Amiya starts as the cast
   one: 「以伤害的方式拯救」 keeps a layer source on the board, 「继承之剑」 trades it for a carry — the layers the rest of
   the team funds stop being pure barrier/aura fuel and start being her damage. Both records are zero-engine-change
   (official events / readers), so the split cost no new code — see the 特质 section above.
-- **Bonds of the three forms** (2026-10-11 ruling, revised): 术士 and 近卫 are **罗德岛 + 奥术** — identical, so a
-  〈继承之剑〉 transform never moves the bond board — while the 医疗 is **罗德岛 + 奥术 + 助力**: the extra membership is
-  worth the most on HER, because her 特质 (`bond_self`) pays a layer to every bond she has active, and it is the very
-  membership the bot's 变形同构体 pairing reaches for (see "The bot plays the mod"). The 奥术 / 助力 members are appended
-  to those OFFICIAL bonds' `members` / `visibleMembers` by the builder's `extraBonds` pass, and the strip removes them
-  again.
+- **Bonds of the three forms** (2026-10-11 rulings, revised twice the same day): 术士 = **罗德岛 + 奥术**; 近卫 = those
+  same two **+ 不屈** (added the same evening — the front-line form gets the front-liner's insurance, 「地面干员被击倒时
+  有概率立即重新部署」), so a 〈继承之剑〉 transform never MOVES the bond board, it only adds one; 医疗 = **罗德岛 + 奥术
+  + 助力**. That extra membership is worth the most on HER, because her 特质 (`bond_self`) pays a layer to every bond she
+  has active — and it is the very membership the bot's 变形同构体 pairing reaches for (see "The bot plays the mod"). The
+  奥术 / 不屈 / 助力 members are appended to those OFFICIAL bonds' `members` / `visibleMembers` by the builder's
+  `extraBonds` pass, and the strip removes them again.
 - **The 术师 ships all three of her skills** — 战术咏唱·γ型 / 精神爆发 / 奇美拉. The 2本 normal sits at 精英1, where the
   official 奇美拉 (S3, unlocked at 精英2) is still locked; the builder's `op.extraSkills` force-includes it, so the shop
   form offers the same three as the 精锐 — **without** touching which one is the DEFAULT (精神爆发 on the normal, 奇美拉

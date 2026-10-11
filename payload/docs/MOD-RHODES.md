@@ -697,6 +697,12 @@ Amiya** — the shop only ever offers the 术士. Every Amiya starts as the cast
   **二选一** that locks the route (〈继承之剑〉 / 〈以伤害的方式拯救〉), shows live progress, and a **升变** button
   once the quest is `ready`. The state machine is `choose → (pick) → active → (onBattleResult) → ready → (claim) → done`,
   prep phases only; definitions and pure helpers live in `shared/amiyaQuest.js`.
+- **The panel reads as Amiya's, not the firm's** (2026-10-11): text sizes follow the game's TEXT root
+  (`calc(· * var(--t))` — a first draft used `rem`, which in this game is the ~100px **layout** root and blew the
+  panel up to unreadable sizes), the accents are her warm gold instead of the terminal mint, the modal speaks in the
+  `gold` tone, each route card carries its own small mark (the blade / the healing ring) and a halo-and-ears crest
+  sits as a watermark, and both the panel and the corner tab show an **overall progress bar** (what is left of both
+  conditions against their goal sizes — it never goes backwards and reads 100% exactly when the route is done).
 - **〈继承之剑〉(blade)** — 奎隆之剑, 「争斗在此止歇」: Amiya herself deals **8000** cumulative damage → the caster
   becomes the **近卫形态** (`char_1001_amiya2`, 影霄 twin blades, once-per-battle 绝影).
 - **〈以伤害的方式拯救〉(lamp)** — 「以战斗的方式治愈，以伤害的方式拯救」: Amiya herself deals **6000** damage **and**

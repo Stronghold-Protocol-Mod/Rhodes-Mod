@@ -49,6 +49,39 @@ async function sendAmiya(action, quest) {
   }
 }
 
+// Amiya's own marks (user design 2026-10-11: the panel should feel like HERS, not like the firm's HUD) — a thin gold
+// halo above two long ears as the crest, and one small mark per path: the blade she inherits, the ring she heals by.
+const CREST = html`<svg class="amyq-crest" viewBox="0 0 120 84" aria-hidden="true">
+  <ellipse cx="60" cy="12" rx="20" ry="5.5" fill="none" stroke="currentColor" stroke-width="3" />
+  <path d="M45 84 C36 62 33 36 42 24 C49 15 57 19 56 33 C55 53 51 71 50 84 Z" fill="currentColor" opacity=".8" />
+  <path d="M75 84 C84 62 87 36 78 24 C71 15 63 19 64 33 C65 53 69 71 70 84 Z" fill="currentColor" opacity=".4" />
+</svg>`;
+const MARK_BLADE = html`<svg class="amyq-mark" viewBox="0 0 24 24" aria-hidden="true">
+  <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+    <path d="M19.4 4.6 9.9 14.1" />
+    <path d="M12.1 16.7 7.3 11.9" />
+    <path d="M8.3 15.7 4.6 19.4" />
+  </g>
+  <path d="M19.8 4.2l-3.5.5 3 3z" fill="currentColor" />
+</svg>`;
+const MARK_LAMP = html`<svg class="amyq-mark" viewBox="0 0 24 24" aria-hidden="true">
+  <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+    <circle cx="12" cy="12" r="8.2" />
+    <path d="M12 8.2v7.6M8.2 12h7.6" />
+  </g>
+</svg>`;
+const QUEST_MARK = { blade: MARK_BLADE, lamp: MARK_LAMP };
+
+/** Overall progress of a route as 0–1: what is left of both conditions against their goal sizes (dmg and heal only
+ *  ever accumulate, so the bar never goes backwards; it reads 100% exactly when the route is done). */
+function questProgress(d, questId) {
+  const q = AMIYA_QUESTS[questId];
+  if (!q || !d) return 0;
+  const left = amiyaQuestRemaining(d, questId);
+  const total = q.dmg + q.heal;
+  return total ? Math.min(1, Math.max(0, (total - left.dmg - left.heal) / total)) : 0;
+}
+
 /** One quest card: name, conditions, live progress, the pick button (choose state) / the marker of the picked route. */
 function QuestCard({ quest, d, picked, onPick, busy }) {
   const left = amiyaQuestRemaining(d, quest.id);
@@ -58,8 +91,9 @@ function QuestCard({ quest, d, picked, onPick, busy }) {
     <span class="amyq-cond__bar" aria-hidden="true"><i style=${`width:${Math.min(100, Math.round(((need - Math.max(0, leftv)) / need) * 100))}%`}></i></span>
     <span class="amyq-cond__num num">${need - Math.max(0, leftv)} / ${need}</span>
   </div>`;
-  return html`<div class=${`amyq-card${picked ? ' is-picked' : ''}${met && picked ? ' is-met' : ''}`}>
+  return html`<div class=${`amyq-card amyq-card--${quest.id}${picked ? ' is-picked' : ''}${met && picked ? ' is-met' : ''}`}>
     <div class="amyq-card__head">
+      <span class="amyq-card__mark-badge" aria-hidden="true">${QUEST_MARK[quest.id] || MARK_LAMP}</span>
       <b class="amyq-card__name">〈${quest.name}〉</b>
       <span class="amyq-card__form">${t('奖励：术士形态 → {form}', { form: quest.formName })}</span>
     </div>
@@ -88,6 +122,7 @@ function QuestPanel({ d, onClose }) {
 
   if (d.state === 'choose') {
     return html`<div class="amyq-choose">
+      ${CREST}
       <p class="amyq-lead">${t('术士形态的阿米娅已加入你的编队。两条道路只能选择其一——选定后不可更改：')}</p>
       <div class="amyq-cards">
         ${Object.values(AMIYA_QUESTS).map((q) => html`<${QuestCard} key=${q.id} quest=${q} d=${d} busy=${busy}
@@ -101,6 +136,16 @@ function QuestPanel({ d, onClose }) {
   if (!q) return null;
   const left = amiyaQuestRemaining(d, d.quest);
   const ready = d.state === 'ready';
+  const p = questProgress(d, d.quest);
+  const progress = html`<div class=${`amyq-progress${ready ? ' is-ready' : ''}`}>
+    <div class="amyq-progress__head">
+      <span class="amyq-progress__label">${ready ? t('可以升变') : t('升变进度')}</span>
+      <span class="amyq-progress__pct num">${Math.round(p * 100)}%</span>
+    </div>
+    <div class="amyq-progress__bar" role="progressbar" aria-valuenow=${Math.round(p * 100)} aria-valuemin="0" aria-valuemax="100">
+      <i style=${`width:${Math.round(p * 100)}%`}></i>
+    </div>
+  </div>`;
   if (d.state === 'done') {
     return html`<div class="amyq-done">
       <p class="amyq-lead">${t('阿米娅已升变为{form}。本局的任务到此完成。', { form: q.formName })}</p>
@@ -113,6 +158,7 @@ function QuestPanel({ d, onClose }) {
         ? t('任务「{name}」已完成！点击升变，让场上的／手中的术士阿米娅成为{form}。', { name: q.name, form: q.formName })
         : t('当前道路：〈{name}〉——完成后即可让阿米娅升变为{form}。', { name: q.name, form: q.formName })}
     </p>
+    ${progress}
     <${QuestCard} quest=${q} d=${d} picked=${true} busy=${busy} onPick=${() => {}} />
     <div class="amyq-actions">
       <button type="button" class=${`amyq-btn${ready ? ' is-primary' : ''}`} disabled=${!ready || busy}
@@ -147,8 +193,11 @@ function AmiyaAscendHost() {
       title=${t('阿米娅的升变')} onClick=${() => setOpen(true)}>
       <span class="amyq-tab__dot" aria-hidden="true"></span>${t('阿米娅的升变')}
       ${d.state === 'ready' ? html`<b class="amyq-tab__n">!</b>` : null}
+      ${d.quest ? html`<span class="amyq-tab__line" aria-hidden="true"><i style=${`width:${Math.round(questProgress(d, d.quest) * 100)}%`}></i></span>` : null}
     </button>` : null}
-    <${Modal} open=${open} onClose=${() => setOpen(false)} width="min(92vw, 720px)"
+    <${Modal} open=${open} onClose=${() => setOpen(false)}
+      width=${d.state === 'choose' ? 'min(92vw, 7.4rem)' : 'min(92vw, 5.6rem)'}
+      tone="gold"
       title=${t('阿米娅的升变')} micro="AMIYA ASCENSION" closeOnBackdrop=${false}>
       <${QuestPanel} d=${d} onClose=${() => setOpen(false)} />
     <//>
@@ -156,44 +205,67 @@ function AmiyaAscendHost() {
 }
 
 const CSS = `
-.amyq-root{position:fixed;left:calc(var(--pad,16px) + 4px);bottom:calc(var(--pad,16px) + 56px);z-index:var(--z-modal,900);}
-.amyq-tab{display:inline-flex;align-items:center;gap:.4em;padding:.45em .9em;border:1px solid color-mix(in srgb,var(--c-accent,#7ce0c3) 45%,transparent);
-  border-radius:999px;background:color-mix(in srgb,var(--c-bg,#10231f) 82%,transparent);color:var(--c-text,#d9efe7);
-  font-size:.85rem;letter-spacing:.08em;cursor:pointer;backdrop-filter:blur(6px);}
-.amyq-tab:hover{border-color:var(--c-accent,#7ce0c3);}
-.amyq-tab__dot{width:.5em;height:.5em;border-radius:50%;background:var(--c-accent,#7ce0c3);opacity:.8;}
-.amyq-tab.is-ready{border-color:#ffd479;color:#ffd479;animation:amyq-pulse 1.6s ease-in-out infinite;}
-.amyq-tab.is-ready .amyq-tab__dot{background:#ffd479;}
+/* Text sizes follow the game's TEXT root (--t): 1rem here is the LAYOUT root (~100px at 1080p) — never a font size.
+   Palette: Amiya's warm gold instead of the firm's terminal mint; each path keeps a tint of its own. */
+.amyq-root{--amyq-gold:#f0c96a;--amyq-gold-hi:#ffd98f;--amyq-blade:#eda36b;--amyq-lamp:#9fd6c0;
+  position:fixed;left:calc(var(--pad,16px) + 4px);bottom:calc(var(--pad,16px) + 56px);z-index:var(--z-modal,900);}
+.amyq-tab{position:relative;display:inline-flex;align-items:center;gap:.4em;padding:.45em .9em;border:1px solid color-mix(in srgb,var(--amyq-gold,#f0c96a) 40%,transparent);
+  border-radius:999px;background:color-mix(in srgb,#241f19 82%,transparent);color:#efe6d2;
+  font-size:calc(.13 * var(--t));letter-spacing:.08em;cursor:pointer;backdrop-filter:blur(6px);overflow:hidden;}
+.amyq-tab:hover{border-color:var(--amyq-gold,#f0c96a);}
+.amyq-tab__dot{width:.5em;height:.5em;border-radius:50%;background:var(--amyq-gold,#f0c96a);opacity:.8;}
+.amyq-tab.is-ready{color:var(--amyq-gold-hi,#ffd98f);animation:amyq-pulse 1.6s ease-in-out infinite;}
+.amyq-tab.is-ready .amyq-tab__dot{background:var(--amyq-gold-hi,#ffd98f);}
 .amyq-tab__n{margin-left:.15em;font-weight:700;}
-@keyframes amyq-pulse{50%{box-shadow:0 0 12px color-mix(in srgb,#ffd479 55%,transparent);}}
-.amyq-lead{margin:.2em 0 .9em;font-size:.95rem;line-height:1.6;color:var(--c-text,#d9efe7);}
-.amyq-note{margin:.9em 0 0;font-size:.78rem;line-height:1.55;opacity:.65;}
-.amyq-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:.8em;}
-.amyq-card{display:flex;flex-direction:column;gap:.55em;padding:.9em 1em;border:1px solid color-mix(in srgb,var(--c-text,#d9efe7) 16%,transparent);
-  border-radius:10px;background:color-mix(in srgb,var(--c-text,#d9efe7) 4%,transparent);}
-.amyq-card.is-picked{border-color:color-mix(in srgb,var(--c-accent,#7ce0c3) 55%,transparent);}
-.amyq-card.is-met{border-color:#ffd479;}
-.amyq-card__head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.5em;}
-.amyq-card__name{font-size:1.02rem;color:var(--c-accent,#7ce0c3);}
-.amyq-card__form{font-size:.78rem;opacity:.75;}
-.amyq-card__text{margin:0;font-size:.82rem;line-height:1.6;opacity:.85;}
-.amyq-cond{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.6em;font-size:.78rem;}
+.amyq-tab__line{position:absolute;left:14%;right:14%;bottom:3px;height:2px;border-radius:999px;
+  background:color-mix(in srgb,#efe6d2 18%,transparent);overflow:hidden;}
+.amyq-tab__line i{display:block;height:100%;background:var(--amyq-gold,#f0c96a);transition:width .4s ease;}
+.amyq-tab.is-ready .amyq-tab__line i{background:var(--amyq-gold-hi,#ffd98f);}
+.amyq-progress{margin:.1rem 0 .02rem;}
+.amyq-progress__head{display:flex;align-items:baseline;justify-content:space-between;gap:.6em;margin-bottom:.06em;}
+.amyq-progress__label{font-size:calc(.13 * var(--t));letter-spacing:.14em;opacity:.75;}
+.amyq-progress__pct{font-size:calc(.15 * var(--t));color:var(--amyq-gold-hi,#ffd98f);}
+.amyq-progress__bar{height:.09rem;border-radius:999px;background:color-mix(in srgb,#efe6d2 12%,transparent);overflow:hidden;}
+.amyq-progress__bar i{display:block;height:100%;border-radius:999px;transition:width .4s ease;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--amyq-blade,#eda36b) 80%,var(--amyq-gold,#f0c96a)),var(--amyq-gold,#f0c96a));}
+.amyq-progress.is-ready .amyq-progress__bar i{background:var(--amyq-gold-hi,#ffd98f);animation:amyq-pulse 1.6s ease-in-out infinite;}
+@keyframes amyq-pulse{50%{box-shadow:0 0 12px color-mix(in srgb,var(--amyq-gold,#f0c96a) 55%,transparent);}}
+.amyq-choose{position:relative;z-index:0;}
+.amyq-crest{position:absolute;top:-.04rem;right:.08rem;width:.74rem;height:auto;color:var(--amyq-gold,#f0c96a);opacity:.28;pointer-events:none;z-index:-1;}
+.amyq-lead{margin:.2em 0 .12rem;padding-left:.12rem;border-left:2px solid color-mix(in srgb,var(--amyq-gold,#f0c96a) 65%,transparent);
+  font-size:calc(.16 * var(--t));line-height:1.6;color:var(--text-hi,#f2ede2);}
+.amyq-note{margin:.12rem 0 0;font-size:calc(.125 * var(--t));line-height:1.55;opacity:.6;}
+.amyq-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(2.9rem,1fr));gap:.12rem;margin-top:.12rem;}
+.amyq-card{position:relative;display:flex;flex-direction:column;gap:.1rem;padding:.14rem .16rem;border-radius:12px;
+  border:1px solid color-mix(in srgb,var(--path,#f0c96a) 34%,transparent);
+  background:linear-gradient(160deg,color-mix(in srgb,var(--path,#f0c96a) 9%,transparent),color-mix(in srgb,#f0c96a 3%,transparent));}
+.amyq-card--blade{--path:var(--amyq-blade,#eda36b);}
+.amyq-card--lamp{--path:var(--amyq-lamp,#9fd6c0);}
+.amyq-card.is-picked{border-color:color-mix(in srgb,var(--path,#f0c96a) 62%,transparent);box-shadow:0 0 .14rem color-mix(in srgb,var(--path,#f0c96a) 18%,transparent);}
+.amyq-card.is-met{--path:var(--amyq-gold,#f0c96a);border-color:color-mix(in srgb,var(--amyq-gold,#f0c96a) 70%,transparent);}
+.amyq-card__head{display:flex;flex-wrap:wrap;align-items:center;gap:.4em;}
+.amyq-card__mark-badge{display:inline-flex;width:calc(.2 * var(--t));height:calc(.2 * var(--t));color:var(--path,#f0c96a);}
+.amyq-card__mark-badge .amyq-mark{width:100%;height:100%;}
+.amyq-card__name{font-size:calc(.17 * var(--t));color:var(--path,#f0c96a);}
+.amyq-card__form{font-size:calc(.12 * var(--t));opacity:.7;}
+.amyq-card__text{margin:0;font-size:calc(.14 * var(--t));line-height:1.65;opacity:.85;}
+.amyq-cond{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.6em;font-size:calc(.14 * var(--t));}
 .amyq-cond__num{opacity:.85;}
-.amyq-cond__bar{height:.32em;border-radius:999px;background:color-mix(in srgb,var(--c-text,#d9efe7) 12%,transparent);overflow:hidden;}
-.amyq-cond__bar i{display:block;height:100%;background:var(--c-accent,#7ce0c3);transition:width .4s ease;}
-.amyq-cond.is-met .amyq-cond__bar i{background:#ffd479;}
-.amyq-card__pick{align-self:flex-start;padding:.4em 1.1em;border:1px solid color-mix(in srgb,var(--c-accent,#7ce0c3) 55%,transparent);
-  border-radius:6px;background:transparent;color:var(--c-accent,#7ce0c3);font-size:.85rem;letter-spacing:.1em;cursor:pointer;}
-.amyq-card__pick:hover:not(:disabled){background:color-mix(in srgb,var(--c-accent,#7ce0c3) 16%,transparent);}
+.amyq-cond__bar{height:.32em;border-radius:999px;background:color-mix(in srgb,var(--text-hi,#f2ede2) 12%,transparent);overflow:hidden;}
+.amyq-cond__bar i{display:block;height:100%;background:var(--path,#f0c96a);transition:width .4s ease;}
+.amyq-cond.is-met .amyq-cond__bar i{background:var(--amyq-gold,#f0c96a);}
+.amyq-card__pick{align-self:flex-start;padding:.4em 1.2em;border:1px solid color-mix(in srgb,var(--path,#f0c96a) 60%,transparent);
+  border-radius:999px;background:transparent;color:var(--path,#f0c96a);font-size:calc(.14 * var(--t));letter-spacing:.1em;cursor:pointer;}
+.amyq-card__pick:hover:not(:disabled){background:color-mix(in srgb,var(--path,#f0c96a) 14%,transparent);}
 .amyq-card__pick:disabled{opacity:.45;cursor:default;}
-.amyq-card__mark{font-size:.8rem;letter-spacing:.12em;opacity:.75;}
-.amyq-card__mark.is-ready{color:#ffd479;opacity:1;}
-.amyq-actions{display:flex;gap:.7em;margin-top:1em;}
-.amyq-btn{padding:.5em 1.4em;border:1px solid color-mix(in srgb,var(--c-text,#d9efe7) 28%,transparent);border-radius:6px;
-  background:transparent;color:var(--c-text,#d9efe7);font-size:.9rem;letter-spacing:.1em;cursor:pointer;}
-.amyq-btn:hover:not(:disabled){border-color:var(--c-text,#d9efe7);}
-.amyq-btn.is-primary{border-color:#ffd479;color:#ffd479;}
-.amyq-btn.is-primary:hover:not(:disabled){background:color-mix(in srgb,#ffd479 14%,transparent);}
+.amyq-card__mark{font-size:calc(.13 * var(--t));letter-spacing:.12em;opacity:.7;}
+.amyq-card__mark.is-ready{color:var(--amyq-gold-hi,#ffd98f);opacity:1;}
+.amyq-actions{display:flex;gap:.1rem;margin-top:.14rem;}
+.amyq-btn{padding:.45em 1.4em;border:1px solid color-mix(in srgb,var(--text-hi,#f2ede2) 26%,transparent);border-radius:999px;
+  background:transparent;color:var(--text-hi,#f2ede2);font-size:calc(.15 * var(--t));letter-spacing:.1em;cursor:pointer;}
+.amyq-btn:hover:not(:disabled){border-color:var(--text-hi,#f2ede2);}
+.amyq-btn.is-primary{border-color:var(--amyq-gold,#f0c96a);color:var(--amyq-gold-hi,#ffd98f);}
+.amyq-btn.is-primary:hover:not(:disabled){background:color-mix(in srgb,var(--amyq-gold,#f0c96a) 13%,transparent);}
 .amyq-btn:disabled{opacity:.4;cursor:default;}
 `;
 

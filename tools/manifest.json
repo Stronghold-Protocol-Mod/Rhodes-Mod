@@ -1,6 +1,6 @@
 {
   "name": "rhodes-mod",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "mod": {
     "id": "rhodes",
     "name": "罗德岛 MOD",
@@ -47,10 +47,10 @@
     "server/mod/toggle.js": "e2b9edcb779e4acc1e917dd763c8dbec1a0cf89cb66663f4217314365fe9259c",
     "tools/game-root.mjs": "57eecb7e34ad9ec93ba1841fbd6941590993cf0a632faebd4bfe3de8e4025460",
     "tools/mod-toggle.mjs": "fa36142165bf25a9ac999ceddf49a516a582d522f0944c31cdbb7c797c892937",
-    "docs/MOD-RHODES.md": "89b063d0bd8b112a42d1cb6f39a628c86bd3561de758034a18971aa37ca24987",
-    "mod/variants/rhodes/on/bonds.json": "48f4ffe88d731fa2e27b5b123c53126d4c0508d950bd50ca470013dab3a6291e",
+    "docs/MOD-RHODES.md": "1a00ae1b3c28514234070aa5fd219ab8b0356bda2e280c60923b9ec5d1e81505",
+    "mod/variants/rhodes/on/bonds.json": "a26c5929209fef50d90d5c6fd7e3dbd1ef851cc280962ad5a532de5488c8c653",
     "mod/variants/rhodes/off/bonds.json": "53a22f4724771b6ff40041635e907c0af39790731f661b0439fc593f5a91c94c",
-    "mod/variants/rhodes/on/chess.json": "7b964b2145475817e368df2ecf9e4b696036de349f70bcb469b7ebc7a18b8e19",
+    "mod/variants/rhodes/on/chess.json": "354c45395f544536cbc8d36ade57021500c05772df2c0e8b77fa4314e2e1cb52",
     "mod/variants/rhodes/off/chess.json": "fd463d31c21d3f40524058abb47fe64b6c32ebed22956586a50bee672e6dfa79",
     "mod/variants/rhodes/on/config.json": "696adeecb6b76b21e619203f09031e90bd29a73daa4c4be45a8d2c39e990589a",
     "mod/variants/rhodes/off/config.json": "c16504ca347c4a967d9cf3349d5e1ad081d2ae52d56b87b7841e33ea38853eef",

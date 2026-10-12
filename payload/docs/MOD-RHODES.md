@@ -12,7 +12,7 @@ are chosen by the mod (tier, price, shop order, phase/level, the bond).
 |               |                                                                                                                                                                                                                                                                                                                                                                   |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Operators** | 暴行 (T1 WARRIOR 强攻手) · 可露希尔 (T3 PIONEER 战术家) · Mon3tr (T4 MEDIC 链愈师) · 阿斯卡纶 (T5 SPECIAL 伏击客) · 凯尔希·思衡托 (T6 MEDIC 守望者) · 逻各斯 (T6 CASTER 中坚术师) · **阿米娅的三形态** (术士 T2 CASTER 中坚术师 → 近卫 T5 WARRIOR 术战者 → 医疗 T6 MEDIC 咒愈师, 阿米娅的升变**行**) — 18 chess records (9 operators × normal + 精锐; the ascended forms are `isHidden`, quest-only)          |
-| **Bond**      | `rhodesShip` 「罗德岛」 — thresholds **3 / 6** distinct members, 13 members (4 official + 9 mod)                                                                                                                                                                                                                                                                       |
+| **Bond**      | `rhodesShip` 「罗德岛」 — thresholds **3 / 6** distinct members, 15 members (6 official chess / 5 operators + 9 mod chess / 7 operators)                                                                                                                                                                                                                                                                       |
 | **Effect**    | `bondeffect_rhodes`, implemented in `server/sim/content/bonds/rhodes.js`                                                                                                                                                                                                                                                                                          |
 | **特质**        | 暴行 `SERVER_ADD_BOND_CHESS_ALL` · 逻各斯 `act1autochess_gar_eff_attrByBond` · 阿米娅·医疗 `modautochess_gar_event_heal` · 阿米娅（术师）`act1autochess_gar_event_selfkillenemy` · 阿米娅（近卫）`act1autochess_gar_eff_attrByBond` · 可露希尔 `modautochess_gar_prep_gain_chess_by_bond` · 阿斯卡纶 `act1autochess_gar_event_selfkillenemy` · 凯尔希·思衡托 `act1autochess_gar_event_useskill` · Mon3tr `act1autochess_gar_event_useskill` (normal + 精锐 variants, **18 records**) — all nine operators; the three Amiya forms carry 1 / 2 / 3 **inherited** traits since 2026-10-12 |
 | **Equipment** | 2 items × normal/精锐 = 4 records — 罗德岛急救包 (T3 `chess_item_3_13_e`, the bond's low-tier `giveBondId` piece) and 罗德岛徽章 (T6 `chess_item_6_12_e`, the 盟约签名件), implemented in `server/sim/content/items/battle.js`                                                                                                                                                      |
@@ -91,11 +91,15 @@ other official bond is a one-line change to her `extraBonds` in the builder.
 
 Besides the seven new operators, every existing 罗德岛-identity operator without a faction gets `rhodesShip` appended.
 百炼嘉维尔 and 烛煌 are deliberately **excluded** (they keep their original faction as their only one). The 2026-10-06
-mod ruling trims the official side to a **4-member keeper list** (`KEEP_OFFICIAL` in the builder) — 调香师, 泥岩,
-隐德来希, 迷迭香 (`OFFICIAL_MEMBER_CAP = 4`); every other official operator the builder used to tag has `rhodesShip`
-removed from both its normal and 精锐 record. 波登可 / 休谟斯 / 寒芒克洛丝 / 史尔特尔 were keepers of an earlier
-7-name list and were dropped by request in the same ruling's second pass (re-add a name to `KEEP_OFFICIAL` to restore
-it). The lineup is therefore **11 distinct members** (4 official keepers + the 7 mod operators) at thresholds 3 / 6.
+mod ruling trims the official side to a **5-member keeper list** (`KEEP_OFFICIAL` in the builder) — 调香师, 泥岩,
+**华法琳**, 隐德来希, 迷迭香 (`OFFICIAL_MEMBER_CAP = 5`); every other official operator the builder used to tag has `rhodesShip`
+removed from both its normal and 精锐 record. **华法琳 was added by request on 2026-10-12** and is the one keeper that
+exists at **two tiers** (`chess_char_4_26_a` at 4本 and `chess_char_5_04_a` at 5本), so she contributes **two** members
+entries — the official convention is one entry per chess record, not per operator (yanShip lists 录武官 twice). Her own
+奇迹 (`miraShip`) bond is kept: the keeper rule only **appends** 罗德岛, it never swaps a bond out. 波登可 / 休谟斯 / 寒芒克洛丝 / 史尔特尔 were keepers of an earlier
+7-name list and were dropped by request in the same ruling's second pass; 魔王 / 妮芙 (also two tiers each) stay dropped
+(re-add a name to `KEEP_OFFICIAL` to restore it). The lineup is therefore **12 distinct members** (5 official keepers
++ the 7 mod operators) at thresholds 3 / 6.
 
 The nine hand-written 特质 (`data/garrisons.json`, one normal + one 精锐 record each):
 

@@ -1,0 +1,26 @@
+--- a/public/js/ui/detailPanel.js
++++ b/public/js/ui/detailPanel.js
+@@ -407,7 +407,11 @@
+   // a chosen skill the manifest has no icon for (only the default skills' icons are fetched): its slot letter
+   const skIcon = sk && lo && !lo.defaultSkill ? skillRecordIconUrl(m, sk, { empty: false }) : skillIconUrl(m, body);
+   const skSlot = sk && Number.isInteger(sk.index) ? `S${sk.index + 1}` : null;
+-  const garrison = Array.isArray(c.garrisonIds) && c.garrisonIds[0] ? data.lookup('garrisons', c.garrisonIds[0]) : null;
++  // every 特质 the record carries, each its own block: an operator can hold SEVERAL (the 罗德岛 MOD's 阿米娅 inherits
++  // along her ascension line — 术士's 杀敌给层数 survives into the 近卫 and the 医疗, each step adding one more), and an
++  // official record is routinely shared by several owners
++  const garrisonsAll = (Array.isArray(c.garrisonIds) ? c.garrisonIds : [])
++    .map((g) => data.lookup('garrisons', g)).filter(Boolean);
+   const items = Array.isArray(piece?.items) ? piece.items : [];
+   // the bonds the unit counts for: its own + a 变形同构体 pairing's (its piece's items; without one: `unitItems` — a
+   // teammate's unit's UnitInfo items, a bond popup 同构 row's wearer's)
+@@ -444,7 +448,9 @@
+         <${BondChips} bondIds=${bondIds} bonds=${bonds} off=${offBonds} onBond=${onBond} granted=${grantedIds} />
+       </div>
+     </div>`;
+-  blocks.garrison = garrison ? html`<${GarrisonBlock} key="garrison" garrison=${garrison} m=${m} />` : null;
++  blocks.garrison = garrisonsAll.length
++    ? garrisonsAll.map((g) => html`<${GarrisonBlock} key=${g.garrisonId} garrison=${g} m=${m} />`)
++    : null;
+   blocks.trait = body.trait?.desc ? html`<p key="trait" class="dtrait"><${Icon} name="info" /><${RichText} text=${traitText(body, golden, lo)} /></p>` : null;
+   // (`fr` is the body the unit fights with — a stand-in's record for a 补位 chess; `chess` is only the range's fallback)
+   blocks.stats = chessStatsBlock({ rec: fr, chess: c, live });

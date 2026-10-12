@@ -165,15 +165,17 @@ export function install(battle) {
  * selling, 休整期 income) and from the layer 特质 of its operators — not from this file, and (since 2026-10-06) not
  * from healing either.
  *
- * Plus the 阿米娅升变任务 (shared/amiyaQuest.js, 2026-10-09 design): the FIRST caster (`chess_rhodes_amiya`) a player
- * gains in a match opens the quest (a persistent EffectRef whose `data` carries the state; transparent to the client
- * through effectsView's `data` passthrough — the 升变面板 renders from it). Two quests, ONE is picked and its reward
- * transforms the caster in place (Match.amiyaQuest, server/match/match/amiya.js — g.amiya pick/claim):
- *   〈继承之剑〉blade: Amiya herself 8000 cumulative damage → 近卫形态
- *   〈以伤害的方式拯救〉lamp: Amiya herself 6000 damage AND the team 8000 healing → 医疗形态
+ * Plus the 阿米娅升变任务 (shared/amiyaQuest.js, 2026-10-09 design; a LINE since 2026-10-12): the FIRST caster
+ * (`chess_rhodes_amiya`) a player gains in a match opens the quest (a persistent EffectRef whose `data` carries the
+ * state; transparent to the client through effectsView's `data` passthrough — the 升变面板 renders from it). The
+ * route is 术士 → 近卫 → 医疗, one step at a time, each step's reward transforming the form it starts from in place
+ * (Match.amiyaQuest, server/match/match/amiya.js — g.amiya pick/claim):
+ *   〈继承之剑〉blade: Amiya herself 8000 cumulative damage → 近卫形态 (from the 术士)
+ *   〈以伤害的方式拯救〉lamp: Amiya herself 6000 damage AND the team 8000 healing → 医疗形态 (from the 近卫)
  * Progress folds from every onBattleResult (any `chess_rhodes_amiya*` unit's dmg + the player's healingDone), so a
- * merged / transformed Amiya keeps counting. Inert while the mod is off: no `chess_rhodes_amiya` record exists then,
- * so the global handler never matches. All numbers are the mod's own (shared/amiyaQuest.js), not official data.
+ * merged / transformed Amiya keeps counting; each step's counters reset when it is claimed (shared/amiyaQuest.js
+ * `amiyaAdvance`), so the second step is scored on its own. Inert while the mod is off: no `chess_rhodes_amiya`
+ * record exists then, so the global handler never matches. All numbers are the mod's own, not official data.
  */
 import {
   AMIYA_QUESTS, AMIYA_QUEST_EFFECT_ID, AMIYA_QUEST_EFFECT_KEY,
@@ -181,7 +183,7 @@ import {
 } from '../../../../shared/amiyaQuest.js';
 
 const QUEST_NAME = '阿米娅的升变';
-const QUEST_DESC = '局内首次获得术士形态的阿米娅后开启。完成以下任一任务，即可手动将其升变：\n〈继承之剑〉阿米娅本人累计造成 8000 点伤害 → 近卫形态；\n〈以伤害的方式拯救〉阿米娅本人累计造成 6000 点伤害，且全队累计治疗 8000 点 → 医疗形态。';
+const QUEST_DESC = '局内首次获得术士形态的阿米娅后开启。升变之路依次有两段，完成后阿米娅会在上一形态的基础上多继承一条特质：\n〈继承之剑〉阿米娅本人累计造成 8000 点伤害 → 术士形态升变为近卫形态；\n〈以伤害的方式拯救〉阿米娅本人累计造成 6000 点伤害，且全队累计治疗 8000 点 → 近卫形态升变为医疗形态。';
 
 /** globals run on every hook: only onGain of an Amiya form matters (this dataset's `baseId` IS the `_a` id, so the
  * family check is isAmiyaChessId — a transformed guard / medic re-firing onGain finds the effect and no-ops). */

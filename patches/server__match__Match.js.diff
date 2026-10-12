@@ -1,0 +1,19 @@
+--- a/server/match/Match.js
++++ b/server/match/Match.js
+@@ -189,6 +189,7 @@
+ import { MatchViews } from './match/views.js';
+ import { MatchWatch } from './match/watch.js';
+ import { MatchIntents } from './match/intents.js';
++import { MatchAmiya } from './match/amiya.js';
+ import { MatchPause } from './match/pause.js';
+ import { MatchPhases } from './match/phases.js';
+ import { MatchSetupVote } from './match/setupVote.js';
+@@ -400,7 +401,7 @@
+ }
+ 
+ // the method modules, in this order (a name defined twice is an error, never a silent override)
+-for (const part of [MatchPlatform, MatchInfra, MatchMessaging, MatchViews, MatchWatch, MatchIntents, MatchPause, MatchPhases, MatchSetupVote, MatchSpDraft, MatchPrep, MatchCombat, MatchClientCombat, MatchReports, MatchUnite, MatchBoss, MatchSettle]) {
++for (const part of [MatchPlatform, MatchInfra, MatchMessaging, MatchViews, MatchWatch, MatchIntents, MatchAmiya, MatchPause, MatchPhases, MatchSetupVote, MatchSpDraft, MatchPrep, MatchCombat, MatchClientCombat, MatchReports, MatchUnite, MatchBoss, MatchSettle]) {
+   for (const key of Reflect.ownKeys(part.prototype)) {
+     if (key === 'constructor') continue;
+     if (Object.prototype.hasOwnProperty.call(Match.prototype, key)) throw new Error(`Match.${String(key)} is defined twice`);

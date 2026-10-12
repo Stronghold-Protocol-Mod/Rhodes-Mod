@@ -1,6 +1,6 @@
 {
   "name": "rhodes-mod",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "mod": {
     "id": "rhodes",
     "name": "罗德岛 MOD",
@@ -47,34 +47,34 @@
     "server/mod/toggle.js": "e2b9edcb779e4acc1e917dd763c8dbec1a0cf89cb66663f4217314365fe9259c",
     "tools/game-root.mjs": "57eecb7e34ad9ec93ba1841fbd6941590993cf0a632faebd4bfe3de8e4025460",
     "tools/mod-toggle.mjs": "fa36142165bf25a9ac999ceddf49a516a582d522f0944c31cdbb7c797c892937",
-    "docs/MOD-RHODES.md": "449b265da80d15e830286a9b118ac51a7b7fe111124996c4456f11bfa8d18f4d",
+    "docs/MOD-RHODES.md": "89b063d0bd8b112a42d1cb6f39a628c86bd3561de758034a18971aa37ca24987",
     "mod/variants/rhodes/on/bonds.json": "48f4ffe88d731fa2e27b5b123c53126d4c0508d950bd50ca470013dab3a6291e",
     "mod/variants/rhodes/off/bonds.json": "53a22f4724771b6ff40041635e907c0af39790731f661b0439fc593f5a91c94c",
-    "mod/variants/rhodes/on/chess.json": "cf29f037809219b734e51f235da7038d6c1c163ef86606b13aa637dd8d0b09a2",
+    "mod/variants/rhodes/on/chess.json": "7b964b2145475817e368df2ecf9e4b696036de349f70bcb469b7ebc7a18b8e19",
     "mod/variants/rhodes/off/chess.json": "fd463d31c21d3f40524058abb47fe64b6c32ebed22956586a50bee672e6dfa79",
     "mod/variants/rhodes/on/config.json": "696adeecb6b76b21e619203f09031e90bd29a73daa4c4be45a8d2c39e990589a",
     "mod/variants/rhodes/off/config.json": "c16504ca347c4a967d9cf3349d5e1ad081d2ae52d56b87b7841e33ea38853eef",
     "mod/variants/rhodes/on/effects.json": "98cad4458ef10023fe8a721f5a355b800efeef56e7a0ce5a424a93c77473a713",
     "mod/variants/rhodes/off/effects.json": "96e28be614f04da6d58c9e95706d742863c756b94dcad498e808c3410ba620e3",
-    "mod/variants/rhodes/on/garrisons.json": "c89745fcd9c1c77acaaffdab0f3ded7b9aab757d364a3660a2747890848889ba",
+    "mod/variants/rhodes/on/garrisons.json": "62efa765fb7dcf94fd0959460a3f3e7cab9252b86bad58c984879ec6a69517c2",
     "mod/variants/rhodes/off/garrisons.json": "f5b1f5558a263c95abcf36411c31e781efd3ebb1bebdced99ad1f242c2a960e3",
     "mod/variants/rhodes/on/items.json": "cc149800d96f41465f7f1d23863b8afe1a67e07541f8681aad1a14eb91e4d6fc",
     "mod/variants/rhodes/off/items.json": "6122a3cd75531f551a03082f000426a2d6b8028788fbd1abbaea5286592fbba4",
     "mod/variants/rhodes/on/tokens.json": "cf7519f445bb61e2b14b18d11d7b0ec4a3c43637784c3be43dde6a8882ad0c3a",
     "mod/variants/rhodes/off/tokens.json": "9e3501357b07d754711fcfd8506286efa32b7774d98e419fdcff48c1f6729b39",
-    "public/js/ui/amiyaAscend.js": "45bc17b19cdbb19b56c15bf382d2b8a59617baaf6d94f107b4ffcd751176d582",
-    "server/sim/content/bonds/rhodes.js": "e2edc358829556dbdb17a0447a347093193abfd86a0995b3d8b2b2a7a24aff12",
+    "public/js/ui/amiyaAscend.js": "a92323dec79995fe047914569549c4f6c19802c828ebd46f6ae837a745c53903",
+    "server/sim/content/bonds/rhodes.js": "4cc59c1ef4b7c3f2d52c40da29216e4677db25432fd1e5a785cb3c765edd1c73",
     "server/sim/content/kits/mod.js": "19f64f2e3bdbc31c4ed8dc961ea8eb36d2121aed7305ee54f975209738f1d155",
     "server/sim/content/kits/ops/mod-rhodes-amiya.js": "aafc8d44c1e204025e4acb5a64b8b79f4f6bf45372c631ec91993d86a9c60c83",
     "server/sim/content/kits/ops/mod-rhodes-amiya2.js": "f4b0deed649ae0703799d5d330cccbe8440c3a53bcf48489000edcee6144731d",
     "server/sim/content/kits/ops/mod-rhodes-amiya3.js": "a613da560a7a83e4c2d708ef0bbdde16a59ab29d384d13973058cede91601ad3",
     "server/sim/content/kits/ops/mod-rhodes-ascln.js": "21d58aebe1c1ec7949756da1ee4ea2e53e6ffe58a0f4180542db2c757eb9c643",
     "server/sim/content/kits/ops/mod-rhodes-closur.js": "605f027ee4e50cbec19e4848b19e12955b5159852d8d36720c8d2d0ec519e27c",
-    "server/sim/content/kits/ops/mod-rhodes-kalts2.js": "8f74a1d6184481d9a84d6523da54caa0308f4251b742a6439ebe851ce87c8317",
+    "server/sim/content/kits/ops/mod-rhodes-kalts2.js": "0f2bf2487a14f565ccd6153f24249b14ac1ec70e93f5fa1aa332bffa7a938098",
     "server/sim/content/kits/ops/mod-rhodes-logos.js": "d5caa7f277398e99ff452059120d59acb2c568b600f7665b1f262b580b0aa570",
     "server/sim/content/kits/ops/mod-rhodes-monstr.js": "f2954b1f5c47345a2a685f65d416e961bb8b697b1dfc712879ced94c34ab4bbf",
-    "server/match/match/amiya.js": "e54b052ca49dec0a455bd5b1264b58e6a5d520333657403307667b18ecde8ad7",
-    "shared/amiyaQuest.js": "0068410e0e6ac1b86614bf6d61ee5134b2cce615bda8a5ddfa3d9196c7a2a307",
+    "server/match/match/amiya.js": "1576e1f837c9b43b69c728bb3a58d7431f42dcd226301388ac46929c1d91140b",
+    "shared/amiyaQuest.js": "421d53985e0450a4e839d8a2490efef16ae1ba4671e580a27d704dd13fde6810",
     "mod/toggles.d/rhodes.json": "91a321356dbeec3c8fa5f1176452bc26268fc2381a9633f0b1d55a7deecac486",
     "public/assets/bond/rhodesShip.png": "c1aafd771ed19a83ef254f5baa446f76ca2d39391e98b3447ff0432f532ca5e6",
     "public/assets/char/avatar/char_002_amiya.png": "cf3529aa76413865f3adcca74daa07807412c4833509991cde46c700d67e626d",
@@ -255,6 +255,24 @@
       "added": 14,
       "removed": 1
     },
+    "public/js/ui/detailPanel.js": {
+      "layer": "M",
+      "patch": "patches/public__js__ui__detailPanel.js.diff",
+      "baseSha256": "a09e525e888e0aef2fe08db2690861be708ea2fa98befe080d86f9531e7d3923",
+      "resultSha256": "f464173c10104640adf33b3fe7a483b7316d6f6db2277ffaf08871d8c64bc45b",
+      "hunks": 2,
+      "added": 8,
+      "removed": 2
+    },
+    "server/match/Match.js": {
+      "layer": "M",
+      "patch": "patches/server__match__Match.js.diff",
+      "baseSha256": "42f5b30eebf4571305f264862eb59b5a6684c71e7f5bd9fa02d1fbb1e504eb59",
+      "resultSha256": "a5ef7ac26c1bc6e384904f2dd98ae2995af4b5374250474b6e971ec3c0d76ec6",
+      "hunks": 2,
+      "added": 2,
+      "removed": 1
+    },
     "server/match/PlayerState.js": {
       "layer": "M",
       "patch": "patches/server__match__PlayerState.js.diff",
@@ -273,6 +291,24 @@
       "added": 132,
       "removed": 4
     },
+    "server/match/effectsMeta.js": {
+      "layer": "M",
+      "patch": "patches/server__match__effectsMeta.js.diff",
+      "baseSha256": "3274cd7283e871e1c82c44069c96191ab5aabdd9bb2a682fe6340a5009e4eecc",
+      "resultSha256": "6b89fa196aaed6945d9d2809a33be8975553e7b8ec989f4db9ab6af69c24f392",
+      "hunks": 2,
+      "added": 11,
+      "removed": 1
+    },
+    "server/match/invariants.js": {
+      "layer": "M",
+      "patch": "patches/server__match__invariants.js.diff",
+      "baseSha256": "75bcefa65273c9e89c89d1c9979957a9ab962ece80281737c2a24a695fae0f09",
+      "resultSha256": "37233111226779ca629bca17ea28d058089045c539cbea64bbc248f38d3449a0",
+      "hunks": 3,
+      "added": 14,
+      "removed": 1
+    },
     "server/match/match/intents.js": {
       "layer": "M",
       "patch": "patches/server__match__match__intents.js.diff",
@@ -281,6 +317,15 @@
       "hunks": 1,
       "added": 2,
       "removed": 0
+    },
+    "server/match/match/spDraft.js": {
+      "layer": "M",
+      "patch": "patches/server__match__match__spDraft.js.diff",
+      "baseSha256": "8e39710a5af1ed17654371c60ca63733c89799658f2cc967b4da45ba2f4cfab9",
+      "resultSha256": "bb0f9703e8e12cfd4eb3599ae965c1ddb72948f865833b4d866f9c2e92390109",
+      "hunks": 2,
+      "added": 7,
+      "removed": 3
     },
     "server/match/player/acquire.js": {
       "layer": "M",
@@ -322,9 +367,9 @@
       "layer": "M",
       "patch": "patches/server__sim__content__garrisons__battle.js.diff",
       "baseSha256": "0dbb5f8617cf0c9ebf85ec44acd4c0fec02e480bfe44d244474fd5271bcd1a7d",
-      "resultSha256": "b4fa59caac022bb2a25706b005a882c2d835caa2f947d74b614e1cf87e722e09",
+      "resultSha256": "b29551c41434ef45a56b76c2111eb85f611fb64a5d46eef0ede7f10973331bca",
       "hunks": 2,
-      "added": 81,
+      "added": 91,
       "removed": 0
     },
     "server/sim/content/garrisons/meta.js": {

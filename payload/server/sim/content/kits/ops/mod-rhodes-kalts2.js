@@ -7,8 +7,17 @@ import { COLS } from '../../../constants.js';
 import { releaseSkillSummon } from '../../tokens.js';
 
 const KALTS2_ANCHOR = 'token_10068_kalts2_mtship';
-/** [ASSUMED] splash radius (tiles) of 保护性拒止 — the official blackboard carries no 溅射半径. */
-const KALTS2_SPLASH = 1.0;
+/**
+ * 保护性拒止's damage / heal radius (tiles) around the unit the 医疗单元 strikes: **1.5**. The skill's own blackboard
+ * carries no 溅射半径, so this came in as an upstream assumption (1.0) when the kit was extracted; the authoritative value
+ * is PRTS 凯尔希·思衡托 S2 备注 「伤害与治疗溅射半径均为1.5」 — the client's projectile_chr_kalts2_s2_dmg / _heal prefabs
+ * carry those sub-ranges. The author's 自选 kit of the same character reads it the same way (kits/ops/op-kalts2.js
+ * `S2_RADIUS = 1.5`, and its own S2 test asserts a patient 1.41 away is healed). User report 2026-10-11
+ * 「凯尔希二技能…效果和文案不符」: at 1.0 the circle held only the impact tile and its orthogonal neighbours, so an ally
+ * (or an enemy) one tile away on the DIAGONAL — 1.414 — stayed outside 「目标周围所有…」 no matter that the text says
+ * 周围所有: it neither took the true damage nor got the heal.
+ */
+const KALTS2_SPLASH = 1.5;
 
 function kalts2(bb, chess, def) {
   const t0 = tbb(def, 0), t1 = tbb(def, 1);
@@ -106,21 +115,57 @@ function kalts2(bb, chess, def) {
         ...(skillGridOf(def) ? { targeting: { rangeGrid: skillGridOf(def) } } : {}),
         attack: {
           dmgType: 'true',
-          atkScale: 0,                          // the 医疗单元's own hit deals no damage — the burst around it is the damage
+          // 文案「攻击变为射出**医疗单元**」: the piece's own impact deals no damage at all — the burst around it is the
+          // damage. `hitsFn: () => 0` (no hit instance), NOT `atkScale: 0`: the latter still lands a 0-点 damage event on
+          // the struck unit, i.e. a real 「受到伤害」 for every `damaged` listener and per-hit counter. Same device as the
+          // author's kit (kits/ops/op-kalts2.js `hitsFn: () => 0`).
+          hitsFn: () => 0,
           projectile: 'bolt',
-          onEachHit({ battle, unit, target }) {
-            if (!target || target.side !== 'enemy') return;
+          /**
+           * 文案「攻击变为射出医疗单元（**优先选择敌人**）」: while the skill runs, an enemy she can select inside her
+           * (skill) range keeps priority, but with none left she fires the 医疗单元 at the lowest-HP-ratio INJURED ally
+           * in that range instead and the burst follows her across — otherwise the remaining 弹药 of a 10-shot skill
+           * would simply rot once the wave is dead, which is exactly the clause that used to have no route here (the
+           * MOD's S2 keeps `heal:false` + trigger `SEARCH`, so the skill itself only ever STARTS on an enemy).
+           * `true` = the engine attacks as usual; `false` = it must not, because `Battle.forceAttack` has already spent
+           * this shot on an ally — the author's own device for the same skill (kits/ops/op-kalts2.js `s2CanAttack`).
+           * The enemy probe carries HER OWN `canHitFly` (her profile is a heal one, so no flyer rule of its own): a probe
+           * that cannot reach flyers must not report one as available, or the shot would be held back for nothing.
+           */
+          canAttack(battle, unit) {
+            const prof = { canHitFly: !!unit.profile?.canHitFly };
+            if (battle.enemiesInKeys(unit.rangeKeys, unit, prof).length || battle.blockedTargets(unit, prof).length) return true;
+            const ally = battle.injuredAlliesInKeys(unit.rangeKeys, unit)[0];
+            if (ally && battle.forceAttack(unit, [ally])) unit.atkCd = Math.max(unit.atkCd, unit.s.interval);
+            return false;
+          },
+          onEachHit({ battle, unit, target, kind, attackId }) {
+            if (kind !== 'main' || !target) return;
             const dmg = unit.s.atk * bv(bb, 'attack@atk_scale', 3.5);
             const heal = unit.s.atk * bv(bb, 'attack@heal_scale', 1.7);
             const slow = bv(bb, 'attack@sluggish', 5);
+            const onEnemy = target.side === 'enemy';
             battle.fx('aoe', { x: target.x, y: target.y, id: unit.id, r: KALTS2_SPLASH, dmgType: 'true' });
-            for (const e of battle.enemiesInRadius(target.x, target.y, KALTS2_SPLASH, true)) {
-              battle.dealDamage(unit, e, { amount: dmg, type: 'true', isSkill: true, tags: ['skill', 'kalts2:repulse'] });
-              if (e.alive && slow > 0) battle.applyStatus(e, 'sluggish', { duration: slow, source: unit });
-            }
-            for (const a of battle.alliesInRadius(target.x, target.y, KALTS2_SPLASH, unit.ownerId)) {
-              battle.heal(unit, a, heal, { tags: ['skill', 'kalts2:repulse'] });
-            }
+            battle.fx('healAoe', { x: target.x, y: target.y, id: unit.id, r: KALTS2_SPLASH });
+            // 「对目标周围所有敌人造成相当于攻击力N%的真实伤害并使其停顿5秒」 — 真实**普通**伤害 (PRTS S2 备注), so
+            // `isAttack` as well as `isSkill`; the AOE selector keeps 不可选中 / 隐匿 enemies out (`foesInRadius`), and
+            // 停顿 rides on the enemies the hit reaches, only when the 医疗单元 landed on one.
+            const hurt = () => {
+              for (const e of battle.foesInRadius(target.x, target.y, KALTS2_SPLASH, true)) {
+                battle.dealDamage(unit, e, { amount: dmg, type: 'true', isAttack: true, isSkill: true, attackId, tags: ['skill', 'kalts2:repulse'] });
+                if (onEnemy && slow > 0 && e.alive) battle.applyStatus(e, 'sluggish', { duration: slow, source: unit });
+              }
+            };
+            // 「回复目标周围所有友方干员相当于攻击力N%的生命」 — a friendly selector, so a 孤立 ally stays out
+            // (`allySelectable`, Battle.allySelectable) exactly like the author's kit's `mend()`.
+            const mend = () => {
+              for (const a of battle.alliesInRadius(target.x, target.y, KALTS2_SPLASH, unit.ownerId)) {
+                if (battle.allySelectable(a, unit)) battle.heal(unit, a, heal, { tags: ['skill', 'kalts2:repulse'] });
+              }
+            };
+            // landing on an enemy: damage first, then the heal; on an ally (no enemy selectable): heal first, no 停顿
+            // — the author's own order (kits/ops/op-kalts2.js s2Burst).
+            if (onEnemy) { hurt(); mend(); } else { mend(); hurt(); }
           },
         },
       },

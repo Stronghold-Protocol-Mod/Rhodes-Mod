@@ -11,10 +11,10 @@ are chosen by the mod (tier, price, shop order, phase/level, the bond).
 
 |               |                                                                                                                                                                                                                                                                                                                                                                   |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Operators** | 暴行 (T1 WARRIOR 强攻手) · 可露希尔 (T3 PIONEER 战术家) · Mon3tr (T4 MEDIC 链愈师) · 阿斯卡纶 (T5 SPECIAL 伏击客) · 凯尔希·思衡托 (T6 MEDIC 守望者) · 逻各斯 (T6 CASTER 中坚术师) · **阿米娅的三形态** (术士 T2 CASTER 中坚术师 → 近卫 T5 WARRIOR 术战者 / 医疗 T5 MEDIC 咒愈师, 阿米娅的升变) — 18 chess records (9 operators × normal + 精锐; the ascended forms are `isHidden`, quest-only)          |
+| **Operators** | 暴行 (T1 WARRIOR 强攻手) · 可露希尔 (T3 PIONEER 战术家) · Mon3tr (T4 MEDIC 链愈师) · 阿斯卡纶 (T5 SPECIAL 伏击客) · 凯尔希·思衡托 (T6 MEDIC 守望者) · 逻各斯 (T6 CASTER 中坚术师) · **阿米娅的三形态** (术士 T2 CASTER 中坚术师 → 近卫 T5 WARRIOR 术战者 → 医疗 T6 MEDIC 咒愈师, 阿米娅的升变**行**) — 18 chess records (9 operators × normal + 精锐; the ascended forms are `isHidden`, quest-only)          |
 | **Bond**      | `rhodesShip` 「罗德岛」 — thresholds **3 / 6** distinct members, 13 members (4 official + 9 mod)                                                                                                                                                                                                                                                                       |
 | **Effect**    | `bondeffect_rhodes`, implemented in `server/sim/content/bonds/rhodes.js`                                                                                                                                                                                                                                                                                          |
-| **特质**        | 暴行 `SERVER_ADD_BOND_CHESS_ALL` · 逻各斯 `act1autochess_gar_eff_attrByBond` · 阿米娅·医疗 `modautochess_gar_event_heal` · 阿米娅（术师）`act1autochess_gar_event_selfkillenemy` · 阿米娅（近卫）`act1autochess_gar_eff_attrByBond` · 可露希尔 `modautochess_gar_prep_gain_chess_by_bond` · 阿斯卡纶 `act1autochess_gar_event_selfkillenemy` · 凯尔希·思衡托 `act1autochess_gar_event_useskill` · Mon3tr `act1autochess_gar_event_useskill` (normal + 精锐 variants, **18 records**) — all nine operators, the three Amiya forms included (2026-10-11) |
+| **特质**        | 暴行 `SERVER_ADD_BOND_CHESS_ALL` · 逻各斯 `act1autochess_gar_eff_attrByBond` · 阿米娅·医疗 `modautochess_gar_event_heal` · 阿米娅（术师）`act1autochess_gar_event_selfkillenemy` · 阿米娅（近卫）`act1autochess_gar_eff_attrByBond` · 可露希尔 `modautochess_gar_prep_gain_chess_by_bond` · 阿斯卡纶 `act1autochess_gar_event_selfkillenemy` · 凯尔希·思衡托 `act1autochess_gar_event_useskill` · Mon3tr `act1autochess_gar_event_useskill` (normal + 精锐 variants, **18 records**) — all nine operators; the three Amiya forms carry 1 / 2 / 3 **inherited** traits since 2026-10-12 |
 | **Equipment** | 2 items × normal/精锐 = 4 records — 罗德岛急救包 (T3 `chess_item_3_13_e`, the bond's low-tier `giveBondId` piece) and 罗德岛徽章 (T6 `chess_item_6_12_e`, the 盟约签名件), implemented in `server/sim/content/items/battle.js`                                                                                                                                                      |
 
 > 凯尔希·思衡托 (`char_1052_kalts2`, 守望者) is **not** 凯尔希 (`char_003_kalts`, 医师) — different operator,>
@@ -110,14 +110,26 @@ The nine hand-written 特质 (`data/garrisons.json`, one normal + one 精锐 rec
 - **逻各斯** — `act1autochess_gar_eff_attrByBond`, the official reader: every 3 layers of 罗德岛+奥术 (the bonds listed
   in `bbStr.bond_id`, active only) gives **himself** +2 % / +4 % ATK. Zero engine change.
 - **阿米娅** — `modautochess_gar_event_heal` (new installer, `battle.js installHealGain`): a heal she lands on another
-  operator of her player inside her **attack range** adds +1 (+2 精锐) to **every bond she has active**, ≤ **12 triggers
+  operator of her player adds +1 (+2 精锐) to **every bond she has active**, ≤ **12 triggers
   per round** (cut from 48 to 10 by the 2026-10-06 ruling, raised to 12 in the same day's fourth pass; she was also
-  demoted to tier 2 in the first pass and **raised to tier 3** in the fourth). The record declares
+  demoted to tier 2 in the first pass and **raised to tier 3** in the fourth). She carries **THREE** traits since
+  2026-10-12 (the inheritance along the ascension line — see that section): the 术士's kill→layers and the 近卫's
+  层数→stats sit above this record on her card, and the three are independent installs with their own counters and
+  caps. The record declares
   `max_add_count_per_battle` (12 / 24 = the trigger ceiling × the per-trigger count):
   `gainLayers` reads it as the official per-battle layer cap, and the client-result plausibility bound adds it to its
   60 + 4·round budget (`fields.js layerAllowanceOf` — the same field official traits like
   `act1autochess_gar_event_selfkillenemy` declare, up to 200), so an honest client reporting the burst is
   **accepted** instead of rejected and re-simulated.
+  - **No range clause (2026-10-11, user report 「医疗形态的阿米娅有时候提供了屏障但却不会提供层数」).** The installer used
+    to demand `S.inRange(src, t)` — her **attack** range. 咒愈师's attack range is `3-3` (the four columns in front), but
+    S1 哀恸共情 heals her whole `x-1` 「自身周围一定范围」 diamond, which reaches **two tiles above / below / behind** her.
+    A heal on one of those off-range tiles restored HP, overflowed into the target's 屏障 (罗德岛's `opts.overheal`) and
+    paid **no layer** — precisely the reported symptom (the barrier appeared, the layers did not). The clause is gone: the
+    trigger is a heal that lands on another same-player operator, and the record's text dropped 「攻击范围内的」 (it now
+    reads 「为友方干员恢复生命或赋予屏障时」). The check was redundant anyway — the heal pipeline has already selected a
+    reachable target. Pinned by `test/content/mod_rhodes_battle.test.js` (a heal two tiles BEHIND her pays, on top of the
+    in-range one).
   - **Three trigger shapes (2026-10-07, user request 「阿米娅如果给予屏障也可以用于叠加层数，然后阿米娅天赋的自动回血也可以
     用于叠加层数」).** Next to a heal that restores HP, two more count, both still same-player and range-limited and one
     heal instance firing **at most one** trigger:
@@ -154,15 +166,19 @@ The nine hand-written 特质 (`data/garrisons.json`, one normal + one 精锐 rec
   actual gate. **每击倒1名单位 +1** (+2 精锐), **uncapped** — the ceiling is the room under 999, which
   `fields.js layerAllowanceOf` reads as Infinity for the bonds it funds. She is the form **every run starts with** and the
   only Amiya the shop sells (T2, price 3), so this is the mod's most reachable in-battle layer source, and 逻各斯 (奥术)
-  spends what she feeds just as the 近卫 spends 罗德岛. Zero engine change.
+  spends what she feeds just as the 近卫 spends 罗德岛. Zero engine change. **Since 2026-10-12 both ascended forms
+  inherit this very record** (the ascension line — `AMIYA_TRAIT_CHAIN`), so 「杀敌给层数」 never stops running: the 近卫
+  carries it as row one and adds her reader as row two, the 医疗 adds her heal trigger as row three.
   **2026-10-11 ruling, the trigger revised the same day after playtest:** it was `act1autochess_gar_event_useskill`
   (开启技能时 +2 / +4, ≤6 casts, declared as 12 / 24 layers like Mon3tr's) — but 精神爆发 (S2, the 2本 normal's default)
   costs **100** SP and 奇美拉 (S3) **120**, both `INCREASE_WITH_TIME`, so a battle saw 0–1 casts and the trait sat idle.
   Kill-driven gain needs no SP at all. The two 升变 forms' 层数特质 were the mod's last open question (they used to carry
-  no `garrisonIds` at all); see the ascension section for how the three forms now divide the layer economy.
+  no `garrisonIds` at all); see the ascension section for how the three forms now **stack** their layer roles (the
+  2026-10-12 line: each form keeps the previous one's traits and adds its own).
 - **阿米娅（近卫）** — `act1autochess_gar_eff_attrByBond`, the OFFICIAL reader (逻各斯's key) — the ascended form is a
   **layer SPENDER**: every **3** layers of 罗德岛 give **herself** 攻击力 / 最大生命 / 防御力 **+2 %** (+3 % 精锐) and
-  攻击速度 **+1** (+2 精锐). The scale is the mod's deliberate **×2** of the official single-key readers — 拉特兰·坚守
+  攻击速度 **+1** (+2 精锐). Since 2026-10-12 it is her **SECOND** trait, not her only one: she inherits the 术士's
+  kill→layers (see above), so the ascended carry funds layers AND spends them — 「杀敌给层数 + 另起一栏写层数给属性」. The scale is the mod's deliberate **×2** of the official single-key readers — 拉特兰·坚守
   (防御力) / 维多利亚 (攻击速度) / 迷迭香 (攻击力+生命值) all sit at 1 % or +1 per 3 layers, and no official record
   carries more than TWO keys — applied to four keys at once, which is what makes her the carry the ascension promises.
   `bbStr.bond_id` lists **罗德岛 alone**: her chess record carries 奥术 (`arcaneShip`) exactly like 逻各斯's, and HIS
@@ -691,43 +707,69 @@ it *is* a 核心盟约 (`isCore`, listed on every mode's roster, see above). Wha
   held, never spent: with no bond item in play the morph stays in the hand.
 - `test/match/mod_bot.test.js` pins both (skipping itself while the mod is off).
 
-## 阿米娅的升变 · the Amiya ascension quest (2026-10-11)
+## 阿米娅的升变 · the Amiya ascension quest (2026-10-11; a single LINE since 2026-10-12)
 
 The mod's own take on 明日方舟's three Amiyas (user design, 2026-10-09/11): **a player cannot buy the 医疗 or 近卫
-Amiya** — the shop only ever offers the 术士. Every Amiya starts as the caster, and ascension is **earned, then chosen**:
+Amiya** — the shop only ever offers the 术士. Every Amiya starts as the caster, and ascension is **earned, one step at a
+time, along a line that only ever goes forward**:
 
+- **术士 → 近卫 → 医疗, one step per quest, no forks** (2026-10-12 user decision — it replaced the earlier 二选一).
+  The caster can only become the 近卫, and the 近卫 can only become the 医疗; each step's reward transforms the form it
+  starts from in place, and the NEXT step arms itself the moment the previous one is claimed (`amiyaAdvance` in
+  `shared/amiyaQuest.js`). The route lives in `AMIYA_ROUTE`; `AMIYA_QUESTS[x].from` names the form each step
+  transforms, so nothing in the code has to know the order twice.
 - First in-match purchase of a caster Amiya opens a persistent quest (an EffectRef, `modrhodes:amiya-quest`, whose
-  `data` the client panel reads through the `effects[].data` view passthrough). The panel auto-opens; it offers a
-  **二选一** that locks the route (〈继承之剑〉 / 〈以伤害的方式拯救〉), shows live progress, and a **升变** button
-  once the quest is `ready`. The state machine is `choose → (pick) → active → (onBattleResult) → ready → (claim) → done`,
+  `data` the client panel reads through the `effects[].data` view passthrough). The panel auto-opens; it shows **the
+  step the line is on** (a single card — 〈继承之剑〉 for the first, 〈以伤害的方式拯救〉 for the second), the live
+  progress, and a **升变** button once that step is `ready`. The state machine is
+  `choose → (pick, the first step only) → active → (onBattleResult) → ready → (claim) → active (next step) → … → done`,
   prep phases only; definitions and pure helpers live in `shared/amiyaQuest.js`.
+- **Each step is scored on its own counters.** `claim` resets `dmg` / `heal` when it moves the line on — otherwise the
+  8000 damage that opened step one would clear step two's 6000 on sight. A step's conditions still accumulate from the
+  very start of the match *until* it is the live step, so picking late never loses progress.
+- **The traits are inherited, one per step** (2026-10-12 user request 「特质一步步继承」): the 术士's
+  `act1autochess_gar_event_selfkillenemy` (每击倒1名单位 → 层数) is carried by **all three forms**, the 近卫 adds her
+  `act1autochess_gar_eff_attrByBond` reader on top, and the 医疗 adds her `modautochess_gar_event_heal` on top of both.
+  The records are SHARED, not copied (`build-rhodes-mod.mjs` `AMIYA_TRAIT_CHAIN`; the record's `owners` lists every
+  form that carries it), so the three triggers stay independent installs with their own caps — an ascended 阿米娅 both
+  **funds** layers and **spends** them. `<operator card>` renders one 特质 block per trait, in line order.
 - **The panel reads as Amiya's, not the firm's** (2026-10-11): text sizes follow the game's TEXT root
   (`calc(· * var(--t))` — a first draft used `rem`, which in this game is the ~100px **layout** root and blew the
   panel up to unreadable sizes), the accents are her warm gold instead of the terminal mint, the modal speaks in the
-  `gold` tone, each route card carries its own small mark (the blade / the healing ring) and a halo-and-ears crest
+  `gold` tone, each step's card carries its own small mark (the blade / the healing ring) and a halo-and-ears crest
   sits as a watermark, and both the panel and the corner tab show an **overall progress bar** (what is left of both
-  conditions against their goal sizes — it never goes backwards and reads 100% exactly when the route is done).
-- **〈继承之剑〉(blade)** — 奎隆之剑, 「争斗在此止歇」: Amiya herself deals **8000** cumulative damage → the caster
+  conditions against their goal sizes — it never goes backwards and reads 100% exactly when the step is done).
+- **〈继承之剑〉(blade)** — 奎隆之剑, 「争斗在此止歇」: Amiya herself deals **8000** cumulative damage → the 术士
   becomes the **近卫形态** (`char_1001_amiya2`, 影霄 twin blades, once-per-battle 绝影).
 - **〈以伤害的方式拯救〉(lamp)** — 「以战斗的方式治愈，以伤害的方式拯救」: Amiya herself deals **6000** damage **and**
-  the team heals **8000** → the caster becomes the **医疗形态** (`char_1037_amiya3`, the 咒愈师 of chapter 14).
+  the team heals **8000** → the **近卫** becomes the **医疗形态** (`char_1037_amiya3`, the 咒愈师 of chapter 14).
   Any `chess_rhodes_amiya*` defId counts as "Amiya herself", so transformed / merged Amiyas keep counting.
 - **Price 3 across all three forms** (pay once, transform free). The ascended forms ship as complete `isHidden`
-  records (`chess_rhodes_amiya2/3_*`, tier 5) — outside the shop pool exactly like the author's hidden chess.
-- `claim` transforms **in place** (`transformChess` — equipment, summons, tile and pool copies survive; `_b` caster →
-  `_b` form), falling back to a plain grant when the caster was lost mid-quest.
-- **The shop follows the ascension** (2026-10-11): after the claim the claimant's shop offers the ascended form
-  wherever it would have offered the 术士 — shelf cards re-face at once, later rolls (`economy.js _rollChessSlot`,
-  `acquire.js pushRewardOffer`) draw the form in the caster's stead, and the form's copy accounting (buy / merge /
-  sell / elimination) rides the caster's shared-pool entries through a `poolOf` facade (`diy.js`). It is a
-  **per-player** swap (`ps.poolSwap`, installed by `server/match/match/amiya.js`): other players' shops keep the
-  术士, and nobody can buy an ascended form without finishing the quest.
+  records (`chess_rhodes_amiya2_*` at tier 5, `chess_rhodes_amiya3_*` at **tier 6** since the 2026-10-12 ruling — the
+  end of the line drafts at the top tier, so her 精锐 carries the tier-6 **模组3** where the 近卫 carries 模组1) —
+  outside the shop pool exactly like the author's hidden chess.
+- `claim` transforms **in place** (`transformChess` — equipment, summons, tile and pool copies survive; an elite
+  piece ascends into the matching `_b` form at EVERY step, so 精锐化 is never lost on the way down the line),
+  falling back to a plain grant when the piece the step starts from was lost mid-quest.
+- **The shop follows the ascension** (2026-10-11; cumulative along the line since 2026-10-12): after a claim the
+  claimant's shop offers the NEW form wherever it could have offered the 术士 **or any earlier form** — shelf cards
+  re-face at once (a 近卫 card becomes a 医疗 card on the second step), later rolls (`economy.js _rollChessSlot`,
+  `acquire.js pushRewardOffer`) draw the new form in the old one's stead, and every ascended form's copy accounting
+  (buy / merge / sell / elimination) rides the 术士's shared-pool entries through a `poolOf` facade (`diy.js`). It is
+  a **per-player** swap (`ps.poolSwap`): other players' shops keep the 术士, and nobody can buy an ascended form
+  without finishing the quest.
+- **Every OTHER way a random operator reaches the player follows the same swap** (2026-10-12 user request
+  「可露希尔的特质也只会发对应阶段的阿米娅。寻呼模块还有一个道具也是」): `ctx.rollChess` (可露希尔's 进入休整期时 特质,
+  贾维's gift, the bands, the items) and `ctx.rollPool` (the choices.json pools) both read `ps.poolSwap.roll`, so an
+  effect can never hand an ascended player the form she has left behind. The invariant checker learned the same route
+  (`invariants.js poolBaseOf`, mirrored in the test harness) — otherwise an ascended form looks like a non-pool chess
+  holding copies it could never have.
 - New intents ride the framework's neutral **`MOD_C2S`** registry (shared/protocol.js): a MOD registers its own C2S
   schemas at import time — `server/match/match/amiya.js` on the server, the panel module on the client — so the
   author-owned `C2S` table stays free of per-MOD entries. `g.amiya { action: pick|claim, quest: blade|lamp }`.
 - **Both gates read that registry** (fix, 2026-10-11). The framework's first cut only taught `platform.js` — the
   *match-side* gate — about `MOD_C2S`, while `server/net.js` validates every frame **before the lobby** and still
-  checked the author table alone. Result: the panel's both routes came back as **无效的请求**
+  checked the author table alone. Result: the panel's messages came back as **无效的请求**
   (`BAD_MSG`, detail `unknown type g.amiya`) and the quest could never leave `choose` — the real playtest found what
   the suites could not, because they call `m.handle()` *below* the transport. `server/net.js` is a framework patch
   now, and `test/match/mod_amiya.test.js` boots a real server and sends the panel's own message so the layer stays
@@ -735,16 +777,16 @@ Amiya** — the shop only ever offers the 术士. Every Amiya starts as the cast
 - The panel (`public/js/ui/amiyaAscend.js`) is the rhodes toggle's `client` (self-mounting, CSS injected by the
   module). Art for the 近卫 form (avatars, portrait, front/back spine, skill icons) and the caster's two missing
   skill icons came from PRTS (`torappu.prts.wiki/assets/skill_icon|char_spine`, `media.prts.wiki`).
-- **The three forms divide the layer economy** (2026-10-11 user design — the last open question of the ascension). The
-  caster is the **feeder** every run starts with (`act1autochess_gar_event_selfkillenemy`, 每击倒1名单位 +1 / +2 paid to
-  **every** bond she has active, uncapped — it was 开启技能时 +2 / +4 ≤ 6 casts until the user playtested it, see the
-  特质 section); the 近卫 is the
-  **spender** the blade route buys (`act1autochess_gar_eff_attrByBond`, 每3层 → 攻/血/防 +2 % / +3 % and 攻速 +1 / +2 on
-  herself, 罗德岛 layers only); the 医疗 keeps her heal-driven feeder (`modautochess_gar_event_heal`, 12 / 24 layers a
-  round) **and** her 6-member support role. Because the ascension **replaces** the caster in place, the fork is a real
-  one: 「以伤害的方式拯救」 keeps a layer source on the board, 「继承之剑」 trades it for a carry — the layers the rest of
-  the team funds stop being pure barrier/aura fuel and start being her damage. Both records are zero-engine-change
-  (official events / readers), so the split cost no new code — see the 特质 section above.
+- **The three forms stack their layer roles** (2026-10-11 design, re-cut as a line 2026-10-12). Every form keeps the
+  ones before it, so the roles ADD instead of replacing each other: the 术士 is the **feeder** every run starts with
+  (`act1autochess_gar_event_selfkillenemy`, 每击倒1名单位 +1 / +2 paid to **every** bond she has active, uncapped — it
+  was 开启技能时 +2 / +4 ≤ 6 casts until the user playtested it, see the 特质 section); the 近卫 keeps that feeder and
+  adds the **spender** (`act1autochess_gar_eff_attrByBond`, 每3层 → 攻/血/防 +2 % / +3 % and 攻速 +1 / +2 on herself,
+  罗德岛 layers only), so the carry pays for her own stats with the kills she lands; the 医疗 keeps both and adds her
+  heal-driven feeder (`modautochess_gar_event_heal`, 12 / 24 layers a round) **plus** her 6-member support role — the
+  strongest of the three, and the end of the road. The 2026-10-11 fork (「继承之剑」 trades the layer source for a
+  carry) is gone with the fork itself: the line only ever gains. All three records are zero-engine-change (official
+  events / readers), so the stacking cost no new code — see the 特质 section above.
 - **Bonds of the three forms** (2026-10-11 rulings, revised twice the same day): 术士 = **罗德岛 + 奥术**; 近卫 = those
   same two **+ 不屈** (added the same evening — the front-line form gets the front-liner's insurance, 「地面干员被击倒时
   有概率立即重新部署」), so a 〈继承之剑〉 transform never MOVES the bond board, it only adds one; 医疗 = **罗德岛 + 奥术
@@ -789,15 +831,16 @@ Amiya** — the shop only ever offers the 术士. Every Amiya starts as the cast
       the gauge itself does not retroactively qualify [ASSUMED — the official text is simultaneous].
     - The **non-elite** record ships no module at all (every module in this game's data hangs off the 精锐 chess: 139
       normal records carry none, 127 elite records do), so `chess_rhodes_logos_a` is the module-less control.
-  - 阿米娅·医疗 (`chess_rhodes_amiya3`, `kits/ops/mod-rhodes-amiya3.js` — off tier 5 by the 2026-10-06 mod ruling, settled on tier 3 in
-    the same day's fourth pass): her 咒愈师 trait (attacks are
+  - 阿米娅·医疗 (`chess_rhodes_amiya3`, `kits/ops/mod-rhodes-amiya3.js` — a hidden 升变 target at **tier 6** since 2026-10-12,
+    tier 5 before that and the shop unit at tier 3 while the mod shipped her that way): her 咒愈师 trait (attacks are
     arts and heal one ally for a share of
     the damage) is the profession profile, so only the skills/talent are authored. S1 哀恸共情 adds attack speed and, on
     every attack, heals **every** ally whose body overlaps the skill's own 12-tile area (PRTS 备注 "周围十二格（碰撞判定）")
     — full-HP allies included, which is what turns a 罗德岛 member's overflow into a shield. S2 慈悲愿景 is usable **once
     per battle**: on cast it grants ATK% per enemy hit *before* the at-scale arts burst lands (the burst is therefore
     already amplified), debuffs every hit enemy (ASPD −60, move ×0.4) and, for the rest of its 32 s, makes her attacks
-    真实伤害 that hit 2 enemies. Talent 诚挚期许 is a deploy-wide +8 % max-HP aura, plus a 2.5 %/s max-HP regen aura
+    真实伤害 that hit 2 enemies. Talent 诚挚期许 is a deploy-wide max-HP aura (+8 %, the **精锐** reads +10 % through her
+    模组3: 带有灼痕的裙子's talent upgrade), plus a 2.5 %/s (精锐 3.5 %/s) max-HP regen aura
     while her skill runs. The engine has no once-per-battle flag, so the runtime is switched off when the skill ends.
   - 阿斯卡纶 (`chess_rhodes_ascln`, `kits/ops/mod-rhodes-ascln.js`): her 伏击客 trait (every enemy in range is hit; 50 % phys/arts dodge;
     taunt −1) is the profession profile, so only the talents/skills/module are authored. **Talent 1 死亡拘审** (the
@@ -871,7 +914,33 @@ Amiya** — the shop only ever offers the 术士. Every Amiya starts as the cast
      while she is only *carried*, and a kit installs into a battle), and the engine has no 部署费用下限. `[NO-ENGINE]`
   2. 凯尔希·思衡托 S3 破梏重生, second clause — "使攻击范围内最多2名友方干员可以部署至自身攻击范围的另一位置" is a
      **prep/placement** feature (no skill moves allies in the engine). `[NO-ENGINE]`
-     凯尔希·思衡托 S2 保护性拒止's 溅射半径 is `[ASSUMED] 1.0` tiles: the official blackboard carries no radius.
+- **凯尔希·思衡托 S2 保护性拒止 — the circle is 1.5, not 1.0 (user report 2026-10-11 「凯尔希二技能…效果和文案不符」).**
+  The kit was extracted carrying an early upstream assumption, `[ASSUMED] 1.0` (the skill's own blackboard has no
+  溅射半径 key), while the authoritative value is PRTS 凯尔希·思衡托 S2 备注 「伤害与治疗溅射半径均为1.5」 — the client's
+  `projectile_chr_kalts2_s2_dmg` / `_heal` sub-ranges, which is exactly what the author's own 自选 kit of the same
+  character reads (`kits/ops/op-kalts2.js` `S2_RADIUS`, and its S2 test asserts a patient **1.41** away is healed). At
+  1.0 the circle held the impact tile and its orthogonal neighbours only, so anything one tile away on the **diagonal**
+  (1.414 — the most common adjacency on this board) was outside 「目标周围所有…」: no true damage, no 停顿, no heal, while
+  the text promises all three. Fixed to 1.5 in both directions, together with four fidelity points the same pass closed
+  — all aligned with `op-kalts2.js`:
+  1. the impact's own hit: `hitsFn: () => 0` instead of `atkScale: 0`. The latter left a **0-点 `type: 'true'` damage
+     instance** on the struck unit — a real 「受到伤害」 event (every `damaged` listener, every per-hit counter and the
+     damage accounting sees a hit) for an impact that is supposed to land no hit at all (「攻击变为射出**医疗单元**」);
+  2. `isAttack: true` on the burst: PRTS S2 备注 says 「伤害为真实**普通**伤害」, so the instance is an attack hit as well
+     as a skill one;
+  3. `foesInRadius` instead of `enemiesInRadius`: the AOE selector keeps 不可选中 / 隐匿 enemies out (PRTS 作战机制 §AOE
+     判定; the author's kit uses it, and it is the same fix as player report #8's);
+  4. the heal runs through `allySelectable` (a friendly selector may not pick a 孤立 ally) and the burst emits the
+     `healAoe` fx beside the `aoe` one, so both circles are drawn.
+  Landing on an enemy damages first, then heals; landing on an ally (no enemy selectable) heals first and applies no
+  停顿 — the author's `s2Burst` order. The 文案's 「（优先选择敌人）」 **ally fallback is implemented too** (same night's
+  follow-up): the MOD's S2 keeps `heal:false` + `trigger: 'SEARCH'` (it still only ever STARTS on an enemy in range), but
+  once it is running the kit's `attack.canAttack` — the engine's own hook (`ai.js`, the same one 深靛 / 猎手 use) — spends
+  every further 弹药 on the lowest-HP-ratio **injured ally** in her range whenever no enemy is selectable, and the burst
+  follows her across. That is `op-kalts2.js`'s `s2CanAttack` verbatim (an attack in every respect: `Battle.forceAttack`,
+  one bullet, her own `canHitFly` carried on the enemy probe, `atkCd` re-armed). Without it the remaining shots of a
+  10-shot skill rot the moment the wave dies — which is what the clause exists for. Pinned by
+  `test/content/mod_rhodes_battle.test.js`.
 - **Six of the seven mod operators have hand-authored kits** — 逻各斯, 阿米娅·医疗, 阿斯卡纶, 可露希尔, Mon3tr,
   凯尔希·思衡托. 暴行 does not: she fights on the **generic kit** and exists for her 获得时 特质. That is the whole of
   the mod's coverage gap — `tools/kit-coverage.mjs` (which only reports mod operators under `includeMod: true`) gives

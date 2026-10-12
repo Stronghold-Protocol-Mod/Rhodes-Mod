@@ -1,0 +1,27 @@
+--- a/server/match/match/spDraft.js
++++ b/server/match/match/spDraft.js
+@@ -213,10 +213,12 @@
+    * list — only chess with a free pool copy (or outside the pool) qualify — else a copy-weighted draw from the shared
+    * pool filtered by `tier` / `minTier` / `maxTier` (number or 'shopLevel') / `bond`; `golden: true` yields the elite id.
+    * `extra` (the drawing player's 自选 stock, player/diy.js diyStockEntries) joins that shared-pool draw, `chessOf` reads the
+-   * bonds (the player's data view: a slotted slot's operator) — 0.2.0 WE2.
++   * bonds (the player's data view: a slotted slot's operator) — 0.2.0 WE2. `swap` (ps.poolSwap, the 罗德岛 MOD's 阿米娅
++   * 升变) re-faces the drawn id the same way the shop's own rolls are re-faced: a pool may only ever hand this player
++   * the form she actually IS.
+    * @returns {{ kind: 'item'|'chess', id: string, golden?: boolean } | null}
+    */
+-  rollPool(poolId, { shopLevel = 6, extra = null, chessOf = null } = {}) {
++  rollPool(poolId, { shopLevel = 6, extra = null, chessOf = null, swap = null } = {}) {
+     const pools = this.gd.choices.pools && typeof this.gd.choices.pools === 'object' ? this.gd.choices.pools : {};
+     const p = typeof poolId === 'string' && Object.hasOwn(pools, poolId) ? pools[poolId] : null;
+     if (!p || typeof p !== 'object') return null;
+@@ -253,6 +255,8 @@
+     }
+     if (!id) return null;
+     const golden = !!p.golden;
+-    return { kind: 'chess', id: golden ? this.gd.goldenIdOf(id) || id : id, golden };
++    const raw = golden ? this.gd.goldenIdOf(id) || id : id;
++    // the per-player shop swap (ps.poolSwap) re-faces the body on the card: the drawn copies stay the 术士's
++    return { kind: 'chess', id: (swap && swap.roll.get(raw)) || raw, golden };
+   }
+ }

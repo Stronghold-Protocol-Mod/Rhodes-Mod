@@ -3,11 +3,14 @@
 // The server owns the quest STATE: the first caster (`chess_rhodes_amiya`) a player gains in a match opens a persistent
 // EffectRef (`modrhodes:amiya-quest`) whose `data` ({ state, quest, dmg, heal }) rides m.private.effects[].data
 // (effectsView's passthrough). This module only RENDERS that state and sends the two intents the state machine knows:
-//   choose → (g.amiya pick, 二选一, locks the route) → active → (the server folds every battle result) → ready
-//          → (g.amiya claim, 手动升变 — transformChess in place) → done
-// User design 2026-10-09: the panel AUTO-OPENS when the quest appears (局内第一次购买阿米娅) and again when a quest
-// completes; between the two it waits behind its own corner button. The 〈继承之剑〉(→ 近卫) / 〈以伤害的方式拯救〉
-// (→ 医疗) cards show the conditions and the live progress; the numbers are the mod's own (shared/amiyaQuest.js).
+//   choose → (g.amiya pick — the FIRST step of the line, 术士 → 近卫) → active → (the server folds every battle
+//          result) → ready → (g.amiya claim, 手动升变 — transformChess in place) → active (the next step, counters
+//          reset) → … → done
+// **The route is a line since 2026-10-12** (user decision): 术士 → 近卫 → 医疗, so there is nothing to fork between —
+// the panel only ever shows the step the state machine is ON, and it re-opens by itself when the line moves on.
+// User design 2026-10-09: the panel AUTO-OPENS when the quest appears (局内第一次购买阿米娅), when a step completes,
+// and when the next step opens; between those it waits behind its own corner button. Each step's card shows its
+// conditions and the live progress; the numbers are the mod's own (shared/amiyaQuest.js).
 //
 // Mount contract (the FRAMEWORK's, not a mod's): `client: "js/ui/amiyaAscend.js"` in mod/toggles.d/rhodes.json —
 // ui/modBadge.js imports this module while the mod is ON and calls mount(); the returned cleanup unmounts it.
@@ -24,7 +27,7 @@ import { net } from '../net.js';
 import { selectRoute, store, useStore, shallowEqual } from '../store.js';
 import { t } from '../../../shared/i18n.js';
 import { MOD_C2S } from '../../../shared/protocol.js';
-import { AMIYA_QUEST_EFFECT_ID, AMIYA_QUESTS, AMIYA_C2S, amiyaQuestRemaining } from '../../../shared/amiyaQuest.js';
+import { AMIYA_QUEST_EFFECT_ID, AMIYA_QUESTS, AMIYA_C2S, AMIYA_ROUTE, amiyaQuestRemaining } from '../../../shared/amiyaQuest.js';
 
 // the client half of the MOD_C2S registration (net.js validates every outgoing message): this module is what sends
 // g.amiya, and modBadge imports it before the panel exists, so the schema is always in before the first send
@@ -95,7 +98,7 @@ function QuestCard({ quest, d, picked, onPick, busy }) {
     <div class="amyq-card__head">
       <span class="amyq-card__mark-badge" aria-hidden="true">${QUEST_MARK[quest.id] || MARK_LAMP}</span>
       <b class="amyq-card__name">〈${quest.name}〉</b>
-      <span class="amyq-card__form">${t('奖励：术士形态 → {form}', { form: quest.formName })}</span>
+      <span class="amyq-card__form">${t('奖励：{from} → {to}', { from: quest.fromName || '', to: quest.formName })}</span>
     </div>
     <p class="amyq-card__text">
       ${quest.id === 'blade'
@@ -121,14 +124,16 @@ function QuestPanel({ d, onClose }) {
   if (!d) return null;
 
   if (d.state === 'choose') {
+    // the line has ONE first step — 术士 can only become the 近卫 (2026-10-12), so the old 二选一 screen is a single card
+    const first = AMIYA_QUESTS[AMIYA_ROUTE[0]];
     return html`<div class="amyq-choose">
       ${CREST}
-      <p class="amyq-lead">${t('术士形态的阿米娅已加入你的编队。两条道路只能选择其一——选定后不可更改：')}</p>
+      <p class="amyq-lead">${t('术士形态的阿米娅已加入你的编队。升变是一条单行线——第一步，让她成为近卫形态：')}</p>
       <div class="amyq-cards">
-        ${Object.values(AMIYA_QUESTS).map((q) => html`<${QuestCard} key=${q.id} quest=${q} d=${d} busy=${busy}
-          onPick=${() => guard(async () => { if (await sendAmiya('pick', q.id)) onClose(); })} />`)}
+        <${QuestCard} key=${first.id} quest=${first} d=${d} busy=${busy}
+          onPick=${() => guard(async () => { if (await sendAmiya('pick', first.id)) onClose(); })} />
       </div>
-      <p class="amyq-note">${t('阿米娅本人的伤害与全队的治疗会一直累计，无论先选还是后选——选好的道路会立刻检查完成条件。')}</p>
+      <p class="amyq-note">${t('阿米娅本人的伤害与全队的治疗会一直累计——任务完成后即可在面板里升变。每完成一步，她在上一形态的基础上多继承一条特质：术士 → 近卫 → 医疗。')}</p>
     </div>`;
   }
 
@@ -148,14 +153,14 @@ function QuestPanel({ d, onClose }) {
   </div>`;
   if (d.state === 'done') {
     return html`<div class="amyq-done">
-      <p class="amyq-lead">${t('阿米娅已升变为{form}。本局的任务到此完成。', { form: q.formName })}</p>
+      <p class="amyq-lead">${t('阿米娅已升变为{form}——术士 → 近卫 → 医疗，本局的升变之路到此完成。', { form: q.formName })}</p>
       <div class="amyq-actions"><button type="button" class="amyq-btn" onClick=${onClose}>${t('关闭')}</button></div>
     </div>`;
   }
   return html`<div class="amyq-active">
     <p class="amyq-lead">
       ${ready
-        ? t('任务「{name}」已完成！点击升变，让场上的／手中的术士阿米娅成为{form}。', { name: q.name, form: q.formName })
+        ? t('任务「{name}」已完成！点击升变，让场上的／手中的阿米娅成为{form}。', { name: q.name, form: q.formName })
         : t('当前道路：〈{name}〉——完成后即可让阿米娅升变为{form}。', { name: q.name, form: q.formName })}
     </p>
     ${progress}
@@ -167,7 +172,7 @@ function QuestPanel({ d, onClose }) {
       </button>
       <button type="button" class="amyq-btn" onClick=${onClose}>${t('稍后')}</button>
     </div>
-    ${!ready ? html`<p class="amyq-note">${t('升变在休整期进行：场上、手牌或整备区中的术士阿米娅会原地成为{form}（装备、站位与精锐阶都保留）。', { form: q.formName })}</p>` : null}
+    ${!ready ? html`<p class="amyq-note">${t('升变在休整期进行：场上、手牌或整备区中的{from}阿米娅会原地成为{form}（装备、站位与精锐阶都保留）。', { from: q.fromName || '', form: q.formName })}</p>` : null}
   </div>`;
 }
 
@@ -177,13 +182,15 @@ function AmiyaAscendHost() {
   const d = useStore(selectAmiyaQuest, shallowEqual);
   const [open, setOpen] = useState(false);
   const seen = useRef(null);
-  // auto-open: the quest's first appearance (首次购买阿米娅) and every transition into `ready`
+  // auto-open: the quest's first appearance (首次购买阿米娅), every transition into `ready`, and every move of the
+  // LINE onto its next step (the quest id changes on claim — `blade` → `lamp`)
   useEffect(() => {
     const key = d ? `${d.state}:${d.quest ?? ''}` : null;
     if (key && seen.current !== key) {
       const prev = seen.current;
       seen.current = key;
-      if (prev === null || (d && d.state === 'ready')) setOpen(true);
+      const movedOn = prev !== null && prev.split(':')[1] !== (d.quest ?? '');
+      if (prev === null || (d && d.state === 'ready') || movedOn) setOpen(true);
     }
     if (!d) seen.current = null;
   }, [d]);
@@ -196,7 +203,7 @@ function AmiyaAscendHost() {
       ${d.quest ? html`<span class="amyq-tab__line" aria-hidden="true"><i style=${`width:${Math.round(questProgress(d, d.quest) * 100)}%`}></i></span>` : null}
     </button>` : null}
     <${Modal} open=${open} onClose=${() => setOpen(false)}
-      width=${d.state === 'choose' ? 'min(92vw, 7.4rem)' : 'min(92vw, 5.6rem)'}
+      width=${d.state === 'choose' ? 'min(92vw, 5.8rem)' : 'min(92vw, 5.6rem)'}
       tone="gold"
       title=${t('阿米娅的升变')} micro="AMIYA ASCENSION" closeOnBackdrop=${false}>
       <${QuestPanel} d=${d} onClose=${() => setOpen(false)} />

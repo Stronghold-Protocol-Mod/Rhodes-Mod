@@ -18,7 +18,7 @@
  //   act1autochess_gar_event_addition_cnt (魔王)  layerGain: a 'garrison' gain whose source stands on the tile in front
  //                       of 魔王 (range_id 1-1) — or was knocked out there this instant (幽灵鲨 "被击倒时"; engine ctx.tile)
  //                       — gets +extra_cnt per bond (the extra does not count toward the source's per-battle cap).
-@@ -368,9 +379,79 @@
+@@ -368,9 +379,89 @@
    // grants are resolved in install(); 风丸's rule lives in the prep economy
    ADD_BOND() {},
    NONE() {},
@@ -32,8 +32,10 @@
 +
 +/**
 + * 阿米娅·医疗's 特质 (`modautochess_gar_event_heal`): every heal the owner LANDS on another operator of her own player
-+ * that stands inside her ATTACK RANGE adds `bb.bond_add_count` layers to each of her ACTIVE bonds (bond_self) — +1
-+ * normal, +2 精锐. "每回合至多N次" is a cap on the number of TRIGGERS: `bb.max_trigger_per_battle` is counted right
++ * adds `bb.bond_add_count` layers to each of her ACTIVE bonds (bond_self) — +1 normal, +2 精锐. No range clause: the
++ * record reads 「为友方干员恢复生命或赋予屏障时」 and the heal pipeline has already picked a reachable target
++ * (see the NO-range-check note at the end of this comment). "每回合至多N次" is a cap on the number of TRIGGERS:
++ * `bb.max_trigger_per_battle` is counted right
 + * here, and `bb.max_add_count_per_battle` (12 / 24 = the ceiling × the per-trigger count) is handed to `gainLayers`
 + * as the official per-battle LAYER cap — the declaration the client-result plausibility bound also reads
 + * (server/match/fields.js layerAllowanceOf), so 12 triggers of +2 are an honest, accepted result.
@@ -53,9 +55,18 @@
 + *      is one of the owners — the kit stamps `source` on the aura). Without it the regen half of her own talent could
 + *      never fund her own 特质.
 + *
-+ * Both stay same-player and range-limited (the text's 攻击范围内的干员), and one heal instance fires at most ONE trigger
-+ * (a heal that both restores HP and overflows counts once). This is the ONLY thing that turns healing into 罗德岛 layers
-+ * in battle: the bond's own `layer_heal_step` accumulator was deleted on 2026-10-06 (user ruling — see bonds/rhodes.js).
++ * Both stay same-player, and one heal instance fires at most ONE trigger (a heal that both restores HP and overflows
++ * counts once). This is the ONLY thing that turns healing into 罗德岛 layers in battle: the bond's own
++ * `layer_heal_step` accumulator was deleted on 2026-10-06 (user ruling — see bonds/rhodes.js).
++ *
++ * NO range check (user report 2026-10-11: 「医疗形态的阿米娅有时候提供了屏障但却不会提供层数」). The trigger used to
++ * demand `S.inRange(src, t)` — her ATTACK range (3-3, the four columns in front of her). Her heals do not all happen
++ * there: 哀恸共情 (skchr_amiya3_1) heals EVERY ally in its own x-1 grid — "自身周围一定范围" per the official text, a
++ * diamond that reaches two tiles above / below / behind a caster whose attack range is 3-3 in front. A heal landing on
++ * one of those five off-range tiles restored HP, overflowed into the target's 屏障 (the 罗德岛 bond's `opts.overheal`),
++ * and paid NO layer — exactly the reported symptom. The range filter was redundant anyway: a heal only ever lands on
++ * somebody the healer can reach (the heal pipeline already picked the target), so "she healed them" is the whole
++ * condition the 特质 describes.
 + */
 +function installHealGain(battle, list) {
 +  const owners = new Set(list.map((it) => it.unit));
@@ -71,7 +82,6 @@
 +    }
 +    if (!src || !owners.has(src) || !S.onField(src)) return;
 +    if (t === src || t.ownerId !== src.ownerId) return;
-+    if (!S.inRange(src, t)) return;
 +    const missing = t.s ? t.s.maxHp - t.hp : 0;
 +    const banks = !!(c.opts && c.opts.overheal) && c.amount > missing; // the overflow becomes the target's 屏障
 +    if (!(missing > 0) && !banks) return;

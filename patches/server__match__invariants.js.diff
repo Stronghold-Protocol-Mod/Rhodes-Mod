@@ -1,0 +1,38 @@
+--- a/server/match/invariants.js
++++ b/server/match/invariants.js
+@@ -4,6 +4,8 @@
+ //
+ // collectViolations(m) → string[] (empty when every invariant holds):
+ //   pool     0 ≤ left ≤ cap and left + Σ copies held by pieces == cap per base chess; non-pool chess hold 0 copies;
++//            a per-player shop swap (ps.poolSwap, the 罗德岛 MOD's 阿米娅升变) routes a form's copies to the base they
++//            ride, exactly like PlayerState.poolOf (poolBaseOf below) — the ascended 阿米娅 is not a "non-pool chess";
+ //            a player's 自选 stock (0.2.0, player/diy.js) the same against its own pieces of each slotted slot — a DIY
+ //            piece is always a slotted slot of its owner's, and a DIY shop / reward card one of its stocked slots
+ //   economy  funds / pendingFunds non-negative integers, LP finite, shop level in range, prices ≥ 0
+@@ -33,6 +35,16 @@
+  * @param {{ limit?: number }} [opts]
+  * @returns {string[]}
+  */
++/** The shared-pool entry a piece's copies belong to: `base` itself, or — with a per-player shop swap installed
++ *  (ps.poolSwap, the 罗德岛 MOD's 阿米娅升变: 术士 → 近卫 → 医疗) — the earlier form's entry its copies ride. This
++ *  mirrors PlayerState.poolOf, the route the engine actually takes, so an ascended form is not mistaken for a
++ *  non-pool chess holding copies it could never have. Null swap (no mod) ⇒ the base itself. */
++const poolBaseOf = (ps, base) => {
++  const map = ps && ps.poolSwap && ps.poolSwap.pool;
++  const alt = map && typeof map.get === 'function' ? map.get(base) : null;
++  return alt || base;
++};
++
+ export function collectViolations(m, { limit = 25 } = {}) {
+   const out = [];
+   const fail = (msg) => { if (out.length < limit) out.push(msg); };
+@@ -107,7 +119,8 @@
+         }
+         const maxCopies = rec.isGolden ? gd.goldenCopies : 1;
+         if (!Number.isInteger(p.poolCopies) || p.poolCopies < 0 || p.poolCopies > maxCopies) fail(`${id}: ${p.id} holds ${p.poolCopies} copies`);
+-        const base = gd.baseIdOf(p.id);
++        // the copies of a shop-swap offer (the ascended 阿米娅 form) ride the 术士's entry — poolBaseOf, like poolOf
++        const base = poolBaseOf(ps, gd.baseIdOf(p.id));
+         const tally = rec.isDiy ? diyHeld : held;
+         tally.set(base, (tally.get(base) || 0) + (p.poolCopies || 0));
+       } else if (p.kind === 'item') {

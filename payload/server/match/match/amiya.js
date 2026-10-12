@@ -3,22 +3,26 @@
 //
 // The quest STATE lives in a persistent EffectRef (`modrhodes:amiya-quest`) on the player's ps.effects — created by
 // the content-side global handler on the first caster gained (bonds/rhodes.js), its progress folded by the effect's
-// onBattleResult. This module only moves the state machine along the player's explicit choices:
-//   choose → (pick) → active → (onBattleResult) → ready → (claim) → done
-// pick names ONE quest (二选一, locking the route); claim transforms the caster in place (PlayerState.transformChess:
-// equipment, summons, pool copies and the tile survive — 突变细胞's machinery), the elite correspondence riding
-// (`_b` caster → `_b` form). The ascension also re-faces the claimant's SHOP (2026-10-11 user decision): ps.poolSwap
-// makes this player's rolls offer the ascended form wherever they would have offered the 术士 — shelf cards re-face at
-// once, and the form's copy accounting (buy / merge / sell / elimination) rides the caster's shared-pool entries
-// (diy.js poolOf) — so the form stays quest-only for everyone else and no hidden record ever enters the shared pool. A caster lost after the quest started (sold / destroyed / 突变细胞-ed away) does not
-// strand the reward: claim falls back to gaining the form like any effect grant. Prep phases only (the same gate as
-// g.unitStats): a transform is board state, never a battle-time action.
+// onBattleResult. This module only moves the state machine along, one step at a time:
+//   choose → (pick, the FIRST step only) → active → (onBattleResult) → ready → (claim) → active (next step) → … → done
+// **The route is a line, not a fork (2026-10-12 user decision)**: 术士 → 近卫 → 医疗. `claim` transforms the piece the
+// CURRENT step starts from (`quest.from` — the caster for 〈继承之剑〉, the guard for 〈以伤害的方式拯救〉) in place
+// (PlayerState.transformChess: equipment, summons, pool copies and the tile survive — 突变细胞's machinery), the elite
+// correspondence riding (`_b` caster → `_b` form), then advances the state (shared/amiyaQuest.js `amiyaAdvance`:
+// next step `active` with the counters reset, else `done`). The ascension also re-faces the claimant's SHOP
+// (2026-10-11 user decision, cumulative since 2026-10-12): ps.poolSwap makes this player's rolls offer the new form
+// wherever they could have offered 术士 **or any earlier form** — shelf cards re-face at once, and every ascended
+// form's copy accounting (buy / merge / sell / elimination) rides the 术士's shared-pool entries (diy.js poolOf) — so
+// the forms stay quest-only for everyone else and no hidden record ever enters the shared pool. A piece lost after
+// the quest started (sold / 突变细胞-ed away) does not strand the reward: claim falls back to gaining the form like
+// any effect grant. Prep phases only (the same gate as g.unitStats): a transform is board state, never a battle-time
+// action.
 //
 // Inert while the mod is off: without a caster record no EffectRef is ever created, so every intent fails BAD_TARGET.
 
 import { PHASE, ERR } from '../../../shared/constants.js';
 import { MOD_C2S } from '../../../shared/protocol.js';
-import { AMIYA_QUESTS, AMIYA_QUEST_EFFECT_ID, AMIYA_C2S, amiyaQuestDone, amiyaQuestTarget, amiyaFormOf, amiyaShopSwap } from '../../../shared/amiyaQuest.js';
+import { AMIYA_QUESTS, AMIYA_QUEST_EFFECT_ID, AMIYA_C2S, AMIYA_ROUTE, amiyaQuestDone, amiyaQuestTarget, amiyaFormOf, amiyaShopSwap, amiyaAdvance } from '../../../shared/amiyaQuest.js';
 import { boardOrder } from '../board.js';
 import { OK, fail } from './common.js';
 
@@ -26,13 +30,14 @@ import { OK, fail } from './common.js';
 // server has it from boot — whether the mod is ON or OFF; OFF the intent then answers BAD_TARGET as before)
 MOD_C2S['g.amiya'] = AMIYA_C2S;
 
-/** 术士阿米娅 to transform: board reading order, then the hand, then the temp 整备区 (null when none is owned). */
-function casterPiece(m, ps) {
+/** The 阿米娅 of form `form` to transform: board reading order, then the hand, then the temp 整备区 (null when none
+ * is owned). `form` is the CURRENT step's origin — 'caster' for 〈继承之剑〉, 'guard' for 〈以伤害的方式拯救〉. */
+function pieceOfForm(ps, form) {
   for (const { piece } of boardOrder(ps.board)) {
-    if (piece.kind === 'chess' && amiyaFormOf(piece.id) === 'caster') return piece;
+    if (piece.kind === 'chess' && amiyaFormOf(piece.id) === form) return piece;
   }
-  for (const p of ps.hand) if (p && p.kind === 'chess' && amiyaFormOf(p.id) === 'caster') return p;
-  for (const p of ps.temp) if (p && p.kind === 'chess' && amiyaFormOf(p.id) === 'caster') return p;
+  for (const p of ps.hand) if (p && p.kind === 'chess' && amiyaFormOf(p.id) === form) return p;
+  for (const p of ps.temp) if (p && p.kind === 'chess' && amiyaFormOf(p.id) === form) return p;
   return null;
 }
 
@@ -49,36 +54,43 @@ export class MatchAmiya {
     const ref = ps.effects.find((e) => e && e.id === AMIYA_QUEST_EFFECT_ID);
     const d = ref && ref.data;
     if (!d) return fail(ERR.BAD_TARGET, 'no ascension quest');
-    const quest = AMIYA_QUESTS[msg.quest];
-    if (!quest) return fail(ERR.BAD_MSG, 'unknown quest');
+    if (!AMIYA_QUESTS[msg.quest]) return fail(ERR.BAD_MSG, 'unknown quest');
 
     if (msg.action === 'pick') {
       if (d.state !== 'choose') return fail(ERR.ALREADY, `quest state ${d.state}`);
+      // the line starts at ONE place: only the first step is ever open, so only it may be picked (later steps arm
+      // themselves on claim — amiyaAdvance)
+      if (msg.quest !== AMIYA_ROUTE[0]) return fail(ERR.BAD_MSG, `the first step is ${AMIYA_ROUTE[0]}`);
+      const quest = AMIYA_QUESTS[msg.quest];
       d.state = 'active';
       d.quest = msg.quest;
-      // the progress kept accumulating before the pick — a route whose conditions are already met is ready at once
+      // the progress kept accumulating before the pick — a step whose conditions are already met is ready at once
       if (amiyaQuestDone(d, msg.quest)) d.state = 'ready';
       this.toast(ps, 'info', d.state === 'ready'
         ? `已选择升变道路「${quest.name}」——任务已完成，随时可以让阿米娅升变为${quest.formName}`
-        : `已选择升变道路「${quest.name}」——完成它即可让阿米娅升变为${quest.formName}`);
+        : `已踏上升变之路「${quest.name}」——第一步：让阿米娅成为${quest.formName}`);
       ps.dirty();
       return OK;
     }
 
     if (msg.action === 'claim') {
+      // the CURRENT step is the authority; the message's quest is only echoed back by the panel, never trusted
+      const quest = AMIYA_QUESTS[d.quest];
+      if (!quest || msg.quest !== d.quest) return fail(ERR.BAD_MSG, 'unknown quest');
       if (d.state !== 'ready' || !amiyaQuestDone(d, d.quest)) return fail(ERR.BAD_TARGET, 'quest not ready');
-      const piece = casterPiece(this, ps);
+      const piece = pieceOfForm(ps, quest.from);
       const target = amiyaQuestTarget(quest, !!(piece && this.gd.isGolden(piece.id)));
       const gained = piece
         ? ps.transformChess(piece, target)
         : ps.acquireChess(target, { source: 'amiya-quest' });
       if (!gained) return fail(ERR.HAND_FULL, 'no room for the gained operator');
-      d.state = 'done';
-      // the shop follows the ascension (2026-10-11 user decision): this player's shop rolls now offer the ascended
-      // form wherever they would have offered the 术士 (ps.poolSwap — economy.js rolls, diy.js poolOf copy
-      // accounting), and shelf cards already showing the caster re-face into the form at once (frozen included;
-      // sold slots are dead). Other players' shops keep the 术士 — the form stays quest-only for everyone else.
-      const swap = amiyaShopSwap(d.quest);
+      // the line moves on: the next step arms itself (counters reset) or the quest ends (amiyaAdvance)
+      amiyaAdvance(d);
+      // the shop follows the ascension (2026-10-11 user decision, cumulative along the line): this player's shop
+      // rolls now offer the NEW form wherever they could have offered 术士 or any earlier form (ps.poolSwap —
+      // economy.js rolls, diy.js poolOf copy accounting), and shelf cards already showing one of those re-face into
+      // it at once (frozen included; sold slots are dead). Other players' shops keep the 术士.
+      const swap = amiyaShopSwap(quest.id);
       if (swap) {
         ps.poolSwap = swap;
         for (const s of ps.shop.slots) {
@@ -86,7 +98,10 @@ export class MatchAmiya {
           if (to) { s.id = to; s.basePrice = this.gd.chessPrice(to); }
         }
       }
-      this.toast(ps, 'info', `阿米娅升变为${quest.formName}！商店此后只刷新${quest.formName}的阿米娅`);
+      const next = d.state === 'active' ? AMIYA_QUESTS[d.quest] : null;
+      this.toast(ps, 'info', next
+        ? `阿米娅升变为${quest.formName}！升变之路还有下一段：〈${next.name}〉——商店此后只刷新${quest.formName}的阿米娅`
+        : `阿米娅升变为${quest.formName}！本局的升变之路到此完成——商店此后只刷新${quest.formName}的阿米娅`);
       ps.dirty();
       return OK;
     }

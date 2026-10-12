@@ -1,0 +1,28 @@
+--- a/server/match/effectsMeta.js
++++ b/server/match/effectsMeta.js
+@@ -582,7 +582,14 @@
+         return typeof opts.filter === 'function' ? !!opts.filter(id) : true;
+       };
+       const extra = typeof ps.diyStockEntries === 'function' ? ps.diyStockEntries() : null;
+-      return m.pool.roll(m.rngMeta, { maxTier: Number.isInteger(opts.maxTier) ? opts.maxTier : 6, tier: Number.isInteger(opts.tier) ? opts.tier : null, filter: f, extra });
++      const drew = m.pool.roll(m.rngMeta, { maxTier: Number.isInteger(opts.maxTier) ? opts.maxTier : 6, tier: Number.isInteger(opts.tier) ? opts.tier : null, filter: f, extra });
++      // a per-player shop swap (ps.poolSwap, match/amiya.js) rides EVERY pool draw, not only the shop's: a 特质 / band /
++      // item / choice that hands this player a random operator must hand the form she actually IS (the 罗德岛 MOD's
++      // 阿米娅升变 — 术士 → 近卫 → 医疗), never the shop form she left behind. economy.js _rollChessSlot and
++      // acquire.js pushRewardOffer are the shop-side twins of this line. The drawn copies ARE the 术士's — the swap
++      // changes the body on the card only, and the grant's copy accounting rides it through diy.js poolOf. Null (and
++      // therefore inert) without the mod.
++      return (drew && ps.poolSwap && ps.poolSwap.roll.get(drew)) || drew;
+     },
+     rollItem: (opts = {}) => m.rollItemId(opts),
+     /**
+@@ -593,6 +600,9 @@
+       shopLevel: ps.shop.level,
+       // a shared-pool draw also takes the player's 自选 stock, its bonds read through the player's view (rollChess)
+       extra: typeof ps.diyStockEntries === 'function' ? ps.diyStockEntries() : null, chessOf: (id) => gd.chess(id),
++      // …and the same per-player shop swap rollChess applies (ps.poolSwap, match/amiya.js): a choices.json pool must
++      // hand the 阿米娅 form this player actually has, not the 术士
++      swap: ps.poolSwap,
+       ...opts,
+     }),
+     /**

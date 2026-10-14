@@ -1,8 +1,8 @@
 --- a/server/sim/content/items/battle.js
 +++ b/server/sim/content/items/battle.js
-@@ -835,6 +835,60 @@
+@@ -845,6 +845,60 @@
      });
-     S.on('death', (c) => { if (c.unit === u) { st.bonus = 0; st.armed = false; } });
+     S.on('death', (c) => { if (c.unit === u) st.bonus = 0; });
    },
 +  // ════════════════════════════════════════════════════════════════════════════════════════════════════════════
 +  // MOD (罗德岛) — the two 罗德岛 items. Inert when the mod's data is stripped: `applyMod` is what puts

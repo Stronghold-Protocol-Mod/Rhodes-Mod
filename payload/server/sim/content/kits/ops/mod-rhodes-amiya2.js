@@ -67,19 +67,31 @@ function amiyaGuard(bb, chess) {
               mods: modsOut({ atkPct: perKillAtk * stacks, resFlat: perKillRes * stacks }),
             });
           };
-          for (let i = 0; i < times; i++) {
+          // PRTS notes that she is invulnerable and unblockable during the multi-slash animation. The engine's
+          // timed burst keeps those flags live only while the 10 slashes are being delivered; the enlarged skill
+          // range and true-damage follow-up remain active for the full skill duration.
+          const slashDuration = Math.min(2, Math.max(0.2, skill.timeLeft));
+          battle.addBuff(unit, { key: 'amiya2:shadowlessSlash', duration: slashDuration, refresh: 'replace',
+            flags: { invulnerable: true, unblockable: true, noBlock: true }, visible: true, source: unit });
+          let i = 0;
+          const strike = () => {
+            if (!unit.alive || !unit.deployed || i >= times) { timer?.cancel?.(); return; }
             const cands = enemiesInGrid(battle, unit, grid2 || null, { priority: 'lowestHp' });
             const t = cands[0];
-            if (!t || !t.alive) break;
-            const last = i === times - 1;
-            const wasAlive = t.alive;
-            battle.dealDamage(unit, t, {
-              amount: unit.s.atk * (last ? lastScale : scale),
-              type: last ? 'true' : 'arts', isSkill: true, tags: ['skill', 'amiya2:slash'],
-            });
-            if (wasAlive && !t.alive) grantStack();
-            battle.fx('aoe', { x: t.x, y: t.y, id: unit.id, r: 0.6, skill: 'amiya2Slash' });
-          }
+            if (t && t.alive) {
+              const last = i === times - 1;
+              const wasAlive = t.alive;
+              battle.dealDamage(unit, t, {
+                amount: unit.s.atk * (last ? lastScale : scale),
+                type: last ? 'true' : 'arts', isSkill: true, tags: ['skill', 'amiya2:slash'],
+              });
+              if (wasAlive && !t.alive) grantStack();
+              battle.fx('aoe', { x: t.x, y: t.y, id: unit.id, r: 0.6, skill: 'amiya2Slash' });
+            }
+            i++;
+            if (i >= times) timer?.cancel?.();
+          };
+          const timer = battle.every(slashDuration / times, strike, { owner: unit });
         },
         // "整场战斗中该技能只能释放一次" — the engine has no once-per-battle flag (the amiya3 pattern).
         onEnd({ unit }) { unit.skill.noSkill = true; },

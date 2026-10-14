@@ -1,6 +1,6 @@
 --- a/public/css/screens/title.css
 +++ b/public/css/screens/title.css
-@@ -278,3 +278,59 @@
+@@ -283,3 +283,59 @@
    font-weight: 700;
    letter-spacing: .02em;
  }

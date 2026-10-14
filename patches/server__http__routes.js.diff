@@ -1,20 +1,23 @@
 --- a/server/http/routes.js
 +++ b/server/http/routes.js
-@@ -11,6 +11,7 @@
+@@ -15,6 +15,8 @@
  import { PROTOCOL_VERSION, APP_VERSION } from '../../shared/constants.js';
  import { buildTag } from './buildTag.js';
  import { setSecurityHeaders, sendError, sendJson, splitUrl } from './common.js';
 +import { handleModRoute } from '../mod/api.js';
++import { handleSandboxRoute } from './sandbox.js';
+ import { clientAddress, isLocalIp } from '../net.js';
  
  const MAX_URL_LENGTH = 4096;
- 
-@@ -42,6 +43,9 @@
+@@ -58,6 +60,11 @@
      if (url.length > MAX_URL_LENGTH) { sendError(req, res, 414, '请求地址过长 · URI too long'); return; }
      const parts = splitUrl(url);
      if (!parts) { sendError(req, res, 400, '请求地址无效 · Bad request'); return; }
 +    // 内容开关 (server/mod/api.js, docs/MOD-RHODES.md §开关): answered BEFORE the GET/HEAD-only rule below, because
 +    // switching is a POST. Only /mod/state and /mod/toggle are ours; anything else falls through untouched.
 +    if (handleModRoute(req, res, parts.rawPath, parts.query, { lobby: health.lobby, log })) return;
++    // 沙盒 (server/http/sandbox.js, docs/SANDBOX.md): also POST, also before the rule below. Only /sandbox is ours.
++    if (await handleSandboxRoute(req, res, parts.rawPath, parts.query, { lobby: health.lobby, log })) return;
      if (req.method !== 'GET' && req.method !== 'HEAD') {
        res.setHeader('Allow', 'GET, HEAD');
        sendError(req, res, 405, '不支持的请求方法 · Method not allowed');

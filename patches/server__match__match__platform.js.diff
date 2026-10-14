@@ -9,7 +9,19 @@
  import { PHASE, ERR } from '../../../shared/constants.js';
  import { syntheticResult } from '../fields.js';
  import { FLOW_TICKER_PRIORITY, OK, fail } from './common.js';
-@@ -43,7 +43,9 @@
+@@ -15,6 +15,11 @@
+ export class MatchPlatform {
+   start() {
+     if (this.disposed || this.ended || this.phase !== PHASE.LOBBY) return;
++    // 沙盒 · 盟约层数加成 (docs/SANDBOX.md): the sandbox the room started with applies before the first round, so the
++    // opening boards already carry the gear. Live changes go through MatchIntents.applySandboxBondLayers instead.
++    if (this.sandbox && Number.isInteger(this.sandbox.bondLayers) && this.sandbox.bondLayers > 0) {
++      this.applySandboxBondLayers(this.sandbox.bondLayers);
++    }
+     this.guard(() => {
+       if (!this.gd.visibleChess.length || this.pool.entries.size === 0) {
+         this.log.error?.(`[match ${this.roomCode}] game data unusable (no chess pool) — ending the match`);
+@@ -43,7 +48,9 @@
        // (DESIGN §14 — an error frame without a rid would surface as a toast in the browser)
        return this.clientCombat && msg && (msg.t === 'b.progress' || msg.t === 'b.result') ? OK : fail(ERR.WRONG_PHASE);
      }

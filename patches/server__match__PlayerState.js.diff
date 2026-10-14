@@ -1,6 +1,6 @@
 --- a/server/match/PlayerState.js
 +++ b/server/match/PlayerState.js
-@@ -182,6 +182,10 @@
+@@ -183,6 +183,10 @@
      this.diyBanned = Object.freeze([]);
      if (!this.isBot && seat.diy) this.setDiy(seat.diy);
      this.shop = { level: 1, upgradePrice: this.gd.upgradeBase(1) ?? 0, slots: [], frozen: false, freeRefreshes: 0 };
@@ -11,3 +11,18 @@
      /** reward offers queue (merge rewards, special refreshes): { tier, source, label, slots: [{ kind, id, price, sold }] } */
      this.offers = [];
      /** @type {Array<any>} */
+@@ -206,6 +210,14 @@
+     this.pendingLayerGains = null;
+     /** optional per-bond count bonus written by effects */
+     this.bondCountBonus = {};
++    /**
++     * 沙盒 · 盟约层数加成 (docs/SANDBOX.md §盟约层数加成): the flat bonus this seat last applied to EVERY bond's layers
++     * (`sandboxGear`, 0 = off) and how much of it each bond actually received (`sandboxBondLayers`, a Map). The pair is
++     * read by `applySandboxBondLayers` (player/economy.js), so lowering the gear takes back exactly the layers the
++     * sandbox itself wrote — never the layers a real card / 特质 / band granted (which may have saturated the cap).
++     */
++    this.sandboxGear = 0;
++    this.sandboxBondLayers = null;
+     /** EffectRef list: { id, key, name, desc, iconKind, iconId, counter?, battle, params, data } */
+     this.effects = [];
+     /** active bounties: { id, card, roundsLeft, chooser } */

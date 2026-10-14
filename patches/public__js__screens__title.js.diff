@@ -1,18 +1,20 @@
 --- a/public/js/screens/title.js
 +++ b/public/js/screens/title.js
-@@ -26,6 +26,7 @@
+@@ -26,6 +26,8 @@
  import { scriptOf } from '../../../shared/i18nPacks.js';
  import { GIcon } from '../ui/gameComponents.js';
  import { SettingsModal } from '../ui/settings.js';
 +import { ModBadge } from '../ui/modBadge.js';
++import { SandboxPanel } from '../ui/sandboxPanel.js';
  
  // Same character classes as server/net.js sanitizeName (control, zero-width, bidi, BOM), so a name
  // the client accepts is never rejected by the server's hello validation.
-@@ -287,6 +288,8 @@
+@@ -287,6 +289,9 @@
  
      <${SettingsModal} open=${settingsOpen} onClose=${() => setSettingsOpen(false)} />
  
 +    <${ModBadge} />
++    <${SandboxPanel} />
 +
      <footer class="title-foot">
        <${ResumeMatchButton} />

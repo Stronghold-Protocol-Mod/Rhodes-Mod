@@ -1,6 +1,6 @@
 --- a/server/http/websocket.js
 +++ b/server/http/websocket.js
-@@ -18,14 +18,16 @@
+@@ -50,14 +50,16 @@
  /**
   * The session stack of one server.
   * @param {{ MatchClass?: Function, seedFn?: () => number, [option: string]: any }} opts startServer() options

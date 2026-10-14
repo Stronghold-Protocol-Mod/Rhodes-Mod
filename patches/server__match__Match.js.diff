@@ -8,7 +8,22 @@
  import { MatchPause } from './match/pause.js';
  import { MatchPhases } from './match/phases.js';
  import { MatchSetupVote } from './match/setupVote.js';
-@@ -400,7 +401,7 @@
+@@ -242,7 +243,13 @@
+     this.broadcastFn = opts.broadcast;
+     this.onEndFn = opts.onEnd;
+     this.data = opts.data && typeof opts.data === 'object' ? opts.data : {};
+-    this.gd = new GameData(this.data, this.modeId);
++    /**
++     * 沙盒 (docs/SANDBOX.md): a `checkSandbox` result (shared/sandbox.js) the host set on the room — the economy, the
++     * prep clock, the round count and the wave. The lobby validates it; the engine only reads it (GameData, the wave
++     * builders and PlayerEconomy), so a match without one is exactly an ordinary run.
++     */
++    this.sandbox = opts.sandbox && typeof opts.sandbox === 'object' && !opts.sandbox.inert ? opts.sandbox : null;
++    this.gd = new GameData(this.data, this.modeId, this.sandbox);
+     if (!this.difficulty) this.difficulty = this.gd.difficulty;
+     this.isSolo = this.mode === 'solo' || this.gd.isSolo;
+     /** 「AI 队友最后选择」 (opts.aiPicksLast, GitHub #338): humans draft before AI seats (MatchPhases.humansFirst) */
+@@ -402,7 +409,7 @@
  }
  
  // the method modules, in this order (a name defined twice is an error, never a silent override)

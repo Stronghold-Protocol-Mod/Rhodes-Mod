@@ -9,9 +9,9 @@
 +  // the same body as GET /mod/state, which is what the badge reads before it ever has a session
 +  'mod.state',
    'm.public', 'm.private', 'm.field', 'm.toast', 'm.ticker', 'm.emote', 'm.result',
-   // m.unitStats { seq, round, units: [unitStatsEntry] } — the answer to g.unitStats (the requester only)
-   'm.unitStats',
-@@ -485,10 +489,12 @@
+   // m.layer { playerId, bondId, add } — own live prep layer gain; ephemeral, never replayed on resync.
+   'm.layer',
+@@ -487,10 +491,12 @@
  /**
   * Validate a decoded client message. Returns `null` when valid, otherwise a short reason string.
   * Extra unknown fields are ignored (not copied by handlers).
@@ -25,7 +25,7 @@
    if (!spec) return `unknown type ${String(msg.t).slice(0, 32)}`;
    if (msg.rid != null && !isInt(msg.rid, 0, 2 ** 31)) return 'bad rid';
    const optional = spec.$optional || [];
-@@ -501,6 +507,13 @@
+@@ -503,6 +509,13 @@
    return null;
  }
  

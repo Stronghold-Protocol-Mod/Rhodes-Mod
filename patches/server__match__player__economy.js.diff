@@ -1,6 +1,68 @@
 --- a/server/match/player/economy.js
 +++ b/server/match/player/economy.js
-@@ -62,7 +62,10 @@
+@@ -4,7 +4,7 @@
+ // Installed on PlayerState.prototype by server/match/PlayerState.js (a method container: never instantiated; `this` is
+ // the player state).
+ 
+-import { ERR, PHASE, layerGainRoom } from '../../../shared/constants.js';
++import { ERR, PHASE, layerGainRoom, BOND_LAYER_CAP } from '../../../shared/constants.js';
+ import { freeSlot } from '../board.js';
+ import { OK, fail } from './common.js';
+ 
+@@ -21,6 +21,9 @@
+ 
+   spend(n) {
+     const v = Number.isFinite(n) ? Math.max(0, Math.trunc(n)) : 0;
++    // 沙盒 无限金币 (docs/SANDBOX.md §金币): the purse never runs out — the sum is still counted as 金币 spent, so
++    // onSpend effects (and the stats) behave exactly as they do in a real match.
++    if (this.gd.sandbox && this.gd.sandbox.funds === -1) { this.stats.gold += v; this.round.spent += v; this.dirty(); return true; }
+     if (v > this.funds) return false;
+     this.funds -= v;
+     this.stats.gold += v;
+@@ -55,6 +58,42 @@
+     return add;
+   }
+ 
++  /**
++   * 沙盒 · 盟约层数加成 (docs/SANDBOX.md §盟约层数加成): set a flat bonus added to EVERY bond's layers. `gear` is the
++   * absolute bonus (0 clears it, up to BOND_LAYER_CAP). For each bond the sandbox keeps its OWN share
++   * (`sandboxBondLayers`, a `{bondId → layers} Map`), so the layers a real card / 特质 / band granted are simply
++   * `layers[id] − own` and survive every gear change — even the ones a raise had to clamp at the cap. Idempotent:
++   * re-applying the same gear changes nothing.
++   * @param {number} gear the bonus every bond's layers get (0 = off)
++   * @returns {number} how many bonds moved
++   */
++  applySandboxBondLayers(gear) {
++    const to = Number.isInteger(gear) && gear > 0 ? Math.min(BOND_LAYER_CAP, gear) : 0;
++    const prev = Number.isInteger(this.sandboxGear) ? this.sandboxGear : 0;
++    if (to === prev && this.sandboxBondLayers) return 0;
++    this.sandboxGear = to;
++    if (!this.sandboxBondLayers) this.sandboxBondLayers = new Map();
++    let moved = 0;
++    for (const id of this.gd.bondIds) {
++      const own = this.sandboxBondLayers.get(id) || 0;   // the layers the sandbox currently owns on this bond
++      const before = this.layers[id] || 0;
++      const real = Math.max(0, before - own);            // everything else: cards / 特质 / bands
++      // The bond must end at `real + to`, save the cap; the sandbox then owns `min(to, cap − real)` of it.
++      const next = Math.min(BOND_LAYER_CAP, real + to);
++      const ownAfter = Math.min(to, Math.max(0, next - real));
++      if (next !== before || ownAfter !== own) {
++        const added = next - before;
++        this.layers[id] = next;
++        if (ownAfter > 0) this.sandboxBondLayers.set(id, ownAfter);
++        else this.sandboxBondLayers.delete(id);
++        if (added > 0) this.m.dispatch(this, 'onLayers', { bondId: id, from: before, to: next, reason: 'sandbox:bondLayers' });
++        moved += 1;
++      }
++    }
++    if (moved) this.recompute();
++    return moved;
++  }
++
+   /** Effective price of a shop slot after onPrice modifiers (never negative). */
+   priceOf(slot) {
+     if (!slot) return 0;
+@@ -66,7 +105,10 @@
  
    _rollChessSlot() {
      // the slotted 自选 pieces join the draw once the 调度中心 reaches their slot's level (player/diy.js diyRollEntries)

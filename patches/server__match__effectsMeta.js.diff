@@ -1,11 +1,11 @@
 --- a/server/match/effectsMeta.js
 +++ b/server/match/effectsMeta.js
-@@ -582,7 +582,14 @@
+@@ -585,7 +585,14 @@
          return typeof opts.filter === 'function' ? !!opts.filter(id) : true;
        };
        const extra = typeof ps.diyStockEntries === 'function' ? ps.diyStockEntries() : null;
--      return m.pool.roll(m.rngMeta, { maxTier: Number.isInteger(opts.maxTier) ? opts.maxTier : 6, tier: Number.isInteger(opts.tier) ? opts.tier : null, filter: f, extra });
-+      const drew = m.pool.roll(m.rngMeta, { maxTier: Number.isInteger(opts.maxTier) ? opts.maxTier : 6, tier: Number.isInteger(opts.tier) ? opts.tier : null, filter: f, extra });
+-      return m.pool.roll(m.rngMeta, { maxTier: Number.isInteger(opts.maxTier) ? opts.maxTier : 6, tier: Number.isInteger(opts.tier) ? opts.tier : null, filter: f, extra, ignoreCounts: opts.ignoreCounts === true });
++      const drew = m.pool.roll(m.rngMeta, { maxTier: Number.isInteger(opts.maxTier) ? opts.maxTier : 6, tier: Number.isInteger(opts.tier) ? opts.tier : null, filter: f, extra, ignoreCounts: opts.ignoreCounts === true });
 +      // a per-player shop swap (ps.poolSwap, match/amiya.js) rides EVERY pool draw, not only the shop's: a 特质 / band /
 +      // item / choice that hands this player a random operator must hand the form she actually IS (the 罗德岛 MOD's
 +      // 阿米娅升变 — 术士 → 近卫 → 医疗), never the shop form she left behind. economy.js _rollChessSlot and
@@ -16,7 +16,7 @@
      },
      rollItem: (opts = {}) => m.rollItemId(opts),
      /**
-@@ -593,6 +600,9 @@
+@@ -596,6 +603,9 @@
        shopLevel: ps.shop.level,
        // a shared-pool draw also takes the player's 自选 stock, its bonds read through the player's view (rollChess)
        extra: typeof ps.diyStockEntries === 'function' ? ps.diyStockEntries() : null, chessOf: (id) => gd.chess(id),

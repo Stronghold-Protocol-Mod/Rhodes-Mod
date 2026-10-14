@@ -11,7 +11,7 @@
      battle.on('death', (ctx) => {
        if (ctx.unit !== u || battle.finished) return;
        u.removed = false;
-@@ -1590,6 +1592,151 @@
+@@ -1594,6 +1596,151 @@
  }
  
  // ---------------------------------------------------------------------------------------------------------------
@@ -163,7 +163,7 @@
  // registry
  
  const RAW_KITS = {
-@@ -1615,6 +1762,10 @@
+@@ -1619,6 +1766,10 @@
    [TOKEN_IDS.yanyou]: yanyouKit,
    [TOKEN_IDS.reserveMedic]: reserveMedicKit,
    [TOKEN_IDS.touch]: touchKit,
@@ -174,7 +174,7 @@
  };
  /** tokenId → kit fn; kits built here carry `fromTokens: true` (deploy limits only police those). */
  export const kits = Object.freeze(Object.fromEntries(Object.entries(RAW_KITS).map(([id, f]) => [id, (bb, raw, def) => {
-@@ -1657,7 +1808,7 @@
+@@ -1661,7 +1812,7 @@
   */
  const SKILL_SUMMON_UNCAPPED = new Set([TOKEN_IDS.goldenOath]);
  /** Tactician talent tokens that replace the engine's generic 援军. */

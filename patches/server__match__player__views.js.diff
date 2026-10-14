@@ -10,7 +10,7 @@
        out.push(v);
      }
      for (const b of this.bounties) {
-@@ -115,7 +118,7 @@
+@@ -117,7 +120,7 @@
        ...(bossMate ? { bossMate } : {}),
        stats: {
          dmgDealt: Math.round(this.stats.dmgDealt), kills: this.stats.kills, leaks: this.stats.leaks, gold: this.stats.gold,

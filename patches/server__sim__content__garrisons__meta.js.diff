@@ -11,7 +11,7 @@
  
  import { metaBonds, frontPiece, behindPiece, distinctTiers } from '../support/meta.js';
  
-@@ -186,6 +190,31 @@
+@@ -192,6 +196,31 @@
    },
  };
  

@@ -1,15 +1,17 @@
 --- a/server/match/invariants.js
 +++ b/server/match/invariants.js
-@@ -4,6 +4,8 @@
+@@ -4,7 +4,9 @@
  //
  // collectViolations(m) → string[] (empty when every invariant holds):
- //   pool     0 ≤ left ≤ cap and left + Σ copies held by pieces == cap per base chess; non-pool chess hold 0 copies;
+ //   pool     raw balance ≤ cap and raw balance + Σ copies held by pieces == cap (public availability is clamped at zero) per base chess; non-pool chess hold 0 copies;
+-//            every capped shop item is held by at most its cap (normal occupies 1, upgraded 2; effect-only items have no cap)
++//            every capped shop item is held by at most its cap (normal occupies 1, upgraded 2; effect-only items have no cap);
 +//            a per-player shop swap (ps.poolSwap, the 罗德岛 MOD's 阿米娅升变) routes a form's copies to the base they
 +//            ride, exactly like PlayerState.poolOf (poolBaseOf below) — the ascended 阿米娅 is not a "non-pool chess";
  //            a player's 自选 stock (0.2.0, player/diy.js) the same against its own pieces of each slotted slot — a DIY
  //            piece is always a slotted slot of its owner's, and a DIY shop / reward card one of its stocked slots
  //   economy  funds / pendingFunds non-negative integers, LP finite, shop level in range, prices ≥ 0
-@@ -33,6 +35,16 @@
+@@ -34,6 +36,16 @@
   * @param {{ limit?: number }} [opts]
   * @returns {string[]}
   */
@@ -26,7 +28,7 @@
  export function collectViolations(m, { limit = 25 } = {}) {
    const out = [];
    const fail = (msg) => { if (out.length < limit) out.push(msg); };
-@@ -107,7 +119,8 @@
+@@ -108,7 +120,8 @@
          }
          const maxCopies = rec.isGolden ? gd.goldenCopies : 1;
          if (!Number.isInteger(p.poolCopies) || p.poolCopies < 0 || p.poolCopies > maxCopies) fail(`${id}: ${p.id} holds ${p.poolCopies} copies`);

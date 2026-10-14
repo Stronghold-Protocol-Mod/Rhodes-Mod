@@ -1,14 +1,37 @@
 --- a/server/lobby.js
 +++ b/server/lobby.js
-@@ -104,6 +104,7 @@
+@@ -104,6 +104,8 @@
  import { encode, isDroppable, isErrCode, sendRaw, sendSession } from './net.js';
  import { getData as defaultGetData, lookup } from './data.js';
  import { Match as DefaultMatch } from './match/Match.js';
 +import { modKitted } from './mod/kitted.js';
++import { checkSandbox, EMPTY_SANDBOX } from '../shared/sandbox.js';
  import { KITTED_CHARS } from './sim/content/kits/index.js';
  
  /** Room code alphabet: uppercase letters without I and O (and no digits, so no 0/1). */
-@@ -691,7 +692,8 @@
+@@ -179,6 +181,13 @@
+      * put every human seat before every AI seat (Match opts.aiPicksLast). Kept across the room's matches.
+      */
+     this.aiPicksLast = false;
++    /**
++     * 沙盒 (docs/SANDBOX.md): the host's test settings for the room's NEXT match — a `checkSandbox` result
++     * (shared/sandbox.js), or null for an ordinary run. Set by the loopback-only HTTP route (server/http/sandbox.js),
++     * never by a `room.*` intent; handed to the Match as `opts.sandbox`. Kept across the room's matches until cleared.
++     * @type {object | null}
++     */
++    this.sandbox = null;
+     /** @type {string | null} */
+     this.hostId = null;
+     /** @type {(Seat | null)[]} */
+@@ -229,6 +238,7 @@
+       mode: this.mode,
+       difficulty: this.difficulty,
+       aiPicksLast: this.aiPicksLast,
++      sandbox: this.sandbox ? { ...this.sandbox } : null,
+       inMatch: !!this.match,
+       seats: this.seats.map((s) => (s
+         ? { seat: s.seat, playerId: s.playerId, name: s.name, isBot: s.isBot, ready: s.ready, connected: s.connected && !s.left }
+@@ -691,7 +701,8 @@
     * start.
     */
    diy(session, { picks }) {
@@ -18,7 +41,7 @@
      if (!res || !('ok' in res)) return fail(ERR.BAD_MSG, res && res.detail);
      const kept = freezeDiy(res.picks);
      session.diy = kept;
-@@ -705,7 +707,7 @@
+@@ -705,7 +716,7 @@
  
    /** Extra fields of every `welcome` (net.js): the operators a 自选 slot may field (shared/diy.js `kitted`). */
    welcomeInfo() {
@@ -27,7 +50,16 @@
    }
  
    // ---------------------------------------------------------------------------------------------------
-@@ -1152,4 +1154,22 @@
+@@ -736,6 +747,8 @@
+         mode: room.mode,
+         difficulty: room.difficulty,
+         modeId: modeIdFor(room.mode, room.difficulty),
++        // 沙盒 (docs/SANDBOX.md): the host's test settings, validated by the HTTP route; null = an ordinary run.
++        sandbox: room.sandbox,
+         // 「AI 队友最后选择」 (GitHub #338): fixed for the match
+         aiPicksLast: room.mode !== 'solo' && room.aiPicksLast === true,
+         seats,
+@@ -1152,4 +1165,86 @@
      if (!session || session.roomCode !== room.code) return false;
      return sendSession(session, msg);
    }
@@ -48,5 +80,69 @@
 +      if (sendSession(session, { t: 'mod.state', ...payload })) sent += 1;
 +    }
 +    return sent;
++  }
++
++  // ---- 沙盒 (docs/SANDBOX.md; server/http/sandbox.js) ------------------------------------------------
++
++  /**
++   * Set (or clear) one room's sandbox — the host's test settings for the NEXT match. Called by the loopback-only HTTP
++   * route, never by a `room.*` intent: a sandbox rewrites the match's economy and wave, so it belongs to the machine
++   * running the server (the same rule as the content switch, server/mod/api.js).
++   *
++   * @param {string} code room code
++   * @param {any} raw the request (shared/sandbox.js checkSandbox); null / `{ clear: true }` clears it
++   * @returns {{ ok: true, sandbox: object|null, code: string } | { ok: false, code: string, detail?: string }}
++   */
++  setSandbox(code, raw) {
++    const room = this.getRoom(code);
++    if (!room) return { ok: false, code: 'SANDBOX_ROOM', detail: `no room ${code}` };
++    // 沙盒 · 盟约层数加成 (docs/SANDBOX.md): a running match can still take THIS one field — it is applied live
++    // (MatchIntents.applySandboxBondLayers). Everything else (the economy, the clock, the round count, the wave) is a
++    // property of the match's own construction and stays refused while a match runs.
++    if (room.match) {
++      const live = this._liveSandboxChange(room, raw);
++      if (!live.ok) return live;
++      return { ok: true, sandbox: room.sandbox, code: room.code, live: true };
++    }
++    if (raw == null || raw === '' || (raw && typeof raw === 'object' && raw.clear === true)) {
++      room.sandbox = null;
++      this.broadcastState(room);
++      return { ok: true, sandbox: null, code: room.code };
++    }
++    const checked = checkSandbox(raw, this.safeData());
++    if (!checked.ok) return { ok: false, code: checked.code, detail: checked.detail };
++    // An inert sandbox (nothing overridden) is kept as `null` — the room is exactly an ordinary run.
++    room.sandbox = checked.sandbox.inert ? null : checked.sandbox;
++    this.broadcastState(room);
++    return { ok: true, sandbox: room.sandbox, code: room.code };
++  }
++
++  /**
++   * Apply a sandbox request to a room whose match is already RUNNING. Only 盟约层数加成 may change mid-match (it is a
++   * live layer write, not a construction-time property); any other field — or a clear — is refused with SANDBOX_BUSY,
++   * the same code the pre-match flow used to answer alone.
++   * @param {object} room @param {any} raw
++   * @returns {{ ok: true } | { ok: false, code: string, detail?: string }}
++   */
++  _liveSandboxChange(room, raw) {
++    if (raw == null || raw === '' || (raw && typeof raw === 'object' && raw.clear === true)) {
++      return { ok: false, code: 'SANDBOX_BUSY', detail: 'a match is running; only 盟约层数加成 can change mid-match' };
++    }
++    const keys = raw && typeof raw === 'object' ? Object.keys(raw).filter((k) => k !== 'room') : [];
++    if (!keys.length || keys.some((k) => k !== 'bondLayers')) {
++      return { ok: false, code: 'SANDBOX_BUSY', detail: 'a match is running; only 盟约层数加成 (bondLayers) can change mid-match' };
++    }
++    const checked = checkSandbox({ bondLayers: raw.bondLayers }, this.safeData());
++    if (!checked.ok) return { ok: false, code: checked.code, detail: checked.detail };
++    const gear = checked.sandbox.bondLayers || 0;
++    room.sandbox = room.sandbox ? { ...room.sandbox, bondLayers: gear || null } : { ...EMPTY_SANDBOX, bondLayers: gear || null, inert: false };
++    this.callMatch(room, 'applySandboxBondLayers', gear);
++    return { ok: true };
++  }
++
++  /** The sandbox the loopback client may configure: the room's own, plus the pickers' option lists (server/http/sandbox.js). */
++  sandboxInfo(code) {
++    const room = code ? this.getRoom(code) : null;
++    return { room: room ? room.code : null, sandbox: room && room.sandbox ? { ...room.sandbox } : null };
 +  }
  }

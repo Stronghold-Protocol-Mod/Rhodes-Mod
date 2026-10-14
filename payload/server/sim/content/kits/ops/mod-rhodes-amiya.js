@@ -15,10 +15,9 @@
 //                                            SELECTABLE third skill on the 2本 normal (the builder's `extraSkills`).
 //   天赋 情绪吸收 (elite only)             — +SP per damage instance dealt, more per kill.
 //
-// Simplifications (documented, the same convention as every kit here):
-//   · 精神爆发 "随机攻击范围内的目标" hits the CURRENT main target `times` times (the engine's attack.hits rule)
-//     instead of scattering the hits randomly — the total is identical, the spread is not.
-//   · 奇美拉's "强制退出战场" is a plain retreat (she may be redeployed later), not the AK once-per-deployment lock.
+// Mechanics notes (documented, the same convention as every kit here):
+//   - 精神爆发 selects a fresh random in-range target for each hit; the end-of-skill stun follows the official record.
+//   - 奇美拉's forced retreat is currently represented as a normal retreat, so she can be redeployed later.
 
 import { num, talentBb, skillRec, onHitBy, giveSp } from '../shared/tier1.js';
 
@@ -47,7 +46,14 @@ function amiyaCaster(bb, chess) {
     // the description states (and the reason the AUTO skill is a gamble).
     skchr_amiya_2: () => ({
       kind: 'duration',
-      attack: { hits: Math.max(1, Math.round(num(bb['attack@times'], 1))), atkScale: num(bb['attack@atk_scale'], 1) },
+      attack: {
+        hits: Math.max(1, Math.round(num(bb['attack@times'], 1))),
+        atkScale: num(bb['attack@atk_scale'], 1),
+        hitTargetForHit(battle, unit, _primary, _hitIndex, _info, profile) {
+          const targets = battle.enemiesInKeys(unit.rangeKeys || [], unit, profile);
+          return targets.length ? battle.rng.pick(targets) : null;
+        },
+      },
       onEnd({ battle, unit }) {
         const stun = num(bb.stun, 0);
         if (!(stun > 0)) return;

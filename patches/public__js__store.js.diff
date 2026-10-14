@@ -1,6 +1,6 @@
 --- a/public/js/store.js
 +++ b/public/js/store.js
-@@ -83,6 +83,10 @@
+@@ -83,6 +83,13 @@
    ticker: [],
    emotes: [],
    clock: { offset: 0, rtt: null, synced: false },
@@ -8,6 +8,9 @@
 +  // refreshed by the `mod.state` push. `canToggle` is the server's answer for THIS page (loopback only); `stale`
 +  // turns on when somebody else switched something, because the page's /data/*.json are fetched once per page.
 +  mod: { ready: false, canToggle: false, reason: null, matches: 0, toggles: [], stale: false, busy: false },
++  // 沙盒 (ui/sandboxPanel.js, docs/SANDBOX.md): the test entry — the room's current settings, the option lists of the
++  // pickers and whether THIS page (loopback) may change them. Read from GET /sandbox.
++  sandbox: { ready: false, canSet: false, room: null, config: null, enemies: [], leaders: [], limits: null, busy: false, open: false },
    ui: { pendingJoin: null, restoring: false, buildStale: false },
  });
  

@@ -1,6 +1,6 @@
 --- a/server/match/match/spDraft.js
 +++ b/server/match/match/spDraft.js
-@@ -213,10 +213,12 @@
+@@ -211,10 +211,12 @@
     * list — only chess with a free pool copy (or outside the pool) qualify — else a copy-weighted draw from the shared
     * pool filtered by `tier` / `minTier` / `maxTier` (number or 'shopLevel') / `bond`; `golden: true` yields the elite id.
     * `extra` (the drawing player's 自选 stock, player/diy.js diyStockEntries) joins that shared-pool draw, `chessOf` reads the
@@ -15,7 +15,7 @@
      const pools = this.gd.choices.pools && typeof this.gd.choices.pools === 'object' ? this.gd.choices.pools : {};
      const p = typeof poolId === 'string' && Object.hasOwn(pools, poolId) ? pools[poolId] : null;
      if (!p || typeof p !== 'object') return null;
-@@ -253,6 +255,8 @@
+@@ -251,6 +253,8 @@
      }
      if (!id) return null;
      const golden = !!p.golden;

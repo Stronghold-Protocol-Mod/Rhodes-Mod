@@ -18,7 +18,7 @@
    net.on('room.closed', (msg) => {
      backToLobby();
      const known = Object.hasOwn(CLOSE_REASON, String(msg.reason)) ? CLOSE_REASON[msg.reason] : null;
-@@ -251,7 +255,10 @@
+@@ -255,7 +259,10 @@
      const playerId = typeof msg.playerId === 'string' ? msg.playerId : null;
      // its broadcast priority: the strip plays the highest first (ui/ticker.js enqueueTickerLines)
      const priority = Number.isFinite(msg.priority) ? msg.priority : 0;

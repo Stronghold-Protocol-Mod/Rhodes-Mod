@@ -1,6 +1,14 @@
 --- a/server/match/match/intents.js
 +++ b/server/match/match/intents.js
-@@ -46,6 +46,8 @@
+@@ -6,6 +6,7 @@
+ 
+ import { unitStatsEntry } from '../../../shared/protocol.js';
+ import { PHASE, ERR, EMOTES, EMOTE_COOLDOWN_MS, GEO } from '../../../shared/constants.js';
++import { EMPTY_SANDBOX } from '../../../shared/sandbox.js';
+ import { deriveSeed } from '../../sim/rng.js';
+ import { OK, fail } from './common.js';
+ import { onHumanEmote } from '../botEmotes.js';
+@@ -46,6 +47,8 @@
        case 'g.pause': return this.setPause(ps, !!msg.on);
        // the stats the board's units start their next battle with (the detail card in prep, user playtest #4 item 7)
        case 'g.unitStats': return this.unitStats(ps, msg.seq ?? null);
@@ -9,3 +17,32 @@
        case 'g.leave': this.onLeave(ps.playerId); return OK;
        case 'b.progress': return this._onProgress(ps, msg);
        case 'b.result': return this._onResult(ps, msg);
+@@ -64,6 +67,28 @@
+     return OK;
+   }
+ 
++  /**
++   * 沙盒 · 盟约层数加成, live (docs/SANDBOX.md §盟约层数加成; the 「对局内可以更改」 requirement): set the flat bonus every
++   * bond's layers of every seat carries, at once, mid-match. Called by the lobby when the host POSTs /sandbox for a room
++   * whose match is already running (server/lobby.js setSandbox — a sandbox field a running match cannot honour is still
++   * refused there). `gear` = the absolute bonus (0 / null clears it, the four gears +1/+10/+100/+999). Idempotent: the
++   * same gear a second time moves nothing. The seats' layers are authoritative on the server, so the change reaches
++   * every player (and bot) the next time its boards / bonds / battles are built.
++   * @param {number|null} gear
++   * @returns {{ gear: number, moved: number }} how many bonds moved (across all seats)
++   */
++  applySandboxBondLayers(gear) {
++    const to = Number.isInteger(gear) && gear > 0 ? gear : 0;
++    this.sandbox = this.sandbox ? { ...this.sandbox, bondLayers: to || null } : { ...EMPTY_SANDBOX, bondLayers: to || null, inert: false };
++    this.gd.sandbox = this.sandbox;
++    let moved = 0;
++    for (const ps of this.players.values()) {
++      if (typeof ps.applySandboxBondLayers === 'function') moved += ps.applySandboxBondLayers(to);
++    }
++    if (moved) this.markPublic();
++    return { gear: to, moved };
++  }
++
+   setAutoplay(ps, on) {
+     if (ps.autoplay === on) return OK;
+     ps.autoplay = on;

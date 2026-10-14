@@ -1,12 +1,12 @@
 --- a/server/match/player/acquire.js
 +++ b/server/match/player/acquire.js
-@@ -225,7 +225,14 @@
+@@ -231,7 +231,14 @@
        const fresh = (id) => !list.includes(id);
        for (let i = 0; i < ro.count; i++) {
          let id = null;
--        for (let tt = t; tt >= 1 && !id; tt--) id = this.m.pool.roll(this.m.rngShop, { tier: tt, filter: fresh, extra: this.diyRollEntries() });
+-        for (let tt = t; tt >= 1 && !id; tt--) id = this.m.pool.roll(this.m.rngShop, { tier: tt, filter: fresh, extra: this.diyStockEntries() });
 +        for (let tt = t; tt >= 1 && !id; tt--) {
-+          const drew = this.m.pool.roll(this.m.rngShop, { tier: tt, filter: fresh, extra: this.diyRollEntries() });
++          const drew = this.m.pool.roll(this.m.rngShop, { tier: tt, filter: fresh, extra: this.diyStockEntries() });
 +          // the same per-player shop swap the shop rolls apply (economy.js _rollChessSlot): an ascended form is
 +          // offered in the caster's stead; a swap collision (the form already offered) leaves the slot to a lower
 +          // tier's draw, like a dupe would

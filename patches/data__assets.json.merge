@@ -3,361 +3,11 @@
   "layer": "M",
   "requires": {
     "version": 1,
-    "hash": "cf275d509d29"
+    "hash": "2424fdc0a6b5"
   },
   "note": "装机时按此结构差量合入；hash 由合并后的 body 重算（tools/assets/manifest.mjs contentHash）",
   "setValues": {
     "chars": {
-      "char_1037_amiya3": {
-        "spine": {
-          "front": {
-            "skel": "/assets/spine/op/char_1037_amiya3/front/char_1037_amiya3.skel",
-            "atlas": "/assets/spine/op/char_1037_amiya3/front/char_1037_amiya3.atlas",
-            "textures": [
-              "/assets/spine/op/char_1037_amiya3/front/char_1037_amiya3.png"
-            ],
-            "pma": false,
-            "anims": {
-              "idle": "Idle",
-              "deploy": "Start",
-              "attack": {
-                "begin": null,
-                "loop": "Attack",
-                "end": null
-              },
-              "attackDown": null,
-              "skill": {
-                "begin": "Skill_1_Begin",
-                "loop": "Skill_1_Loop",
-                "end": "Skill_1_End",
-                "index": 0,
-                "idle": null
-              },
-              "die": "Die",
-              "move": null,
-              "stun": null,
-              "skills": {
-                "0": {
-                  "begin": "Skill_1_Begin",
-                  "loop": "Skill_1_Loop",
-                  "end": "Skill_1_End",
-                  "index": 0,
-                  "idle": null
-                },
-                "1": {
-                  "begin": "Skill_2_Begin",
-                  "loop": "Skill_2_Loop",
-                  "end": "Skill_2_End",
-                  "index": 1,
-                  "idle": null
-                },
-                "2": {
-                  "begin": null,
-                  "loop": "Attack",
-                  "end": null,
-                  "via": "attack",
-                  "index": 2,
-                  "idle": null
-                }
-              }
-            },
-            "animations": {
-              "Attack": 1.6,
-              "Default": 0,
-              "Die": 0.833,
-              "Idle": 4,
-              "Skill_1_Attack": 1,
-              "Skill_1_Begin": 0.167,
-              "Skill_1_End": 0.167,
-              "Skill_1_Loop": 4,
-              "Skill_2_Attack": 1.6,
-              "Skill_2_Begin": 1.833,
-              "Skill_2_End": 0.167,
-              "Skill_2_Loop": 6.133,
-              "Start": 1
-            },
-            "events": [
-              "OnAttack",
-              "OnStart"
-            ],
-            "hits": {
-              "Attack": [
-                0.767
-              ],
-              "Skill_1_Attack": [
-                0.433
-              ],
-              "Skill_2_Attack": [
-                0.633
-              ],
-              "Skill_2_Begin": [
-                1.1
-              ]
-            },
-            "bounds": {
-              "x": -163.548,
-              "y": -1.805,
-              "width": 946.49,
-              "height": 686.421
-            }
-          },
-          "back": {
-            "skel": "/assets/spine/op/char_1037_amiya3/back/char_1037_amiya3.skel",
-            "atlas": "/assets/spine/op/char_1037_amiya3/back/char_1037_amiya3.atlas",
-            "textures": [
-              "/assets/spine/op/char_1037_amiya3/back/char_1037_amiya3.png"
-            ],
-            "pma": false,
-            "anims": {
-              "idle": "Idle",
-              "deploy": "Start",
-              "attack": {
-                "begin": null,
-                "loop": "Attack",
-                "end": null
-              },
-              "attackDown": null,
-              "skill": {
-                "begin": "Skill_1_Begin",
-                "loop": "Skill_1_Loop",
-                "end": "Skill_1_End",
-                "index": 0,
-                "idle": null
-              },
-              "die": null,
-              "move": null,
-              "stun": null,
-              "skills": {
-                "0": {
-                  "begin": "Skill_1_Begin",
-                  "loop": "Skill_1_Loop",
-                  "end": "Skill_1_End",
-                  "index": 0,
-                  "idle": null
-                },
-                "1": {
-                  "begin": "Skill_2_Begin",
-                  "loop": "Skill_2_Loop",
-                  "end": "Skill_2_End",
-                  "index": 1,
-                  "idle": null
-                },
-                "2": {
-                  "begin": null,
-                  "loop": "Attack",
-                  "end": null,
-                  "via": "attack",
-                  "index": 2,
-                  "idle": null
-                }
-              }
-            },
-            "animations": {
-              "Attack": 1.6,
-              "Default": 0,
-              "Idle": 4,
-              "Skill_1_Attack": 1,
-              "Skill_1_Begin": 0.233,
-              "Skill_1_End": 0.167,
-              "Skill_1_Loop": 4,
-              "Skill_2_Attack": 1.6,
-              "Skill_2_Begin": 1.833,
-              "Skill_2_End": 0.167,
-              "Skill_2_Loop": 6.133,
-              "Start": 1
-            },
-            "events": [
-              "OnAttack",
-              "OnStart"
-            ],
-            "hits": {
-              "Attack": [
-                0.767
-              ],
-              "Skill_1_Attack": [
-                0.433
-              ],
-              "Skill_2_Attack": [
-                0.633
-              ],
-              "Skill_2_Begin": [
-                1.1
-              ]
-            },
-            "bounds": {
-              "x": -163.548,
-              "y": -1.805,
-              "width": 946.49,
-              "height": 686.421
-            }
-          }
-        },
-        "avatarE2": "/assets/char/avatar/char_1037_amiya3_2.png",
-        "portraitE2": "/assets/char/portrait/char_1037_amiya3_2.png",
-        "avatar": "/assets/char/avatar/char_1037_amiya3_2.png",
-        "portrait": "/assets/char/portrait/char_1037_amiya3_2.png"
-      },
-      "char_230_savage": {
-        "spine": {
-          "front": {
-            "skel": "/assets/spine/op/char_230_savage/front/char_230_savage.skel",
-            "atlas": "/assets/spine/op/char_230_savage/front/char_230_savage.atlas",
-            "textures": [
-              "/assets/spine/op/char_230_savage/front/char_230_savage.png"
-            ],
-            "pma": false,
-            "anims": {
-              "idle": "Idle",
-              "deploy": "Start",
-              "attack": {
-                "begin": null,
-                "loop": "Attack",
-                "end": null
-              },
-              "attackDown": null,
-              "skill": {
-                "begin": null,
-                "loop": "Skill",
-                "end": null,
-                "index": 0,
-                "idle": null
-              },
-              "die": "Die",
-              "move": null,
-              "stun": null,
-              "skills": {
-                "0": {
-                  "begin": null,
-                  "loop": "Skill",
-                  "end": null,
-                  "index": 0,
-                  "idle": null
-                },
-                "1": {
-                  "begin": null,
-                  "loop": "Skill",
-                  "end": null,
-                  "index": 1,
-                  "idle": null
-                },
-                "2": {
-                  "begin": null,
-                  "loop": "Skill",
-                  "end": null,
-                  "index": 2,
-                  "idle": null
-                }
-              }
-            },
-            "animations": {
-              "Attack": 1.167,
-              "Default": 0,
-              "Die": 1,
-              "Idle": 2,
-              "Skill": 1.167,
-              "Start": 1
-            },
-            "events": [
-              "OnAttack",
-              "OnStart"
-            ],
-            "hits": {
-              "Attack": [
-                0.4
-              ],
-              "Skill": [
-                0.6
-              ]
-            },
-            "bounds": {
-              "x": -152.247,
-              "y": -26.48,
-              "width": 417.266,
-              "height": 480.525
-            }
-          },
-          "back": {
-            "skel": "/assets/spine/op/char_230_savage/back/char_230_savage.skel",
-            "atlas": "/assets/spine/op/char_230_savage/back/char_230_savage.atlas",
-            "textures": [
-              "/assets/spine/op/char_230_savage/back/char_230_savage.png"
-            ],
-            "pma": false,
-            "anims": {
-              "idle": "Idle",
-              "deploy": "Start",
-              "attack": {
-                "begin": null,
-                "loop": "Attack",
-                "end": null
-              },
-              "attackDown": null,
-              "skill": {
-                "begin": null,
-                "loop": "Skill",
-                "end": null,
-                "index": 0,
-                "idle": null
-              },
-              "die": null,
-              "move": null,
-              "stun": null,
-              "skills": {
-                "0": {
-                  "begin": null,
-                  "loop": "Skill",
-                  "end": null,
-                  "index": 0,
-                  "idle": null
-                },
-                "1": {
-                  "begin": null,
-                  "loop": "Skill",
-                  "end": null,
-                  "index": 1,
-                  "idle": null
-                },
-                "2": {
-                  "begin": null,
-                  "loop": "Skill",
-                  "end": null,
-                  "index": 2,
-                  "idle": null
-                }
-              }
-            },
-            "animations": {
-              "Attack": 1.167,
-              "Default": 0,
-              "Idle": 1,
-              "Skill": 1.167,
-              "Start": 1
-            },
-            "events": [
-              "OnAttack",
-              "OnStart"
-            ],
-            "hits": {
-              "Attack": [
-                0.4
-              ],
-              "Skill": [
-                0.6
-              ]
-            },
-            "bounds": {
-              "x": -156.763,
-              "y": -13.942,
-              "width": 421.613,
-              "height": 468.958
-            }
-          }
-        },
-        "avatar": "/assets/char/avatar/char_230_savage.png",
-        "avatarE2": "/assets/char/avatar/char_230_savage_2.png",
-        "portrait": "/assets/char/portrait/char_230_savage_1.png",
-        "portraitE2": "/assets/char/portrait/char_230_savage_2.png"
-      },
       "char_002_amiya": {
         "spine": {
           "front": {
@@ -753,12 +403,411 @@
         "avatarE2": "/assets/char/avatar/char_1001_amiya2_2.png",
         "portrait": "/assets/char/portrait/char_1001_amiya2_1.png",
         "portraitE2": "/assets/char/portrait/char_1001_amiya2_2.png"
+      },
+      "char_1037_amiya3": {
+        "spine": {
+          "front": {
+            "skel": "/assets/spine/op/char_1037_amiya3/front/char_1037_amiya3.skel",
+            "atlas": "/assets/spine/op/char_1037_amiya3/front/char_1037_amiya3.atlas",
+            "textures": [
+              "/assets/spine/op/char_1037_amiya3/front/char_1037_amiya3.png"
+            ],
+            "pma": false,
+            "anims": {
+              "idle": "Idle",
+              "deploy": "Start",
+              "attack": {
+                "begin": null,
+                "loop": "Attack",
+                "end": null
+              },
+              "attackDown": null,
+              "skill": {
+                "begin": "Skill_1_Begin",
+                "loop": "Skill_1_Loop",
+                "end": "Skill_1_End",
+                "index": 0,
+                "idle": null
+              },
+              "die": "Die",
+              "move": null,
+              "stun": null,
+              "skills": {
+                "0": {
+                  "begin": "Skill_1_Begin",
+                  "loop": "Skill_1_Loop",
+                  "end": "Skill_1_End",
+                  "index": 0,
+                  "idle": null
+                },
+                "1": {
+                  "begin": "Skill_2_Begin",
+                  "loop": "Skill_2_Loop",
+                  "end": "Skill_2_End",
+                  "index": 1,
+                  "idle": null
+                },
+                "2": {
+                  "begin": null,
+                  "loop": "Attack",
+                  "end": null,
+                  "via": "attack",
+                  "index": 2,
+                  "idle": null
+                }
+              }
+            },
+            "animations": {
+              "Attack": 1.6,
+              "Default": 0,
+              "Die": 0.833,
+              "Idle": 4,
+              "Skill_1_Attack": 1,
+              "Skill_1_Begin": 0.167,
+              "Skill_1_End": 0.167,
+              "Skill_1_Loop": 4,
+              "Skill_2_Attack": 1.6,
+              "Skill_2_Begin": 1.833,
+              "Skill_2_End": 0.167,
+              "Skill_2_Loop": 6.133,
+              "Start": 1
+            },
+            "events": [
+              "OnAttack",
+              "OnStart"
+            ],
+            "hits": {
+              "Attack": [
+                0.767
+              ],
+              "Skill_1_Attack": [
+                0.433
+              ],
+              "Skill_2_Attack": [
+                0.633
+              ],
+              "Skill_2_Begin": [
+                1.1
+              ]
+            },
+            "bounds": {
+              "x": -163.548,
+              "y": -1.805,
+              "width": 946.49,
+              "height": 686.421
+            }
+          },
+          "back": {
+            "skel": "/assets/spine/op/char_1037_amiya3/back/char_1037_amiya3.skel",
+            "atlas": "/assets/spine/op/char_1037_amiya3/back/char_1037_amiya3.atlas",
+            "textures": [
+              "/assets/spine/op/char_1037_amiya3/back/char_1037_amiya3.png"
+            ],
+            "pma": false,
+            "anims": {
+              "idle": "Idle",
+              "deploy": "Start",
+              "attack": {
+                "begin": null,
+                "loop": "Attack",
+                "end": null
+              },
+              "attackDown": null,
+              "skill": {
+                "begin": "Skill_1_Begin",
+                "loop": "Skill_1_Loop",
+                "end": "Skill_1_End",
+                "index": 0,
+                "idle": null
+              },
+              "die": null,
+              "move": null,
+              "stun": null,
+              "skills": {
+                "0": {
+                  "begin": "Skill_1_Begin",
+                  "loop": "Skill_1_Loop",
+                  "end": "Skill_1_End",
+                  "index": 0,
+                  "idle": null
+                },
+                "1": {
+                  "begin": "Skill_2_Begin",
+                  "loop": "Skill_2_Loop",
+                  "end": "Skill_2_End",
+                  "index": 1,
+                  "idle": null
+                },
+                "2": {
+                  "begin": null,
+                  "loop": "Attack",
+                  "end": null,
+                  "via": "attack",
+                  "index": 2,
+                  "idle": null
+                }
+              }
+            },
+            "animations": {
+              "Attack": 1.6,
+              "Default": 0,
+              "Idle": 4,
+              "Skill_1_Attack": 1,
+              "Skill_1_Begin": 0.233,
+              "Skill_1_End": 0.167,
+              "Skill_1_Loop": 4,
+              "Skill_2_Attack": 1.6,
+              "Skill_2_Begin": 1.833,
+              "Skill_2_End": 0.167,
+              "Skill_2_Loop": 6.133,
+              "Start": 1
+            },
+            "events": [
+              "OnAttack",
+              "OnStart"
+            ],
+            "hits": {
+              "Attack": [
+                0.767
+              ],
+              "Skill_1_Attack": [
+                0.433
+              ],
+              "Skill_2_Attack": [
+                0.633
+              ],
+              "Skill_2_Begin": [
+                1.1
+              ]
+            },
+            "bounds": {
+              "x": -163.548,
+              "y": -1.805,
+              "width": 946.49,
+              "height": 686.421
+            }
+          }
+        },
+        "avatarE2": "/assets/char/avatar/char_1037_amiya3_2.png",
+        "portraitE2": "/assets/char/portrait/char_1037_amiya3_2.png",
+        "avatar": "/assets/char/avatar/char_1037_amiya3_2.png",
+        "portrait": "/assets/char/portrait/char_1037_amiya3_2.png"
+      },
+      "char_230_savage": {
+        "spine": {
+          "front": {
+            "skel": "/assets/spine/op/char_230_savage/front/char_230_savage.skel",
+            "atlas": "/assets/spine/op/char_230_savage/front/char_230_savage.atlas",
+            "textures": [
+              "/assets/spine/op/char_230_savage/front/char_230_savage.png"
+            ],
+            "pma": false,
+            "anims": {
+              "idle": "Idle",
+              "deploy": "Start",
+              "attack": {
+                "begin": null,
+                "loop": "Attack",
+                "end": null
+              },
+              "attackDown": null,
+              "skill": {
+                "begin": null,
+                "loop": "Skill",
+                "end": null,
+                "index": 0,
+                "idle": null
+              },
+              "die": "Die",
+              "move": null,
+              "stun": null,
+              "skills": {
+                "0": {
+                  "begin": null,
+                  "loop": "Skill",
+                  "end": null,
+                  "index": 0,
+                  "idle": null
+                },
+                "1": {
+                  "begin": null,
+                  "loop": "Skill",
+                  "end": null,
+                  "index": 1,
+                  "idle": null
+                },
+                "2": {
+                  "begin": null,
+                  "loop": "Skill",
+                  "end": null,
+                  "index": 2,
+                  "idle": null
+                }
+              }
+            },
+            "animations": {
+              "Attack": 1.167,
+              "Default": 0,
+              "Die": 1,
+              "Idle": 2,
+              "Skill": 1.167,
+              "Start": 1
+            },
+            "events": [
+              "OnAttack",
+              "OnStart"
+            ],
+            "hits": {
+              "Attack": [
+                0.4
+              ],
+              "Skill": [
+                0.6
+              ]
+            },
+            "bounds": {
+              "x": -152.247,
+              "y": -26.48,
+              "width": 417.266,
+              "height": 480.525
+            }
+          },
+          "back": {
+            "skel": "/assets/spine/op/char_230_savage/back/char_230_savage.skel",
+            "atlas": "/assets/spine/op/char_230_savage/back/char_230_savage.atlas",
+            "textures": [
+              "/assets/spine/op/char_230_savage/back/char_230_savage.png"
+            ],
+            "pma": false,
+            "anims": {
+              "idle": "Idle",
+              "deploy": "Start",
+              "attack": {
+                "begin": null,
+                "loop": "Attack",
+                "end": null
+              },
+              "attackDown": null,
+              "skill": {
+                "begin": null,
+                "loop": "Skill",
+                "end": null,
+                "index": 0,
+                "idle": null
+              },
+              "die": null,
+              "move": null,
+              "stun": null,
+              "skills": {
+                "0": {
+                  "begin": null,
+                  "loop": "Skill",
+                  "end": null,
+                  "index": 0,
+                  "idle": null
+                },
+                "1": {
+                  "begin": null,
+                  "loop": "Skill",
+                  "end": null,
+                  "index": 1,
+                  "idle": null
+                },
+                "2": {
+                  "begin": null,
+                  "loop": "Skill",
+                  "end": null,
+                  "index": 2,
+                  "idle": null
+                }
+              }
+            },
+            "animations": {
+              "Attack": 1.167,
+              "Default": 0,
+              "Idle": 1,
+              "Skill": 1.167,
+              "Start": 1
+            },
+            "events": [
+              "OnAttack",
+              "OnStart"
+            ],
+            "hits": {
+              "Attack": [
+                0.4
+              ],
+              "Skill": [
+                0.6
+              ]
+            },
+            "bounds": {
+              "x": -156.763,
+              "y": -13.942,
+              "width": 421.613,
+              "height": 468.958
+            }
+          }
+        },
+        "avatar": "/assets/char/avatar/char_230_savage.png",
+        "avatarE2": "/assets/char/avatar/char_230_savage_2.png",
+        "portrait": "/assets/char/portrait/char_230_savage_1.png",
+        "portraitE2": "/assets/char/portrait/char_230_savage_2.png"
       }
     },
     "tokens": {
       "token_10050_monstr_prosts": {
-        "owner": "char_4179_monstr",
         "avatar": "/assets/token/avatar/token_10050_monstr_prosts.png",
+        "spineLocal": {
+          "group": "spine/token/token_10050_monstr_prosts",
+          "skel": "token_10050_monstr_prosts.skel",
+          "atlas": "token_10050_monstr_prosts.atlas",
+          "textures": [
+            "token_10050_monstr_prosts.png"
+          ],
+          "pma": true,
+          "anims": {
+            "idle": "Idle",
+            "deploy": "Start",
+            "attack": {
+              "begin": null,
+              "loop": "Attack",
+              "end": null
+            },
+            "attackDown": null,
+            "skill": {
+              "begin": null,
+              "loop": "Attack",
+              "end": null,
+              "via": "attack",
+              "index": 0,
+              "idle": null
+            },
+            "die": "Die",
+            "move": null,
+            "stun": null
+          },
+          "animations": {
+            "Attack": 1.333,
+            "Default": 0,
+            "Die": 1,
+            "Idle": 2,
+            "Skill_3": 0,
+            "Skill_3_Begin": 0.667,
+            "Start": 1
+          },
+          "events": [
+            "OnAttack",
+            "OnStart"
+          ],
+          "hits": {
+            "Attack": [
+              0.033
+            ]
+          },
+          "bounds": null
+        },
+        "owner": "char_4179_monstr",
         "spineVariant": "token_10050_monstr_prosts_boc_11",
         "spine": {
           "skel": "/assets/spine/token/token_10050_monstr_prosts/token_10050_monstr_prosts_boc_11.skel",
@@ -835,14 +884,101 @@
         }
       },
       "token_10066_closur_ourbase": {
-        "owner": "char_4228_closur",
         "avatar": "/assets/token/avatar/token_10066_closur_ourbase.png",
-        "spine": null
+        "spineLocal": {
+          "group": "spine/token/token_10066_closur_ourbase",
+          "skel": "token_10066_closur_ourbase.skel",
+          "atlas": "token_10066_closur_ourbase.atlas",
+          "textures": [
+            "token_10066_closur_ourbase.png"
+          ],
+          "pma": true,
+          "anims": {
+            "idle": "Idle",
+            "deploy": "Start",
+            "attack": {
+              "begin": null,
+              "loop": "Idle",
+              "end": null,
+              "via": "idle"
+            },
+            "attackDown": null,
+            "skill": {
+              "begin": null,
+              "loop": "Idle",
+              "end": null,
+              "via": "attack",
+              "index": 0,
+              "idle": null
+            },
+            "die": "Die",
+            "move": null,
+            "stun": null
+          },
+          "animations": {
+            "Default": 0,
+            "Die": 1,
+            "Idle": 1.333,
+            "Start": 1
+          },
+          "events": [
+            "OnStart"
+          ],
+          "hits": {},
+          "bounds": null
+        },
+        "owner": "char_4228_closur"
       },
       "token_10068_kalts2_mtship": {
-        "owner": "char_1052_kalts2",
         "avatar": "/assets/token/avatar/token_10068_kalts2_mtship.png",
-        "spine": null
+        "spineLocal": {
+          "group": "spine/token/token_10068_kalts2_mtship",
+          "skel": "token_10068_kalts2_mtship.skel",
+          "atlas": "token_10068_kalts2_mtship.atlas",
+          "textures": [
+            "token_10068_kalts2_mtship.png"
+          ],
+          "pma": true,
+          "anims": {
+            "idle": "Default",
+            "deploy": "Default",
+            "attack": {
+              "begin": null,
+              "loop": "Default",
+              "end": null,
+              "via": "idle"
+            },
+            "attackDown": null,
+            "skill": {
+              "begin": null,
+              "loop": "Default",
+              "end": null,
+              "via": "attack",
+              "index": 0,
+              "idle": null
+            },
+            "die": null,
+            "move": null,
+            "stun": null
+          },
+          "animations": {
+            "Default": 0,
+            "Die": 1,
+            "Idle": 1,
+            "Start": 1
+          },
+          "events": [
+            "OnStart"
+          ],
+          "hits": {},
+          "bounds": {
+            "x": -218.217,
+            "y": -160.033,
+            "width": 398,
+            "height": 410
+          }
+        },
+        "owner": "char_1052_kalts2"
       }
     },
     "bonds": {
@@ -853,23 +989,22 @@
       "trap_1131_acarm131": "/assets/item/trap_1131_acarm131.png"
     },
     "skills": {
-      "skchr_amiya3_1": "/assets/skill/skchr_amiya3_1.png",
-      "skchr_amiya3_2": "/assets/skill/skchr_amiya3_2.png",
-      "skchr_savage_2": "/assets/skill/skchr_savage_2.png",
       "skchr_amiya_2": "/assets/skill/skchr_amiya_2.png",
       "skchr_amiya_3": "/assets/skill/skchr_amiya_3.png",
       "skchr_amiya2_1": "/assets/skill/skchr_amiya2_1.png",
-      "skchr_amiya2_2": "/assets/skill/skchr_amiya2_2.png"
+      "skchr_amiya2_2": "/assets/skill/skchr_amiya2_2.png",
+      "skchr_amiya3_1": "/assets/skill/skchr_amiya3_1.png",
+      "skchr_amiya3_2": "/assets/skill/skchr_amiya3_2.png",
+      "skchr_savage_2": "/assets/skill/skchr_savage_2.png"
     },
     "skillsById": {
-      "skchr_amiya3_1": "skchr_amiya3_1",
-      "skchr_amiya3_2": "skchr_amiya3_2",
-      "skchr_savage_1": "skcom_powerstrike[2]",
-      "skchr_savage_2": "skchr_savage_2",
       "skchr_amiya_2": "skchr_amiya_2",
       "skchr_amiya_3": "skchr_amiya_3",
       "skchr_amiya2_1": "skchr_amiya2_1",
-      "skchr_amiya2_2": "skchr_amiya2_2"
+      "skchr_amiya2_2": "skchr_amiya2_2",
+      "skchr_amiya3_1": "skchr_amiya3_1",
+      "skchr_amiya3_2": "skchr_amiya3_2",
+      "skchr_savage_2": "skchr_savage_2"
     }
   },
   "remove": {
@@ -886,7 +1021,7 @@
   },
   "statsDelta": {
     "files": 7,
-    "bytes": 95771,
+    "bytes": 136104,
     "chars": 4,
     "charsWithBack": 4,
     "tokensWithSpine": 1,
